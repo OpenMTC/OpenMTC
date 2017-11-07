@@ -29,7 +29,7 @@ For the following, it is expected that the OpenMTC code repository is
 prepared in a directory named:
 
 ```
-openmtc-open-source.git
+OpenMTC
 ```
 
 OpenMTC container images will be created through a hiearchy of
@@ -41,7 +41,7 @@ Docker repository.
 **Be sure to have installed Docker.io in version 1.6.2 at minimum.**
 
 ```
-cd openmtc-open-source.git
+cd OpenMTC
 ./create-binary-docker sdk
 ./create-binary-docker gateway
 ```
@@ -58,7 +58,7 @@ additional parameter needs to be provided to the
 `create-binary-docker` script.
 
 ```
-cd openmtc-open-source.git
+cd OpenMTC
 ./create-binary-docker --arch arm sdk
 ./create-binary-docker --arch arm gateway
 ```

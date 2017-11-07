@@ -8,12 +8,12 @@ In this short tutorial you will:
 
 Clone the OpenMTC repository
 ```sh
-git clone https://github.com/OpenMTC/OpenMTC openmtc-open-source.git
+git clone https://github.com/OpenMTC/OpenMTC OpenMTC
 ```
 
 All following commands should be executed from within the repo folder
 ```sh
-cd openmtc-open-source.git
+cd OpenMTC
 ```
 
 The next steps need Docker to be installed on your system. If you need help for
