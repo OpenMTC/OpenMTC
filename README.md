@@ -1,6 +1,6 @@
-<p align="center">
+<p align="left">
   <a href="http://www.openmtc.org/">
-    <img alt="OpenMTC" src="https://gitlab.fokus.fraunhofer.de/uploads/project/avatar/2903/openmtc-logo.png" width="100"/>
+    <img src="http://www.openmtc.org/assets/img/OpenMTC_Logo_Orange.svg" width="400"/>
   </a>
 </p>
 
