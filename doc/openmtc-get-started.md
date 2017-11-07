@@ -8,7 +8,7 @@ In this short tutorial you will:
 
 Clone the OpenMTC repository
 ```sh
-git clone https://gitlab.fokus.fraunhofer.de/OpenMTC/openmtc-open-source openmtc-open-source.git
+git clone https://github.com/OpenMTC/OpenMTC openmtc-open-source.git
 ```
 
 All following commands should be executed from within the repo folder
