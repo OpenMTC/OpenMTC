@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# make it possible to specify other signal values, defaults to kill
+KILL_SIGNAL=${1:--9}
+
+pkill ${KILL_SIGNAL} -f gateway_main.py

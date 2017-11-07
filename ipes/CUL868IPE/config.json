@@ -1,0 +1,33 @@
+{
+    "name": "CUL868IPE",
+    "ep": "http://localhost:8000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:28728"
+    ],
+    "originator_pre": "//openmtc.org/mn-cse-1",
+    "ssl_certs": {
+        "cert_file": null,
+        "key_file": null,
+        "ca_certs": null
+    },
+    "logging": {
+        "level": "ERROR",
+        "file": null
+    },
+    "sim": true,
+    "sim_period": 3,
+    "cul_device": "/dev/ttyACM0",
+    "device_mappings": {
+        "ZBS12345678": "Fenster",
+        "ZBS12341234": "Dach",
+        "FS20_ST3_16108_1": "Wohnzimmer"
+    },
+    "devices": [
+        "s300th:1",
+        "fs20_motion:21111111-1321",
+        "fs20_brightness:21111111-3322",
+        "fs20:16108-1",
+        "fs20:16108-0"
+    ]
+}

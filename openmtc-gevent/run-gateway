@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd $(dirname ${0})
+
+. ./prep-env.sh
+
+exec python src/openmtc_gevent/gateway_main.py -f config-gateway.json "$@"

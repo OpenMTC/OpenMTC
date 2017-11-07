@@ -1,0 +1,418 @@
+#!/usr/bin/env bash
+
+base_path=$(cd $(dirname "${0}"); pwd)
+
+prog_name="create-binary-docker"
+prog_version="0.1"
+version_str="${prog_name} v${prog_version}"
+usage_str="${prog_name} [OPTS] <module_name>
+  OPTS:
+    -a|--arch <ARCH>           Choose architecture: amd64|arm
+    -p|--prefix <Name Prefix>  Choose Docker image name prefix
+    -e|--export                Export the Docker image to a file, after build
+
+    -h|--help                  Show this help
+    -v|--version               Show version information
+
+  module_name:
+    gateway | backend
+"
+
+version () {
+    echo "${version_str}"
+}
+
+usage () {
+    echo "Usage: $usage_str"
+}
+
+separator_line () {
+counter=${1-80}
+printf '%'${counter}'s\n' | tr ' ' '#'
+}
+
+#
+# Parsing commandline options and arguments using "getopt"
+#
+OPTS=$(getopt -o 'a:ehp:v' --long 'arch:,export,help,prefix:,version' -n "${prog_name}" -- "$@")
+if [ 0 -ne $? ]; then
+    echo 'Exiting' >&2
+    exit 1
+fi
+eval set -- "$OPTS"
+unset OPTS
+
+ARCH_OPT=''
+PREFIX_OPT=''
+EXPORT_OPT=''
+MODULE_NAME=''
+
+while true; do
+    case "$1" in
+        '-a' | '--arch')
+            ARCH_OPT="$2"
+            shift 2
+            continue
+            ;;
+
+        '-e' | '--export')
+            EXPORT_OPT=true
+            shift 1
+            continue
+            ;;
+
+        '-h' | '--help')
+            usage
+            exit 0
+            ;;
+
+        '-p' | '--prefix')
+            PREFIX_OPT="$2"
+            shift 2
+            continue
+            ;;
+
+        '-v' | '--version')
+            version
+            shift 1
+            exit 0
+            ;;
+
+        '--') # Argument handling
+            shift # Remove '--'
+            if [ $# -ne 1 ]; then
+                echo "Error: Exactly one module name needs to be provided" >&2
+                usage
+                exit 1
+            fi
+            MODULE_NAME="$1"
+            break
+            ;;
+        *)
+            echo "Error: Internal problem!"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+# Set architecture
+case ${ARCH_OPT} in
+    amd64)
+        machine="amd64"
+        arch="x86_64"
+        ;;
+
+    arm)
+        machine="arm"
+        arch="armv7l"
+        if [ $(uname -m) == "x86_64" ];then
+            printf "check qemu"
+            qemu_bin=$(which qemu-arm-static)
+            if [ -z "$qemu_bin" ];then
+                printf "Package 'qemu-user-static' not found"
+                printf "Script is exiting now.\n"
+                exit 1
+            fi
+        fi
+        ;;
+
+    '')
+        case $(uname -m) in
+            x86_64)
+                machine="amd64"
+                arch="x86_64"
+                ;;
+            armv6l|armv7l)
+                machine="arm"
+                arch="armv7l"
+                ;;
+            *)
+                printf "Platform %s is not supported!\n" $(uname -m)
+                printf "Script is exiting now.\n"
+                exit 1
+                ;;
+        esac
+        ;;
+
+    *)
+        echo "Error: Unknown architecture ${ARCH_OPT}" >&2
+        usage
+        exit 1
+        ;;
+
+esac
+
+# get docker image to build
+case ${MODULE_NAME} in
+    backend|be)
+        name="backend"
+        setup_file="setup-gevent-all.py"
+        binary_prefix="openmtc-all"
+        ;;
+    gateway|gw)
+        name="gateway"
+        setup_file="setup-gevent-all.py"
+        binary_prefix="openmtc-all"
+        ;;
+    help)
+        usage
+        exit 0
+        ;;
+    *) # other images will be detected by scanning setup files
+        name="$1"
+        setup_file="setup-${name}.py"
+        binary_prefix="openmtc-${name}"
+        ;;
+esac
+
+# Use export image, if set
+export_image=${EXPORT_OPT:-false}
+
+#
+# docker variables
+#
+docker_prefix_default="openmtc/"
+if [ -n "${PREFIX_OPT}" ]; then
+    docker_prefix="${PREFIX_OPT%%/}/"
+else
+    docker_prefix=${docker_prefix_default}
+fi
+
+# get setup file and set working dir
+find_result=($(find ${base_path} -iname "${setup_file}"))
+
+if [ ${#find_result[*]} -eq 0 ]; then
+    echo "Setup file ${setup_file} not existing. Exiting Now!."
+    exit 1
+fi
+
+if [ ${#find_result[*]} -gt 1 ]; then
+    echo "Too many setup files matching the name. Exiting Now!."
+    exit 1
+fi
+
+working_dir=$(dirname ${find_result[0]})
+
+# docker variables
+docker_path="${working_dir}/docker"
+docker_tmp="${docker_path}/tmp"
+
+# base image
+base_docker_file="${docker_path}/base-${machine}"
+base_docker_name="${docker_prefix}base-${machine}"
+
+# builder image
+build_docker_file="${docker_path}/builder-${machine}"
+build_docker_name="${docker_prefix}builder-${machine}"
+build_docker_work_dir="/usr/local/src/openmtc-python/"
+build_container_name="build-container"
+
+# docker image
+target_docker_name="${docker_prefix}${name}-${machine}"
+target_docker_file="${docker_path}/${name}-${machine}"
+target_docker_binary="${docker_tmp}/openmtc-${name}.tar.gz"
+
+# export image
+docker_dist="${base_path}/dist/docker"
+
+##############################################################################
+# set docker command
+# only sudo if not root and not in docker group
+if [ $(id -u) -eq 0 ] || id -nG | grep -qw "docker"; then
+    docker_cmd=$(which docker)
+else
+    docker_cmd="sudo "$(which docker)
+fi
+
+##############################################################################
+# trap and cleanup
+cleanup () {
+separator_line
+printf "### Cleaning..."
+rm -f "${target_docker_binary}"
+rm -f "${docker_tmp}/${name}-dependencies.txt"
+${docker_cmd} rm -f ${build_container_name} &> /dev/null
+printf "done\n"
+}
+
+trap cleanup SIGINT SIGTERM
+
+##############################################################################
+# check if possible
+target_setup_file="${working_dir}/${setup_file}"
+if ! ([ -f "${target_setup_file}" ] && [ -f "${target_docker_file}" ]); then
+    if ! [ -f "${target_setup_file}" ]; then
+        printf "${target_setup_file} not existing\n"
+    fi
+    if ! [ -f "${target_docker_file}" ]; then
+        printf "${target_docker_file} not existing\n"
+    fi
+    printf "Script is exiting now.\n"
+    cleanup
+    exit 1
+fi
+
+##############################################################################
+# Use this script to build sdk package before if necessary
+if [ "${name}" != "sdk" ]; then
+    separator_line
+    printf "### Need to build SDK before.\n"
+
+    # Run this script again to build sdk
+    $0 -a ${machine} -p ${docker_prefix} sdk
+    if [ $? -gt 0 ]; then
+        exit 1
+    fi
+    separator_line
+    printf "### Continuing %s-%s...\n" ${name} ${machine}
+fi
+
+##############################################################################
+separator_line
+printf "### Building docker image for %s-%s...\n" ${name} ${machine}
+
+##############################################################################
+# When building SDK, build base and build container before
+if [ "${name}" == "sdk" ]; then
+    ##########################################################################
+    # build base docker container
+    separator_line
+    printf "### Building base container...\n"
+    ${docker_cmd} build --tag ${base_docker_name} \
+        --file ${base_docker_file} ${docker_path}
+    if [ $? -gt 0 ]; then
+        printf "### Building base container failed. Exiting now.\n"
+        cleanup
+        exit 1
+    fi
+    printf "### Base container built successfully.\n"
+
+    ##########################################################################
+    # build container to run setup script
+    separator_line
+    printf "### Building build container...\n"
+    ${docker_cmd} build --tag ${build_docker_name} \
+        --build-arg OPENMTC_HOME=${build_docker_work_dir} \
+        --file ${build_docker_file} ${docker_path}
+    if [ $? -gt 0 ]; then
+        printf "### Building build container failed. Exiting now.\n"
+        cleanup
+        exit 1
+    fi
+    printf "### Build container built successfully.\n"
+fi
+
+##############################################################################
+# create the build container to run the script
+separator_line
+printf "### Create build container %s.\n" ${name}
+${docker_cmd} create --name ${build_container_name} \
+    --volume=${base_path}:${build_docker_work_dir} \
+    ${build_docker_name} ${name} "$(id -u):$(id -g)"
+if [ $? -gt 0 ]; then
+    printf "### Creating build container failed. Exiting now.\n"
+    cleanup
+    exit 1
+fi
+printf "### Creating build container successfully.\n"
+
+##############################################################################
+# starting container interactive to wait for finishing the script
+separator_line
+printf "### Starting build container...\n"
+${docker_cmd} start -i ${build_container_name}
+if [ $? -gt 0 ]; then
+    printf "### Starting build container failed. Exiting now.\n"
+    cleanup
+    exit 1
+fi
+printf "### Starting build container successful.\n"
+
+##############################################################################
+# move the file
+separator_line
+printf "### Move tar file...\n"
+mkdir -p ${docker_tmp}
+binary_archive="${binary_prefix}.docker.tar.gz"
+binary_archive="${working_dir}/dist/${binary_archive}"
+mv ${binary_archive} ${target_docker_binary}
+printf "### Moving tar successful.\n"
+
+##############################################################################
+# copy requirements
+get_requirements_from_setup_file ()
+{
+    # Each setup file is assumed to hold ".py" suffix, this gets
+    # removed here
+    local module_name=${setup_file%.py}
+
+    cd ${working_dir}
+    python - << END_OF_PYTHON
+from importlib import import_module
+from re import sub
+setup = import_module('${module_name}', '${module_name}')
+print('\n'.join(map(lambda x: sub('[\s+]', '', x),
+                   setup.SETUP_INSTALL_REQUIRES)))
+END_OF_PYTHON
+}
+
+printf "%s\n" $(get_requirements_from_setup_file) | tr " " "\n" > \
+    "${docker_tmp}/${name}-dependencies.txt"
+
+##############################################################################
+# build docker container
+separator_line
+printf "### Building %s-%s container...\n" ${name} ${machine}
+
+${docker_cmd} build -t ${target_docker_name} \
+    -f ${target_docker_file} ${docker_path}
+if [ $? -gt 0 ]; then
+    printf "### Building %s-%s container failed. Exiting now.\n" \
+        ${name} ${machine}
+    cleanup
+    exit 1
+fi
+printf "### Base %s-%s container built successfully.\n" ${name} ${machine}
+
+##############################################################################
+# cleanup
+cleanup
+
+##############################################################################
+# remove dangling images
+separator_line
+printf "### Removing dangled images..."
+for image in $(${docker_cmd} images -qa -f "dangling=true"); do
+    ${docker_cmd} rmi -f ${image} > /dev/null
+done
+printf "done\n"
+
+##############################################################################
+# example to run the docker file
+#${docker_cmd} run --name test -d \
+#    -p 0.0.0.0:8001:8001 \
+#    -e "EXTERNAL_IP=$(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}')" \
+#    ${target_docker_name}
+
+# test with curl
+#curl $(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}'):5001/m2m
+
+# stop and remove container again
+#${docker_cmd} stop test && ${docker_cmd} rm test
+
+##############################################################################
+# export docker image
+if ${export_image}; then
+    separator_line
+    printf "### Exporting the image..."
+    mkdir -p ${docker_dist}
+    # change / in target_docker_name to -
+    docker_dist_file="${docker_dist}/${target_docker_name//\//-}.tar.gz"
+    ${docker_cmd} save ${target_docker_name} | gzip -c > ${docker_dist_file}
+    printf "done\n"
+fi
+
+# import docker image
+#zcat ${target_docker_name}.tar.gz | ${docker_cmd} load
+

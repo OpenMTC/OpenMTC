@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenMTC Gateway
+Documentation=http://www.openmtc.org
+Wants=ntp.service
+
+[Service]
+User=openmtc
+Group=openmtc
+Environment=PYTHONUNBUFFERED=true
+ExecStart=/usr/local/bin/run-gateway
+
+[Install]
+WantedBy=network.target

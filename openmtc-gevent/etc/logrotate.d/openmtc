@@ -1,0 +1,9 @@
+/var/log/openmtc/*.log {
+    size 10M
+    rotate 7
+    notifempty
+    missingok
+    compress
+    delaycompress
+}
+

@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+CONFIG_FILE="/etc/openmtc/gevent/config-gateway.json"
+
+# local ip
+LOCAL_IP=$(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}')
+
+# set hostname
+HOST_NAME=${EXTERNAL_IP-${LOCAL_IP}}
+
+# defaults global
+REQUIRE_AUTH=${REQUIRE_AUTH-false}
+
+# defaults logging
+LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/gateway.log"}
+LOGGING_LEVEL=${LOGGING_LEVEL-"ERROR"}
+
+# defaults onem2m
+ONEM2M_SP_ID=${ONEM2M_SP_ID-"openmtc.org"}
+ONEM2M_CSE_TYPE=${ONEM2M_CSE_TYPE-"MN-CSE"}
+ONEM2M_CSE_ID=${ONEM2M_CSE_ID-"mn-cse-1"}
+ONEM2M_CSE_BASE=${ONEM2M_CSE_BASE-"onem2m"}
+ONEM2M_SSL_KEY=${ONEM2M_SSL_KEY-"/etc/openmtc/certs/mn-cse-1-client-server.key.pem"}
+ONEM2M_SSL_CRT=${ONEM2M_SSL_CRT-"/etc/openmtc/certs/mn-cse-1-client-server.cert.pem"}
+ONEM2M_SSL_CA=${ONEM2M_SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
+ONEM2M_ACCEPT_INSECURE_CERTS=${ONEM2M_ACCEPT_INSECURE_CERTS-false}
+ONEM2M_OVERWRITE_ORIGINATOR=${ONEM2M_OVERWRITE_ORIGINATOR-false}
+
+# defaults onem2m plugins
+ONEM2M_HTTP_TRANSPORT_DISABLED=${ONEM2M_HTTP_TRANSPORT_DISABLED-false}
+ONEM2M_HTTP_TRANSPORT_PORT=${ONEM2M_HTTP_TRANSPORT_PORT-8000}
+ONEM2M_HTTP_TRANSPORT_SSL_ENABLED=${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED-false}
+ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT=${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT-true}
+
+ONEM2M_NOTIFICATION_DISABLED=${ONEM2M_NOTIFICATION_DISABLED-true}
+
+ONEM2M_REGISTRATION_DISABLED=${ONEM2M_REGISTRATION_DISABLED-true}
+ONEM2M_REMOTE_CSE_ID=${ONEM2M_REMOTE_CSE_ID-"in-cse-1"}
+ONEM2M_REMOTE_CSE_POA=${ONEM2M_REMOTE_CSE_POA-"http://localhost:18000"}
+${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED} && SCHEME="https" || SCHEME="http"
+ONEM2M_REMOTE_CSE_OWN_POA="${SCHEME}://${HOST_NAME}:${ONEM2M_HTTP_TRANSPORT_PORT}"
+ONEM2M_REMOTE_CSE_BASE=${ONEM2M_REMOTE_CSE_BASE-"onem2m"}
+ONEM2M_REMOTE_CSE_TYPE=${ONEM2M_REMOTE_CSE_TYPE-"IN-CSE"}
+
+# ensure correct level
+case ${LOGGING_LEVEL} in
+    FATAL|ERROR|WARN|INFO|DEBUG)
+    ;;
+    *)
+    LOGGING_LEVEL="ERROR"
+    ;;
+esac
+
+# Configuration of the service.
+CONFIG_TEMP=${CONFIG_FILE}".tmp"
+echo -n "Configuring M2M gateway..."
+JQ_STRING='.'
+
+# basics
+JQ_STRING=${JQ_STRING}' |
+    .global.require_auth = '${REQUIRE_AUTH}' |
+    .logging.file |= "'${LOGGING_FILE}'" |
+    .logging.level |= "'${LOGGING_LEVEL}'"
+'
+
+# onem2m
+JQ_STRING=${JQ_STRING}' |
+    .onem2m.sp_id = "'${ONEM2M_SP_ID}'" |
+    .onem2m.cse_type = "'${ONEM2M_CSE_TYPE}'" |
+    .onem2m.cse_id |= "'${ONEM2M_CSE_ID}'" |
+    .onem2m.cse_base |= "'${ONEM2M_CSE_BASE}'" |
+    .onem2m.ssl_certs.key |= "'${ONEM2M_SSL_KEY}'" |
+    .onem2m.ssl_certs.crt |= "'${ONEM2M_SSL_CRT}'" |
+    .onem2m.ssl_certs.ca |= "'${ONEM2M_SSL_CA}'" |
+    .onem2m.accept_insecure_certs |= '${ONEM2M_ACCEPT_INSECURE_CERTS}' |
+    .onem2m.overwrite_originator.enabled |= '${ONEM2M_OVERWRITE_ORIGINATOR}'
+'
+
+# onem2m plugins
+JQ_STRING=${JQ_STRING}' |
+    (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .disabled) |= '${ONEM2M_HTTP_TRANSPORT_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.port) |= '${ONEM2M_HTTP_TRANSPORT_PORT}' |
+    (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.enable_https) |= '${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.require_cert) |= '${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT}' |
+    (.plugins.openmtc_cse[] | select(.name == "NotificationHandler") | .disabled) |= '${ONEM2M_NOTIFICATION_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "RegistrationHandler") | .disabled) |= '${ONEM2M_REGISTRATION_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "RegistrationHandler") | .config.remote_cses) |= [{cse_id: "'${ONEM2M_REMOTE_CSE_ID}'", poa: ["'${ONEM2M_REMOTE_CSE_POA}'"], own_poa: ["'${ONEM2M_REMOTE_CSE_OWN_POA}'"], cse_base: "'${ONEM2M_REMOTE_CSE_BASE}'", cse_type: "'${ONEM2M_REMOTE_CSE_TYPE}'"}]
+'
+
+cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}
+mv ${CONFIG_TEMP} ${CONFIG_FILE}
+
+echo "done"
+
+exec python -m openmtc_gevent.gateway_main $@

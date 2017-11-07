@@ -1,0 +1,106 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          openmtc-gateway
+# Required-Start:    $local_fs $network ntp
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: openmtc Gateway Service Capability Layer
+### END INIT INFO
+
+set -e
+
+# /etc/init.d/openmtc-gateway: start and stop the openmtc Gateway
+
+NAME="OpenMTC Gateway"
+DAEMON=/usr/local/bin/openmtc-gateway-gevent
+PID_FILE=/var/run/openmtc-gateway.pid
+CREDENTIALS=openmtc:openmtc
+
+MAX_RETRIES=3
+MAX_SLEEP=30
+
+test -x || exit 0
+
+. /lib/lsb/init-functions
+
+openmtc_start() {
+    if ! /usr/sbin/ntpdate -u de.pool.ntp.org > /dev/null 2>&1; then
+        log_warning_msg "Could not sync time."\
+        "Consider setting the time manually."
+    fi
+    if start-stop-daemon --start --quiet --background --pidfile "${PID_FILE}" --make-pidfile --exec "${DAEMON}"
+    then
+        rc=0
+        counter=0
+        while [ ${counter} -lt ${MAX_SLEEP} ]; do
+            rc=1
+            if [ $(netstat -tulpen | grep $(cat ${PID_FILE})/python | wc -l) -gt 0 ]; then
+                rc=0
+                break
+            fi
+            counter=$((counter+1))
+            sleep 1
+        done
+        if ! kill -0 `cat "${PID_FILE}"` >/dev/null 2>&1; then
+            log_failure_msg " failed to start"
+            rm -f "${PID_FILE}"
+            rc=1
+        fi
+    else
+        rc=1
+    fi
+    if [ "${rc}" -eq 0 ]; then
+        log_end_msg 0
+    else
+        log_end_msg 1
+        rm -f "${PID_FILE}"
+    fi
+}
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting " "${NAME}"
+        if [ -s "${PID_FILE}" ] && kill -0 `cat "${PID_FILE}"` >/dev/null 2>&1; then
+            log_progress_msg "${NAME} apparently already running."
+            log_end_msg 0
+            exit 0
+        fi
+        openmtc_start
+        ;;
+    stop)
+        log_daemon_msg "Stopping " "${NAME}"
+        start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile "${PID_FILE}"
+        log_end_msg 0
+        rm -f "${PID_FILE}"
+        ;;
+    restart)
+        set +e
+        log_daemon_msg "Restarting " "${NAME}"
+        if [ -s "${PID_FILE}" ] && kill -0 `cat "${PID_FILE}"` >/dev/null 2>&1; then
+            start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile "${PID_FILE}" || true
+            sleep 1
+        else
+            log_warning_msg "${NAME} not running, attempting to start."
+            rm -f "${PID_FILE}"
+        fi
+        openmtc_start
+        ;;
+    status)
+        status_of_proc -p "${PID_FILE}" "${DAEMON}" "${NAME}"
+        if [ $? -eq 0 ]; then
+            if [ $(netstat -tulpen | grep $(cat ${PID_FILE})/python | wc -l) -gt 0 ]; then
+                log_success_msg "${NAME} port is reachable"
+                exit 0 # notreached due to set -e
+            fi
+            log_failure_msg "${NAME} port not reachable."
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Usage: /etc/init.d/openmtc-gateway {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0

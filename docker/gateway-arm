@@ -1,0 +1,30 @@
+############################################################
+# Dockerfile to run openmtc gateway binary
+############################################################
+
+# Set the base image to use openmtc/sdk
+FROM openmtc/sdk-arm:latest
+
+ENV MOD_NAME=gateway
+
+# Set the file maintainer
+MAINTAINER rst/tgu
+
+# install openmtc dependencies
+COPY tmp/$MOD_NAME-dependencies.txt /tmp/requirements.txt
+RUN pip install --upgrade --requirement /tmp/requirements.txt
+
+# install openmtc-all
+COPY tmp/openmtc-$MOD_NAME.tar.gz /tmp/openmtc-$MOD_NAME.tar.gz
+RUN tar xzf /tmp/openmtc-$MOD_NAME.tar.gz -C / \
+    --owner root --group root --no-same-owner --no-overwrite-dir \
+    --transform 's/json\.dist/json/' --show-transformed
+
+RUN mkdir -p /var/log/openmtc
+
+# add change config
+COPY configure-$MOD_NAME-and-start /usr/local/bin/configure-and-start
+
+# entry point
+ENTRYPOINT ["/usr/local/bin/configure-and-start"]
+CMD [""]

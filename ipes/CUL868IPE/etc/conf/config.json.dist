@@ -1,0 +1,25 @@
+{
+    "name": "CUL868IPE",
+    "ep": "http://localhost:8000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:28728"
+    ],
+    "originator_pre": "//openmtc.org/mn-cse-1",
+    "ssl_certs": {
+        "cert_file": "/etc/openmtc/certs/cul868ipe.cert.pem",
+        "key_file": "/etc/openmtc/certs/cul868ipe.key.pem",
+        "ca_certs": "/etc/openmtc/certs/ca-chain.cert.pem"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "/var/log/openmtc/cul868ipe.log"
+    },
+    "sim": false,
+    "sim_period": 3,
+    "cul_device": "/dev/ttyACM0",
+    "devices": [
+        "fs20:16108-1",
+        "fs20:16108-0"
+    ]
+}

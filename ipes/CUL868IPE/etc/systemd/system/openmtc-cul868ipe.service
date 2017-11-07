@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenMTC CUL868IPE
+After=network.target
+Wants=ntp.service
+
+[Service]
+ExecStart=/usr/local/bin/cul-868-ipe
+
+[Install]
+WantedBy=multi-user.target

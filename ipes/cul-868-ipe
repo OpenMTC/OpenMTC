@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+cd $(dirname ${0})
+
+. ./prep-env.sh
+
+cd CUL868IPE
+
+PYTHONPATH=${PYTHONPATH}:src exec python -m cul868ipe $@

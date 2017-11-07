@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenMTC OrionContextBroker
+After=network.target
+Wants=ntp.service
+
+[Service]
+ExecStart=/usr/local/bin/orion-context-broker
+
+[Install]
+WantedBy=multi-user.target

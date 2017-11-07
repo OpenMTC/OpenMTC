@@ -1,0 +1,22 @@
+{
+    "name": "OrionContextBroker",
+    "ep": "http://localhost:8000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:25396"
+    ],
+    "originator_pre": "//openmtc.org/mn-cse-1",
+    "ssl_certs": {
+        "cert_file": null,
+        "key_file": null,
+        "ca_certs": null
+    },
+    "logging": {
+        "level": "ERROR",
+        "file": null
+    },
+    "labels": [""],
+    "interval": 10,
+    "orion_host": "http://localhost:1026",
+    "orion_api": "v2"
+}

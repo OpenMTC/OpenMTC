@@ -1,0 +1,9 @@
+# Set the builder image to use openmtc/base
+FROM openmtc/base-amd64:latest
+
+ARG OPENMTC_HOME=/usr/local/src/openmtc-python/
+
+WORKDIR $OPENMTC_HOME
+
+ENTRYPOINT ["./create-binary-dist"]
+CMD [""]

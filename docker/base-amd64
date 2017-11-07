@@ -1,0 +1,33 @@
+############################################################
+# Dockerfile for base python environment
+############################################################
+
+# Set the base image to use debian
+FROM debian:jessie
+
+# Set the file maintainer
+MAINTAINER rst/tgu
+
+# install packages and clean up
+RUN printf "Starting update...\n" && \
+    apt-get update -qq && \
+    printf "Update finished.\n" && \
+    printf "Starting dist-upgrade...\n" && \
+    apt-get dist-upgrade -y > /dev/null && \
+    printf "Upgrade finished.\n" && \
+    printf "Starting install...\n" && \
+    apt-get install -y \
+    build-essential \
+    netbase \
+    iproute2 \
+    python-pip \
+    python-dev \
+    jq > /dev/null && \
+    apt-get clean && \
+    printf "Installation and cleanup finished.\n"
+
+# set user
+USER root
+
+# entry point
+ENTRYPOINT ["/bin/bash"]

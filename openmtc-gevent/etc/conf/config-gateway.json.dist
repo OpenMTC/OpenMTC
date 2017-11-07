@@ -1,0 +1,104 @@
+{
+    "global": {
+        "disable_forwarding": false,
+        "default_lifetime": 2000,
+        "additional_host_names": [],
+        "require_auth": false,
+        "default_content_type": "application/json"
+    },
+    "database": {
+        "driver": "openmtc_server.db.nodb2.NoDB2",
+        "dropDB": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "/var/log/openmtc/gateway.log"
+    },
+    "onem2m": {
+        "sp_id": "openmtc.org",
+        "cse_type": "MN-CSE",
+        "cse_id": "mn-cse-1",
+        "cse_base": "onem2m",
+        "ssl_certs": {
+            "key": "/etc/openmtc/certs/mn-cse-1-client-server.key.pem",
+            "crt": "/etc/openmtc/certs/mn-cse-1-client-server.cert.pem",
+            "ca": "/etc/openmtc/certs/ca-chain.cert.pem"
+        },
+        "accept_insecure_certs": false,
+        "overwrite_originator": {
+            "enabled": false,
+            "originator": "/openmtc.org/mn-cse-1"
+        },
+        "default_privileges": [
+            {
+                "accessControlOperations": [2, 32],
+                "accessControlOriginators": ["all"]
+            }
+        ],
+        "dynamic_authorization": {
+            "enabled": false,
+            "poa": []
+        }
+    },
+    "plugins": {
+        "openmtc_cse": [
+            {
+                "name": "HTTPTransportPlugin",
+                "package": "openmtc_cse.plugins.transport_gevent_http",
+                "disabled": false,
+                "config": {
+                    "interface": "::",
+                    "port": 8000,
+                    "enable_https": false,
+                    "require_cert": true
+                }
+            },
+            {
+                "name": "NotificationHandler",
+                "package": "openmtc_cse.plugins.notification_handler",
+                "disabled": false
+            },
+            {
+                "name": "ExpirationTimeHandler",
+                "package": "openmtc_cse.plugins.expiration_time_handler",
+                "disabled": true,
+                "config": {
+                    "default_lifetime": 10000
+                }
+            },
+            {
+                "name": "RegistrationHandler",
+                "package": "openmtc_cse.plugins.registration_handler",
+                "disabled": false,
+                "config": {
+                    "labels": [
+                        "openmtc"
+                    ],
+                    "remote_cses": [
+                        {
+                            "cse_id": "in-cse-1",
+                            "poa": [
+                                "http://localhost:18000"
+                            ],
+                            "own_poa": [
+                                "http://localhost:8000"
+                            ],
+                            "cse_base": "onem2m",
+                            "cse_type": "IN_CSE"
+                        }
+                    ],
+                    "interval": 3600,
+                    "offset": 3600
+                }
+            },
+            {
+                "name": "AnnouncementHandler",
+                "package": "openmtc_cse.plugins.announcement_handler",
+                "disabled": true,
+                "config": {
+                    "auto_announce": false
+                }
+            }
+        ]
+    }
+}
