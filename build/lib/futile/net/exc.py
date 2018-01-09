@@ -1,4 +1,0 @@
-
-
-class NetworkError(Exception):
-    pass

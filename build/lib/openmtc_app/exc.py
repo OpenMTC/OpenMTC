@@ -1,2 +1,0 @@
-class OpenMTCAppError(Exception):
-    pass

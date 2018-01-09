@@ -1,6 +1,0 @@
-aplus
-futile
-openmtc
-openmtc_app
-openmtc_onem2m
-pyio
