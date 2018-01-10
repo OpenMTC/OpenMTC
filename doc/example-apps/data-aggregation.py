@@ -16,13 +16,14 @@ class DataAggregation(XAE):
         self.sensor_register = {}
         self.dev_cnt_list = []
         # start endless loop
-        self.periodic_discover(self.remote_cse,
-                               {'labels': ["openmtc:sensor_data"]},
-                               self.period, self.handle_discovery_sensor)
-
-    @staticmethod
-    def _time():
-        return format(round(time.time(), 3), '.3f')
+        self.periodic_discover(
+            self.remote_cse,
+            {
+                'labels': ['openmtc:sensor_data'],
+            },
+            self.period,
+            self.handle_discovery_sensor
+        )
 
     def handle_discovery_sensor(self, discovery):
         for uri in discovery:
@@ -54,7 +55,7 @@ class DataAggregation(XAE):
     def handle_sensor(self, container, content):
         sensor_entry = self.sensor_register[container]
         values = sensor_entry['values']
-        try :
+        try:
             values.append(content[0]['v'])
         except KeyError:
             return
@@ -64,35 +65,26 @@ class DataAggregation(XAE):
         except KeyError:
             self.create_sensor_structure(sensor_entry, content)
 
+        num_items = len(values)
         # mean value
-        mean = sum(values) / len(values)
-        data = [{
+        mean = sum(values) / num_items
+        self.push_content(sensor_entry['mean_cnt'], [{
             'bn': content[0]['bn'],
             'n': content[0]['n'] + '_mean',
             'v': mean,
-            't': self._time()
-        }]
+            't': '%.3f' % time.time(),
+            'u': content[0].get('u'),
+        }])
 
         # Standard_deviation value
-        num_item = len(values)
-        standard_mean = sum(values) / num_item
-        differences = [((x - standard_mean) ** 2) ** 2 for x in values]
-        ssd = sum(differences)
-        variance = ssd / num_item
-        sd = sqrt(variance)
-        print sd
-        deviation_data = [{
+        sd = sqrt(sum([(value - mean) ** 4 for value in values]) / num_items)
+        self.push_content(sensor_entry['deviation_cnt'], [{
             'bn': content[0]['bn'],
             'n': content[0]['n'] + '_Standard_deviation',
             'v': sd,
-            't': self._time()
-        }]
-        try:
-            data[0]['u'] = content[0]['u']
-        except KeyError:
-            pass
-        self.push_content(sensor_entry['mean_cnt'], data)
-        self.push_content(sensor_entry['deviation_cnt'], deviation_data)
+            't': '%.3f' % time.time(),
+            'u': content[0].get('u'),
+        }])
 
 
 if __name__ == "__main__":
