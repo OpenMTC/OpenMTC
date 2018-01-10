@@ -18,17 +18,15 @@ class Utc(tzinfo):
     def dst(self, dt):
         return ZERO
 
+
 UTC = Utc()
-
-
-#del Utc
 
 
 def datetime_now():
     return datetime.now(UTC)
 
 
-def datetime_the_future(offset = 0):
+def datetime_the_future(offset=0):
     """ Returns a datetime instance <offset> seconds in the future.
         @note: if no offset is provided or offset == 0, this is equivalent to datetime_now
         @param offset: seconds from now
