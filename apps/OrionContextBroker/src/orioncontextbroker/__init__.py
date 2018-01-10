@@ -7,4 +7,4 @@ __version__ = "0.1"
 __description__ = "OrionContextBroker"
 __author_name__ = "Christian Klopp"
 __author_mail__ = "christian.klopp@fokus.fraunhofer.de"
-__requires__ = []
+__requires__ = ["requests"]

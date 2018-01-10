@@ -16,7 +16,7 @@
         "file": "/var/log/openmtc/orioncontextbroker.log"
     },
     "labels": [],
-    "interval": 1,
+    "interval": 10,
     "orion_host": "http://localhost:1026",
     "orion_api": "v2"
 }

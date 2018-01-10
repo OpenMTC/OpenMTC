@@ -1,11 +1,11 @@
 {
     "name": "OrionContextBroker",
-    "ep": "http://localhost:8000",
+    "ep": "http://localhost:18000",
     "cse_base": "onem2m",
     "poas": [
         "http://auto:25396"
     ],
-    "originator_pre": "//openmtc.org/mn-cse-1",
+    "originator_pre": "//openmtc.org/in-cse-1",
     "ssl_certs": {
         "cert_file": null,
         "key_file": null,
@@ -15,7 +15,7 @@
         "level": "ERROR",
         "file": null
     },
-    "labels": [""],
+    "labels": ["openmtc:sensor_data:temperature", "openmtc:sensor_data:humidity"],
     "interval": 10,
     "orion_host": "http://localhost:1026",
     "orion_api": "v2"
