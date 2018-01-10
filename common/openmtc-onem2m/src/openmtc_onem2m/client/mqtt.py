@@ -6,7 +6,7 @@ from futile.caching import LRUCache
 import gevent
 from gevent import monkey; monkey.patch_all()
 from . import OneM2MClient
-from openmtc.exc import ConnectionFailed, OpenMTCNetworkError
+from openmtc.exc import ConnectionFailed
 from ..exc import (
     ERROR_MIN,
     CSEValueError,
@@ -131,7 +131,8 @@ class OneM2MMQTTClient(OneM2MClient):
             return wrapper
         return decorator
 
-    def __init__(self, m2m_ep, _, client_id, handle_request_func=None, subscribe_sys_topics=False):
+    def __init__(self, m2m_ep, _, client_id, handle_request_func=None, subscribe_sys_topics=False, ca_certs=None,
+                 cert_file=None, key_file=None, insecure=False):
         """
         :param str m2m_ep:
         :param bool _:
@@ -348,6 +349,9 @@ class OneM2MMQTTClient(OneM2MClient):
         if parsed_url.username:
             self._client.username_pw_set(parsed_url.username, parsed_url.password)
 
+        self._client.tls_set(ca_certs=ca_certs, certfile=cert_file, keyfile=key_file)
+        self._client.tls_insecure_set(insecure)
+
         try:
             self._client.connect(
                 parsed_url.hostname,
@@ -423,9 +427,11 @@ class OneM2MMQTTClient(OneM2MClient):
         return p
 
     def stop(self):
-        self._client.disconnect()
-        # TODO(sho): this is abominable. But for the time being, there seems to be no elegant solution to this.
-        self._client._clean_session = True
-        # TS 0010, sec. 6.3 mandates a reconnect in order to leave a clean state with the MQTT broker
-        self._client.reconnect()
-        self._client.disconnect()
+        if self._client:
+            self._client.disconnect()
+            # TODO(sho): this is abominable. But for the time being, there seems to be no elegant solution to this.
+            self._client._clean_session = True
+            # TS 0010, sec. 6.3 mandates a reconnect in order to leave a clean state with the MQTT broker
+            self._client.reconnect()
+            self._client.disconnect()
+            self._client = None
