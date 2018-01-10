@@ -575,16 +575,13 @@ class XAE(LoggerMixin):
             self.runner.flask_app.url_map._rules
         )
 
-    def _add_subscription(self, path, _, handler, delete_handler, filter_criteria=None, expiration_time=None):
+    def _add_subscription(self, path, _, handler, delete_handler, filter_criteria=None,
+                          expiration_time=None):
         params = {
             'filter_criteria': filter_criteria,
             'expiration_time': expiration_time,
         }
-        self.add_subscription_handler(path, handler, **params)
-        # self.notification_manager.subscribe(path, handler, **params)
-        if delete_handler:
-            params['types'] = (NotificationEventTypeE.deleteOfResource,)
-            self.add_subscription_handler(path, delete_handler, **params)
+        return self.add_subscription_handler(path, handler, delete_handler, **params)
 
     def add_subscription(self, path, handler, delete_handler=None):
         """ Creates a subscription resource at path.
@@ -594,14 +591,16 @@ class XAE(LoggerMixin):
         :param handler: notification handler
         :param delete_handler: reference to delete handling function
         """
-        self._add_subscription(path, None, handler, delete_handler)
+        return self._add_subscription(path, None, handler, delete_handler)
 
-    def add_subscription_handler(self, path, handler, types=(NotificationEventTypeE.updateOfResource, ),
+    def add_subscription_handler(self, path, handler, delete_handler=None,
+                                 types=(NotificationEventTypeE.updateOfResource, ),
                                  filter_criteria=None, expiration_time=None):
         """
 
         :param path:
         :param handler:
+        :param delete_handler:
         :param types:
         :param filter_criteria:
         :param expiration_time:
@@ -611,6 +610,7 @@ class XAE(LoggerMixin):
             return self.notification_manager.subscribe(
                 path,
                 handler,
+                delete_handler,
                 notification_types=types,
                 filter_criteria=filter_criteria,
                 expiration_time=expiration_time
@@ -623,16 +623,16 @@ class XAE(LoggerMixin):
             # for some reason subscription is not assigned here,
             # so we make it a parameter
             self.logger.warn("Restoring subscription: %s", subscription.name)
-            self.notification_manager.unsubscribe(subscription.subscriberURI or subscription.path)
+            self.notification_manager.unsubscribe(subscription.path)
             subscribe()
 
         # refresh expirationTime regularly
         # TODO(sho): This should rather be handled through the notification manager itself
         self.__start_refresher(subscription, restore=restore_subscription)
-        return subscription
+        return subscription.path
 
-    def add_container_subscription(self, container, handler,
-                                   delete_handler=None, filter_criteria=None):
+    def add_container_subscription(self, container, handler, delete_handler=None,
+                                   filter_criteria=None):
         """ Creates a Subscription to the ContentInstances of the given
         Container.
 
@@ -657,7 +657,7 @@ class XAE(LoggerMixin):
         def content_handler(cin):
             handler(path, self._get_content_from_cin(cin))
 
-        self._add_subscription(
+        return self._add_subscription(
             path,
             None,
             content_handler,
@@ -685,7 +685,8 @@ class XAE(LoggerMixin):
             interval = max(1, interval * 0.75)
 
         self.logger.debug("Will update expiration time of %s in %s seconds", instance, interval)
-        self.runner.set_timer(interval, self.__update_exp_time, instance=instance, extra_fields=extra_fields, restore=restore)
+        self.runner.set_timer(interval, self.__update_exp_time, instance=instance,
+                              extra_fields=extra_fields, restore=restore)
 
     def start_refresher(self, instance, extra_fields=(), restore=None):
         self.__start_refresher(instance, extra_fields=extra_fields, restore=restore)
