@@ -61,16 +61,16 @@ class OneM2MMapper(BasicMapper):
         return self._do_update(instance, fields)
 
     def _do_update(self, instance, fields=None):
+        try:
+            fields = list(fields or [])
+        except TypeError:
+            fields = []
         attributes = type(instance).attributes
-        fields_to_be_cleared = [a.name for a in attributes if a.accesstype in (a.WO, a.RO)]
-        if fields:
-            fields_to_be_cleared.extend([a.name for a in attributes if a.name not in fields])
-            instance.childResource = []
+        values_to_clear = {a.name: None if a.type is not list else [] for a in attributes
+                           if a.accesstype in (a.WO, a.RO) or a.name not in fields and len(fields)}
 
         # remove NP attributes
-        instance.__dict__.update({
-            a: None for a in fields_to_be_cleared
-        })
+        instance.set_values(values_to_clear)
 
         response = self._send_request(OneM2MRequest(
             OneM2MOperation.update,
