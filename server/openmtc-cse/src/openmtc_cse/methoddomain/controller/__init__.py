@@ -661,17 +661,13 @@ class OneM2MDefaultController(LoggerMixin):
                     except ParseError as e:
                         raise CSEValueError(
                             "Illegal value for expirationTime: %s" % (e,))
-                if expiration_time < self.now + self.global_config[
-                        "min_lifetime"]:
+                if expiration_time < self.now + self.global_config["min_lifetime"]:
                     self.logger.warn("expirationTime is too low. Adjusting")
-                    expiration_time = self.now + self.global_config[
-                        "min_lifetime"]
+                    expiration_time = self.now + self.global_config["min_lifetime"]
                     self.fields.append("expirationTime")
-                elif expiration_time > self.now + self.global_config[
-                        "max_lifetime"]:
+                elif expiration_time > self.now + self.global_config["max_lifetime"]:
                     self.logger.warn("expirationTime is too high. Adjusting")
-                    expiration_time = self.now + self.global_config[
-                        "max_lifetime"]
+                    expiration_time = self.now + self.global_config["max_lifetime"]
                     self.fields.append("expirationTime")
 
             values["expirationTime"] = expiration_time
@@ -693,8 +689,7 @@ class OneM2MDefaultController(LoggerMixin):
                          values[attribute.name] is not None)
             # TODO(rkr): check mandatory attributes
             if not have_attr and attribute.mandatory:
-                raise CSEMissingValue("Missing attribute: %s" %
-                                      (attribute.name,))
+                raise CSEMissingValue("Missing attribute: %s" % (attribute.name,))
             if have_attr and attribute.accesstype == attribute.RO:
                 self._handle_ro_attribute(attribute)
 
