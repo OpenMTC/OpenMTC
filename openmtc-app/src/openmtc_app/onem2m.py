@@ -5,7 +5,7 @@ from base64 import (
 from datetime import datetime
 from gevent import (
     spawn,
-    spawn_later,
+    sleep,
 )
 from iso8601 import parse_date
 from json import (
@@ -172,32 +172,36 @@ class XAE(LoggerMixin):
                 pass
 
         def run_periodically():
-            func(*args, **kw)
-            spawn_later(period, run_periodically)
+            while True:
+                func(*args, **kw)
+                sleep(period)
 
         return spawn(run_periodically)
 
-    def periodic_discover(self, path, fc, interval, cb, err_cb=None):
+    def periodic_discover(self, path, fc, interval, cb, err_cb=None, auto_cra=True):
         """ starts periodic discovery at a given frequency
         :param path: start directory inside cse for discovery
         :param fc: filter criteria (what to discover)
         :param interval: frequency of repeated discovery (in Hz)
         :param cb: callback function to return the result of the discovery to
         :param err_cb: (optional) callback function for errors to return the error of the discovery to
+        :param auto_cra: if created after parameter will be adjusted automatically
         """
         if not isinstance(fc, dict):
             fc = {}
 
         def run_discovery(o):
-            try:
-                cb(self.discover(path, o))
-            except OneM2MErrorResponse as error_response:
-                if err_cb:
-                    return err_cb(error_response)
-            else:
-                o['createdAfter'] = datetime_now()
+            while True:
+                try:
+                    cb(self.discover(path, o))
+                except OneM2MErrorResponse as error_response:
+                    if err_cb:
+                        return err_cb(error_response)
+                else:
+                    if auto_cra:
+                        o['createdAfter'] = datetime_now()
 
-                spawn_later(interval, run_discovery, o)
+                sleep(interval)
 
         return spawn(run_discovery, fc)
 
