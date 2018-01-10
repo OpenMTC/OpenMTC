@@ -74,54 +74,25 @@ class CUL868IPE(XAE):
 
     def add_device(self, cnt_id, labels, sub_containers):
         labels += ["openmtc:device", "openmtc:device:cul868"]
-	cse_id = self.get_resource(self.cse_base).CSE_ID[1:]
-        try:
-            tenant_id, instance_id = cse_id.split('~')
-        except ValueError:
-            tenant_id = cse_id
-            instance_id = 'None'
-        context = (self.device_mappings[cnt_id] 
-                if cnt_id in self.device_mappings.keys() else None)
-
-        dev_cnt = Container(resourceName=cnt_id, maxNrOfInstances=0,
-                            labels=labels)
+        dev_cnt = Container(resourceName=cnt_id, maxNrOfInstances=0, labels=labels)
         dev_cnt = self.create_container(None, dev_cnt)
         self.dev_containers[cnt_id] = dev_cnt
 
+        dev_id = self.device_mappings.get(cnt_id, cnt_id)
         for c_id, l, func in sub_containers:
             s_id = cnt_id + '_' + c_id.upper()
-            
-            if func:
-                l = (map(lambda x: "openmtc:actuator_data:%s" % x, l)
-                     if l else [])
-                l.append('openmtc:actuator_data')
-                l.append('openmtc:sensor_data')
-                # if in device mappings, add smart orchestra labels
-                if context:
-                    l.extend((
-                            '{}'.format(tenant_id),
-                            '{}/{}'.format(tenant_id, instance_id),
-                            '{}/{}/{}'.format(tenant_id, instance_id, context),
-                            '{}/{}/{}/{}'.format(tenant_id, instance_id, context, c_id)
-                            ))
-                sub_cnt = Container(resourceName=c_id, maxNrOfInstances=0,
-                                    labels=l)
-            else:
-                l = map(lambda x: "openmtc:sensor_data:%s" % x, l) if l else []
-                l.append('openmtc:actuator_data')
-                l.append('openmtc:sensor_data')
-                # if in device mappings, add smart orchestra labels
-                if context:
-                    l.extend((
-                            '{}'.format(tenant_id),
-                            '{}/{}'.format(tenant_id, instance_id),
-                            '{}/{}/{}'.format(tenant_id, instance_id, context),
-                            '{}/{}/{}/{}'.format(tenant_id, instance_id, context, c_id)
-                            ))
-                sub_cnt = Container(resourceName=c_id, labels=l)
+            sub_labels = ['openmtc:id:%s/%s/%s' % (self._cse_id, dev_id, c_id)]
 
-            self.containers[s_id] = s_cnt = self.create_container(dev_cnt,
-                                                                  sub_cnt)
+            if func:
+                sub_labels.append('openmtc:actuator_data')
+                sub_labels += map(lambda x: "openmtc:actuator_data:%s" % x, l) if l else []
+                sub_cnt = Container(resourceName=c_id, maxNrOfInstances=0, labels=sub_labels)
+            else:
+                sub_labels.append('openmtc:sensor_data')
+                sub_labels += map(lambda x: "openmtc:sensor_data:%s" % x, l) if l else []
+                sub_cnt = Container(resourceName=c_id, labels=sub_labels)
+
+            self.containers[s_id] = s_cnt = self.create_container(dev_cnt, sub_cnt)
 
             if func:
                 self.add_container_subscription(s_cnt, func)
@@ -129,6 +100,8 @@ class CUL868IPE(XAE):
         return dev_cnt
 
     def _on_register(self):
+        self._cse_id = self.get_resource(self.cse_base).CSE_ID[1:]
+
         for house_code, device_code in self.fs20:
             d = "%s_%s" % (house_code, device_code)
             handle_switch = self._get_handle_switch(house_code, device_code)
