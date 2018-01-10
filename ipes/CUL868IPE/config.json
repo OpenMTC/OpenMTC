@@ -19,8 +19,8 @@
     "sim_period": 3,
     "cul_device": "/dev/ttyACM0",
     "device_mappings": {
-        "ZBS12345678": "Fenster",
-        "ZBS12341234": "Dach",
+        "S300TH_1": "Fenster",
+        "S300TH_2": "Dach",
         "FS20_ST3_16108_1": "Wohnzimmer"
     },
     "devices": [

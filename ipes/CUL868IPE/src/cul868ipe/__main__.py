@@ -41,13 +41,12 @@ ssl_certs = config.get("ssl_certs", {})
 s = config.get("sim", False)
 p = int(config.get("sim_period"))
 cul_device = get_value('cul_device', (unicode, str), default_device, args, config)
-device_mappings = get_value('device_mappings', dict, {}, args, config) 
+device_mappings = get_value('device_mappings', dict, {}, args, config)
 devices = get_value('devices', list, [], args, config)
 
 # start
 app = CUL868IPE(
-    devices, device=cul_device, sim=s, sim_period=p,
-    device_mappings=device_mappings,
+    devices, device=cul_device, sim=s, sim_period=p, device_mappings=device_mappings,
     name=nm, cse_base=cb, poas=poas,
     originator_pre=originator_pre, **ssl_certs
 )

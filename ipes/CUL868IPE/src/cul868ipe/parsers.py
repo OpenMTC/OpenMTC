@@ -30,7 +30,7 @@ class SIMParser(Parser):
         if line == 'K':
             dev_id = '1'
             temperature = random.uniform(0, 30)
-            humidity = random.uniform(0, 30)
+            humidity = random.uniform(5, 95)
             return dev_id, S300THData(temperature, humidity)
         elif line == 'F':
             dev_id = '21111111-132' + choice(['1', '2'])

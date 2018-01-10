@@ -6,14 +6,13 @@ from random import choice
 from gevent import spawn
 
 from futile.logging import LoggerMixin
-from .parsers import (EM1000EMParser, S300THParser, FS20Parser, HMSParser,
-                      SIMParser)
+from .parsers import (EM1000EMParser, S300THParser, FS20Parser, HMSParser, SIMParser)
 
 
 def _hex(n):
     s = hex(n)[2:]
-    l = len(s)
-    return s.zfill(l + l % 2)
+    len_s = len(s)
+    return s.zfill(len_s + len_s % 2)
 
 
 class CUL868Coordinator(LoggerMixin):
@@ -39,9 +38,9 @@ class CUL868Coordinator(LoggerMixin):
         }
 
         self.sim_parsers = {
-            # "K": SIMParser(),
+            "K": SIMParser(),
             # "E": SIMParser(),
-            "F": SIMParser(),
+            # "F": SIMParser(),
             # "H": SIMParser()
         }
 

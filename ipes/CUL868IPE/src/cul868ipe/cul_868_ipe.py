@@ -1,8 +1,9 @@
 import time
+from collections import namedtuple
+
+from cul_868_coordinator import CUL868Coordinator
 from openmtc_app.onem2m import XAE
 from openmtc_onem2m.model import Container
-from collections import namedtuple
-from cul_868_coordinator import CUL868Coordinator
 
 BAUD_RATE = 9600
 NODE_DISCOVER_INTERVAL = 6
@@ -15,8 +16,8 @@ class CUL868IPE(XAE):
     max_nr_of_instances = 30
     default_access_right = False
 
-    def __init__(self, cul_devices, device="/dev/ttyACM0",
-                 sim=False, sim_period=3, device_mappings={}, *args, **kw):
+    def __init__(self, cul_devices, device="/dev/ttyACM0", sim=False, sim_period=3,
+                 device_mappings=None, *args, **kw):
         super(CUL868IPE, self).__init__(*args, **kw)
         self.device = device
 
@@ -37,7 +38,7 @@ class CUL868IPE(XAE):
         self.sim = sim
         self.sim_period = sim_period
 
-        self.device_mappings = device_mappings
+        self.device_mappings = device_mappings or {}
 
         self._old_fs20_values = {}
 

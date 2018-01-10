@@ -1,7 +1,5 @@
 from parsers import S300THParser, EM1000EMParser, FS20Parser
 
-__author__ = 'ren-local'
-
 
 def test_parsers():
     # ('1', S300THData(temperature=22.5, humidity=31.3))
