@@ -1,9 +1,8 @@
 from signal import SIGTERM, SIGINT
 
+import gevent.signal
 from flask import (Flask, request, abort, redirect, url_for,
                    Response as FlaskResponse)
-
-from gevent import signal as gevent_signal
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from socketio import Server as SioServer, Middleware as SioMiddleware
@@ -32,8 +31,8 @@ class SimpleFlaskRunner(AppRunner):
 
         _server = self._get_server()
         self.logger.debug("Serving on %s:%s", self.listen_on, self.port)
-        gevent_signal(SIGTERM, _server.stop)
-        gevent_signal(SIGINT, _server.stop)
+        gevent.signal(SIGTERM, _server.stop)
+        gevent.signal(SIGINT, _server.stop)
         _server.serve_forever()
 
     def add_route(self, route, handler, methods=("POST", "GET")):
