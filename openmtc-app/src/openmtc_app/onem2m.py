@@ -14,6 +14,7 @@ from json import (
 )
 from futile.logging import LoggerMixin
 import logging
+
 from openmtc.util import (
     UTC,
     datetime_now,
@@ -73,8 +74,8 @@ class XAE(LoggerMixin):
     __app = None
 
     def __init__(self, name=None, cse_base=None, expiration_time=None, announce_to=None, poas=None,
-                 originator_pre=None, ca_certs=None, cert_file=None, key_file=None, *args, **kw):
-        super(XAE, self).__init__(*args, **kw)
+                 originator_pre=None, ca_certs=None, cert_file=None, key_file=None):
+        super(XAE, self).__init__()
 
         self.__subscriptions = []
 
@@ -161,7 +162,7 @@ class XAE(LoggerMixin):
 
     @staticmethod
     def run_forever(period=1000, func=None, *args, **kw):
-        """ executes a given function repeatingly at a given interval
+        """ executes a given function repetitively at a given interval
         :param period: (optional) frequency of repeated execution (in Hz)
         :param func: (optional) function to be executed
         """
@@ -284,7 +285,7 @@ class XAE(LoggerMixin):
     def create_application(self, application, path=None):
         """ Creates an Application resource.
 
-        :param application: Application instance or appId as str
+        :param application: Application instance or resourceName as str
         :param path: (optional) path in the resource tree
         """
         # TODO(rst): set app_id via config
