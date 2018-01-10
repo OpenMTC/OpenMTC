@@ -14,7 +14,7 @@ components  with:
 ## How to setup a development environment using Docker?
 
 *Note:* If you do not have a running docker setup, we provide a [docker installation
-guide](./various.md). Alternativly you can use the [offical docker
+guide](./various.md). Alternatively you can use the [official docker
 documentation](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/).
 
 For this scenario, be sure to build Docker container images for following OpenMTC components:
@@ -32,7 +32,7 @@ prepared in a directory named:
 OpenMTC
 ```
 
-OpenMTC container images will be created through a hiearchy of
+OpenMTC container images will be created through a hierarchy of
 dependent images.  For example when creating image 'sdk', a dependent
 'base' image will be created.  After completing the build process for
 each Docker image, the image is to be found in the machine's local
@@ -88,7 +88,7 @@ TODO
 **Disclaimer:** *Docker provides commands like export/import and
 save/load.  Sadly, it is easy to get confused here.  The command
 `save` is used to export a Docker image, while the command `load` is
-used to import this Docker image.  Whereas, the coammds export/import
+used to import this Docker image.  Whereas, the commands export/import
 are to container instances.*
 
 Assuming that the Docker images for OpenMTC Gateway and Backend are
@@ -201,5 +201,5 @@ docker run -d --name gateway  -p 0.0.0.0:8000:8000  -e "EXTERNAL_IP=<EXTERNAL_IP
  - `<POA>` : An URL that describes the POA fo Backend (e.g. "http://localhost:18000")
  - If you need to know more about detail of `-d` (detach) and the port
    mapping configuration `-p 0.0.0.0:8000:8000`, check out the
-  [documenation as provided by Docker](https://docs.docker.com/engine/reference/run/).
+  [documentation as provided by Docker](https://docs.docker.com/engine/reference/run/).
 

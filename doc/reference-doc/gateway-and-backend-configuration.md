@@ -106,9 +106,9 @@ TODO: Description
     "name": "AnnouncementHandler",
     "package": "openmtc_cse.plugins.announcement_handler",
     "disabled": true,
-        "config": {
-            "auto_announce": false
-        }
+    "config": {
+        "auto_announce": false
+    }
 }
 ```
 
@@ -213,7 +213,7 @@ Furthermore, a remote CSE resource which contains information about the backend 
                 ],
                 "poa": [
                     "http://localhost:18000"
-                ],
+                ]
             }
         ],
         "interval": 3600,
