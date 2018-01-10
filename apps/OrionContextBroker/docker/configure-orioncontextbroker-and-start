@@ -3,10 +3,10 @@
 CONFIG_FILE="/etc/openmtc/orioncontextbroker/config.json"
 
 NAME=${NAME-"OrionContextBroker"}
-EP=${EP-"http://localhost:8000"}
+EP=${EP-"http://localhost:18000"}
 CSE_BASE=${CSE_BASE-"onem2m"}
 POAS=${POAS-'["http://auto:25396"]'}
-ORIGINATOR_PRE=${ORIGINATOR_PRE-"//openmtc.org/mn-cse-1"}
+ORIGINATOR_PRE=${ORIGINATOR_PRE-"//openmtc.org/in-cse-1"}
 SSL_CRT=${SSL_CRT-"/etc/openmtc/certs/orioncontextbroker.cert.pem"}
 SSL_KEY=${SSL_KEY-"/etc/openmtc/certs/orioncontextbroker.key.pem"}
 SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
