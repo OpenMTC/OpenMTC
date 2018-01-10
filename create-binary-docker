@@ -216,6 +216,32 @@ target_docker_binary="${docker_tmp}/openmtc-${name}.tar.gz"
 # export image
 docker_dist="${base_path}/dist/docker"
 
+# check if python is installed
+if ! $(which python) --version >/dev/null 2>&1; then
+    echo "Python is not installed. Exiting now."
+    exit 2
+fi
+
+# check if default python version is 2.x
+python_version_getter="import sys; print('%s%s' % (sys.version_info.major, sys.version_info.minor))"
+if [ $($(which python) -c "${python_version_getter}") != "27" ]; then
+    echo "Default python version should be 2.7. Exiting now."
+    exit 2
+fi
+
+# check if python-setuptools is available
+if ! $(which python) -c "import setuptools" >/dev/null 2>&1; then
+    echo -n "Setuptools for python is not installed. "
+    echo "Please use pip or OS package manager to install it. Exiting now."
+    exit 2
+fi
+
+# check if docker is installed
+if ! $(which docker) --version >/dev/null 2>&1; then
+    echo "docker is not installed. Exiting now."
+    exit 2
+fi
+
 ##############################################################################
 # set docker command
 # only sudo if not root and not in docker group
