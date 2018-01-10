@@ -27,7 +27,7 @@ aplus.log_error = log_error
 
 
 def uri_safe(s):
-    return quote(s.replace("/", "_"))
+    return quote(s.replace("/", "_"), safe='~')
 
 
 def is_text_content(mimetype):
