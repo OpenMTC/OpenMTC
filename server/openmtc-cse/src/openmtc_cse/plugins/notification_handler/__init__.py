@@ -67,6 +67,14 @@ class NotificationHandler(Plugin):
 
         self._initialized()
 
+    def _get_subscription_reference(self, to, path):
+        if to.startswith('//'):
+            return self._abs_cse_id + '/' + path
+        elif to.startswith('/'):
+            return self._rel_cse_id + '/' + path
+        else:
+            return path
+
     def _get_sub_list(self, pid, net):
         return [
             v['sub'] for v in self.subscriptions_info.itervalues()
@@ -123,7 +131,10 @@ class NotificationHandler(Plugin):
                 su,
                 pc=Notification(
                     subscriptionDeletion=True,
-                    subscriptionReference=subscription.path,
+                    subscriptionReference=self._get_subscription_reference(su, subscription.path),
+                    # TODO(rst): check if this is the sub creator or the creator of the notification
+                    # TODO          in this case the CSE
+                    creator=subscription.creator,
                 ),
             ))
         except CSENotFound:
@@ -348,14 +359,6 @@ class NotificationHandler(Plugin):
     def _send_notification(self, resource, sub):
         self.logger.debug("sending notification for resource: %s", resource)
 
-        def get_subscription_reference(to, path):
-            if to.startswith('//'):
-                return self._abs_cse_id + '/' + path
-            elif to.startswith('/'):
-                return self._rel_cse_id + '/' + path
-            else:
-                return path
-
         for uri in sub.notificationURI:
             self.api.handle_onem2m_request(OneM2MRequest(
                 op=OneM2MOperation.notify,
@@ -364,7 +367,7 @@ class NotificationHandler(Plugin):
                     notificationEvent=NotificationEventC(
                         representation=resource
                     ),
-                    subscriptionReference=get_subscription_reference(uri, sub.path),
+                    subscriptionReference=self._get_subscription_reference(uri, sub.path),
                     # TODO(rst): check if this is the sub creator or the creator of the notification
                     # TODO          in this case the CSE
                     creator=sub.creator
