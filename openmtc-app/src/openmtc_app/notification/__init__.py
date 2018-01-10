@@ -95,9 +95,12 @@ class NotificationManager(LoggerMixin):
 
         self._init = nop
 
-    def register_callback(self, func, sur):
-        self.callbacks[sur] = func if len(getargspec(func)[0]) > 1 \
-            else lambda _, **notification: func(notification['rep'])
+    def register_callback(self, func, sur, del_func=None):
+        self.callbacks[sur] = {
+            'cb': func if len(getargspec(func)[0]) > 1
+            else lambda _, **notification: func(notification['rep']),
+            'del_cb': del_func
+        }
 
     def _handle_callback(self, originator, **notification):
         sur = notification.pop('sur')
@@ -117,14 +120,18 @@ class NotificationManager(LoggerMixin):
             else:
                 return
         try:
-            spawn(callback, originator, **notification)
+            if notification.get('sud'):
+                del self.callbacks[sur]
+                spawn(callback['del_cb'], sur)
+            else:
+                spawn(callback['cb'], sur, **notification)
         except:
             pass
 
     def get_expiration_time(self):
         return None
 
-    def subscribe(self, path, func, filter_criteria=None, expiration_time=None,
+    def subscribe(self, path, func, delete_func=None, filter_criteria=None, expiration_time=None,
                   notification_types=(NotificationEventTypeE.updateOfResource,)):
         self._init()
 
@@ -136,10 +143,11 @@ class NotificationManager(LoggerMixin):
             notificationURI=[self.mapper.originator],
             expirationTime=expiration_time or self.get_expiration_time(),
             eventNotificationCriteria=event_notification_criteria,
+            subscriberURI=self.mapper.originator,
         ))
 
-        reference = self._normalize_path(subscription.subscriberURI or subscription.path)
-        self.register_callback(func, reference)
+        reference = self._normalize_path(subscription.path)
+        self.register_callback(func, reference, delete_func)
         return subscription
 
     def unsubscribe(self, sur):
@@ -168,6 +176,12 @@ class BaseNotificationHandler(object):
 
     @classmethod
     def _unpack_notification(cls, notification):
+        if notification.subscriptionDeletion:
+            return {
+                'sur': notification.subscriptionReference,
+                'sud': True
+            }
+
         return {
             'sur': notification.subscriptionReference,
             'net': notification.notificationEvent.notificationEventType,
@@ -237,8 +251,8 @@ class HttpNotificationHandler(BaseNotificationHandler):
             assert 'x-m2m-ri' in request.headers, 'Missing request id'
             assert 'content-type' in request.headers, 'Unspecified content type'
 
-            notification = self._unpack_notification(
-                get_onem2m_decoder(request.content_type).decode(request.data))
+            notification = get_onem2m_decoder(request.content_type).decode(request.data)
+            notification = self._unpack_notification(notification)
             self._callback(request.headers['x-m2m-origin'], **notification)
 
             return Response(
