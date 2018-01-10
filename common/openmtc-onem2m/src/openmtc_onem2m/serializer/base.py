@@ -128,7 +128,10 @@ class OneM2MDictSerializer(OneM2MSerializer):
                             if isinstance(item, OneM2MEntity):
                                 return self.encode_resource(item, pretty, path, encoding, fields)
                             return item
-                        o[k] = map(encode_list_item, v)
+                        if len(v):
+                            o[k] = map(encode_list_item, v)
+                        else:
+                            empty_keys.append(k)
                     else:
                         try:
                             if len(v) == 0:
