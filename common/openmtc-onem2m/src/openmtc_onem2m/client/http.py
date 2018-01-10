@@ -92,14 +92,16 @@ class OneM2MHTTPClient(OneM2MClient):
         # TODO(rst): handle IPv6 host here
         # geventhttpclient sets incorrect host header
         # i.e "host: ::1:8000" instead of "host: [::1]:8000
-        if (is_https and ca_certs is not None and cert_file is not None and
-                key_file is not None):
+        if is_https:
             ssl_options = {
-                "ca_certs": ca_certs,
-                "certfile": cert_file,
-                "keyfile": key_file,
-                "ssl_version": self.DEF_SSL_VERSION
+                'ssl_version': self.DEF_SSL_VERSION
             }
+            if ca_certs:
+                ssl_options['ca_certs'] = ca_certs
+            if cert_file and key_file:
+                ssl_options['certfile'] = cert_file
+                ssl_options['keyfile'] = key_file
+
         else:
             ssl_options = None
 
