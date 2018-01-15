@@ -302,6 +302,7 @@ class NotificationHandler(Plugin):
                         resources.append({resource.resourceID: [Notification()]})
                     
                     if int(batch_notify.get_values()["number"]) <= len(resources[index][resource.resourceID]):
+                        pass
                         # TODO: send aggregated notification
                         # TODO: empty buffered notifications
                 except KeyError:
@@ -383,7 +384,7 @@ class NotificationHandler(Plugin):
     def _send_notification(self, resource, sub):
         self.logger.debug("sending notification for resource: %s", resource)
 
-        def get_subscription_reference(self, to, path):
+        def get_subscription_reference(to, path):
             if to.startswith('//'):
                 return self._abs_cse_id + '/' + path
             elif to.startswith('/'):
