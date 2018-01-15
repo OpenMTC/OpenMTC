@@ -739,7 +739,11 @@ class EventNotificationCriteria(OneM2MEntity):
 
 
 class BatchNotify(OneM2MEntity):
-    pass  # TODO
+    """ See TS-004 6.3.5.6
+        See TS-004 Table 6.3.5.6-1"""
+    
+    number = Attribute(str)
+    duration = Attribute(str)
 
 
 class RateLimit(OneM2MEntity):

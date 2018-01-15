@@ -7,6 +7,7 @@ from openmtc_onem2m.model import (
     EventNotificationCriteria,
     NotificationEventTypeE,
     Subscription,
+    BatchNotify,
 )
 from openmtc_onem2m.serializer import get_onem2m_decoder
 from urlparse import urlparse
@@ -124,18 +125,22 @@ class NotificationManager(LoggerMixin):
     def get_expiration_time(self):
         return None
 
-    def subscribe(self, path, func, filter_criteria=None, expiration_time=None,
+    def subscribe(self, path, func, filter_criteria=None, sub_options=None, expiration_time=None,
                   notification_types=(NotificationEventTypeE.updateOfResource,)):
         self._init()
 
         event_notification_criteria = filter_criteria or EventNotificationCriteria()
         event_notification_criteria.notificationEventType = (
             event_notification_criteria.notificationEventType or list(notification_types))
+        
+        batch_notify = BatchNotify()
+        batch_notify.set_values(sub_options["batchNotify"])
 
         subscription = self.mapper.create(path, Subscription(
             notificationURI=[self.mapper.originator],
             expirationTime=expiration_time or self.get_expiration_time(),
             eventNotificationCriteria=event_notification_criteria,
+            batchNotify=batch_notify
         ))
 
         reference = self._normalize_path(subscription.subscriberURI or subscription.path)

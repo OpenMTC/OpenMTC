@@ -570,10 +570,11 @@ class XAE(LoggerMixin):
             self.runner.flask_app.url_map._rules
         )
 
-    def _add_subscription(self, path, _, handler, delete_handler, filter_criteria=None, expiration_time=None):
+    def _add_subscription(self, path, _, handler, delete_handler, filter_criteria=None,  sub_options=None, expiration_time=None):
         params = {
             'filter_criteria': filter_criteria,
             'expiration_time': expiration_time,
+            'sub_options': sub_options,
         }
         self.add_subscription_handler(path, handler, **params)
         # self.notification_manager.subscribe(path, handler, **params)
@@ -592,13 +593,14 @@ class XAE(LoggerMixin):
         self._add_subscription(path, None, handler, delete_handler)
 
     def add_subscription_handler(self, path, handler, types=(NotificationEventTypeE.updateOfResource, ),
-                                 filter_criteria=None, expiration_time=None):
+                                 filter_criteria=None, sub_options=None, expiration_time=None):
         """
 
         :param path:
         :param handler:
         :param types:
         :param filter_criteria:
+        :param sub_options:
         :param expiration_time:
         :return:
         """
@@ -608,6 +610,7 @@ class XAE(LoggerMixin):
                 handler,
                 notification_types=types,
                 filter_criteria=filter_criteria,
+                sub_options=sub_options,
                 expiration_time=expiration_time
             )
 
@@ -627,7 +630,7 @@ class XAE(LoggerMixin):
         return subscription
 
     def add_container_subscription(self, container, handler,
-                                   delete_handler=None, filter_criteria=None):
+                                   delete_handler=None, filter_criteria=None, sub_options=None):
         """ Creates a Subscription to the ContentInstances of the given
         Container.
 
@@ -635,6 +638,7 @@ class XAE(LoggerMixin):
         :param handler: reference of the notification handling function
         :param delete_handler: reference to delete handling function
         :param filter_criteria: (optional) FilterCriteria for the subscription
+        :param sub_options: (optional) SubscriptionOptions forthe subscription
         """
 
         path = getattr(container, "path", container)
@@ -647,6 +651,7 @@ class XAE(LoggerMixin):
         filter_criteria = filter_criteria or EventNotificationCriteria()
         filter_criteria.notificationEventType = list([
             NotificationEventTypeE.createOfDirectChildResource,
+            NotificationEventTypeE.updateOfResource,
         ])
 
         def content_handler(cin):
@@ -657,7 +662,8 @@ class XAE(LoggerMixin):
             None,
             content_handler,
             delete_handler,
-            filter_criteria
+            filter_criteria,
+            sub_options,
         )
 
     def __start_refresher(self, instance, extra_fields=(), restore=None):

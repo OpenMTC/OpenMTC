@@ -45,6 +45,7 @@ class NotificationHandler(Plugin):
         sp_id = config.get('onem2m', {}).get('sp_id', 'openmtc.org')
         self._rel_cse_id = '/' + cse_id
         self._abs_cse_id = '//' + sp_id + '/' + cse_id
+        self.buffered_subscriptions = {}
 
     def _init(self):
         # subscription created
@@ -269,9 +270,44 @@ class NotificationHandler(Plugin):
         except AttributeError:
             pass
 
-        # NOTE: The use of some attributes such as rateLimit, batchNotify and
+        # NOTE: The use of some attributes such as rateLimit, `Notify and
         # preSubscriptionNotify is not supported in this release of the
         # document.
+
+        def _get_resource_index(resources, id):
+            for resource in resources:
+                index = 0
+
+                for key in resource.keys():
+                    if key == id:
+                        return index
+
+                    index += 1
+            
+            return -1
+
+        try:
+            batch_notify = sub.batchNotify
+            
+            if batch_notify == None:
+                self._send_notification(resource, sub)
+            else:
+                try:
+                    resources = self.buffered_subscriptions[sub.resourceID]
+                    index = _get_resource_index(resources, resource.resourceID)
+
+                    if index >= 0:
+                        resources[index][resource.resourceID].append(Notification())
+                    else:
+                        resources.append({resource.resourceID: [Notification()]})
+                    
+                    if int(batch_notify.get_values()["number"]) <= len(resources[index][resource.resourceID]):
+                        # TODO: send aggregated notification
+                        # TODO: empty buffered notifications
+                except KeyError:
+                    self.buffered_subscriptions[sub.resourceID] = [{resource.resourceID: [Notification()]}]
+        except AttributeError:
+            pass
 
         # Step 3.0 The Originator shall check the notification and reachability
         # schedules, but the notification schedules may be checked in different
@@ -343,12 +379,11 @@ class NotificationHandler(Plugin):
         # while storing Notify request primitives locally. When the Receiver as
         # a transit CSE needs to send pending Notify request primitives, it
         # shall send the latest Notify request primitive.
-        self._send_notification(resource, sub)
 
     def _send_notification(self, resource, sub):
         self.logger.debug("sending notification for resource: %s", resource)
 
-        def get_subscription_reference(to, path):
+        def get_subscription_reference(self, to, path):
             if to.startswith('//'):
                 return self._abs_cse_id + '/' + path
             elif to.startswith('/'):
