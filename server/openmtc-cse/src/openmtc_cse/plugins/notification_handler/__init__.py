@@ -311,8 +311,11 @@ class NotificationHandler(Plugin):
                     
                     if int(batch_notify.get_values()["number"]) <= len(resources[index][resource.resourceID]):
                         aggregated_notification = AggregatedNotification()
+                        # TODO: change aggregated_notification argument pass
                         aggregated_notification.set_values({"notification": resources[index][resource.resourceID]})
-                        self._send_notification(resource, sub)
+                        
+                        # TODO: send aggregated notification
+                        del(resources[index])
                 except KeyError:
                     self.buffered_subscriptions[sub.resourceID] = [{resource.resourceID: [notification]}]
         except AttributeError:
