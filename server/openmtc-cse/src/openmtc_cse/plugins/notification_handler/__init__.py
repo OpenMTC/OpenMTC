@@ -8,6 +8,7 @@ from openmtc_onem2m.model import (
     NotificationContentTypeE,
     EventNotificationCriteria,
     NotificationEventTypeE,
+    AggregatedNotification,
 )
 from openmtc_onem2m.transport import OneM2MOperation
 from openmtc_server.Plugin import Plugin
@@ -292,21 +293,28 @@ class NotificationHandler(Plugin):
             if batch_notify == None:
                 self._send_notification(resource, sub)
             else:
+                notification = Notification(
+                    notificationEvent=NotificationEventC(
+                        representation=resource
+                    ),
+                    creator=sub.creator
+                )
+
                 try:
                     resources = self.buffered_subscriptions[sub.resourceID]
                     index = _get_resource_index(resources, resource.resourceID)
 
                     if index >= 0:
-                        resources[index][resource.resourceID].append(Notification())
+                        resources[index][resource.resourceID].append(notification)
                     else:
-                        resources.append({resource.resourceID: [Notification()]})
+                        resources.append({resource.resourceID: [notification]})
                     
                     if int(batch_notify.get_values()["number"]) <= len(resources[index][resource.resourceID]):
-                        pass
-                        # TODO: send aggregated notification
-                        # TODO: empty buffered notifications
+                        aggregated_notification = AggregatedNotification()
+                        aggregated_notification.set_values({"notification": resources[index][resource.resourceID]})
+                        self._send_notification(resource, sub)
                 except KeyError:
-                    self.buffered_subscriptions[sub.resourceID] = [{resource.resourceID: [Notification()]}]
+                    self.buffered_subscriptions[sub.resourceID] = [{resource.resourceID: [notification]}]
         except AttributeError:
             pass
 
