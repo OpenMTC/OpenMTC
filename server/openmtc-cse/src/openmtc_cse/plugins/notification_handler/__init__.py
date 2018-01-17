@@ -46,7 +46,6 @@ class NotificationHandler(Plugin):
         sp_id = config.get('onem2m', {}).get('sp_id', 'openmtc.org')
         self._rel_cse_id = '/' + cse_id
         self._abs_cse_id = '//' + sp_id + '/' + cse_id
-        self.buffered_subscriptions = {}
 
     def _init(self):
         # subscription created
@@ -89,6 +88,7 @@ class NotificationHandler(Plugin):
             "pid": subscription.parentID,
             "enc": get_event_notification_criteria(subscription),
             "sub": subscription,
+            "not": [],
         }
 
     def _handle_subscription_updated(self, subscription, _):
@@ -272,20 +272,8 @@ class NotificationHandler(Plugin):
             pass
 
         # NOTE: The use of some attributes such as rateLimit, `Notify and
-        # preSubscriptionNotify is not supported in this release of the
+        # preSubscriptionNotify is not supported in this release of the(
         # document.
-
-        def _get_resource_index(resources, id):
-            for resource in resources:
-                index = 0
-
-                for key in resource.keys():
-                    if key == id:
-                        return index
-
-                    index += 1
-            
-            return -1
 
         try:
             batch_notify = sub.batchNotify
@@ -293,31 +281,13 @@ class NotificationHandler(Plugin):
             if batch_notify == None:
                 self._send_notification(resource, sub)
             else:
-                notification = Notification(
-                    notificationEvent=NotificationEventC(
-                        representation=resource
-                    ),
-                    creator=sub.creator
-                )
+                notifications = self.subscriptions_info[sub.resourceID]["not"]
+                notifications.append(Notification())
 
-                try:
-                    resources = self.buffered_subscriptions[sub.resourceID]
-                    index = _get_resource_index(resources, resource.resourceID)
-
-                    if index >= 0:
-                        resources[index][resource.resourceID].append(notification)
-                    else:
-                        resources.append({resource.resourceID: [notification]})
-                    
-                    if int(batch_notify.get_values()["number"]) <= len(resources[index][resource.resourceID]):
-                        aggregated_notification = AggregatedNotification()
-                        # TODO: change aggregated_notification argument pass
-                        aggregated_notification.set_values({"notification": resources[index][resource.resourceID]})
-                        
-                        # TODO: send aggregated notification
-                        del(resources[index])
-                except KeyError:
-                    self.buffered_subscriptions[sub.resourceID] = [{resource.resourceID: [notification]}]
+                if int(batch_notify.number) <= len(notifications):
+                    aggregated_notification = AggregatedNotification(**{"notification": notifications})
+                    # TODO: send aggregated_notification
+                    self.subscriptions_info[sub.resourceID]["not"] = []
         except AttributeError:
             pass
 
