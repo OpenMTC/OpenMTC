@@ -13,6 +13,8 @@ from openmtc_onem2m.model import (
 from openmtc_onem2m.transport import OneM2MOperation
 from openmtc_server.Plugin import Plugin
 
+import datetime
+
 
 def get_event_notification_criteria(subscription):
     # If the eventNotificationCriteria attribute is set, then the Originator
@@ -88,7 +90,8 @@ class NotificationHandler(Plugin):
             "pid": subscription.parentID,
             "enc": get_event_notification_criteria(subscription),
             "sub": subscription,
-            "not": [],
+            "not": [],                      # notifications
+            "levt": datetime.datetime.now() # last event time
         }
 
     def _handle_subscription_updated(self, subscription, _):
@@ -281,12 +284,15 @@ class NotificationHandler(Plugin):
             if batch_notify == None:
                 self._send_notification(resource, sub)
             else:
+                current_time = datetime.datetime.now()
                 notifications = self.subscriptions_info[sub.resourceID]["not"]
                 notifications.append(Notification())
 
-                if int(batch_notify.number) <= len(notifications):
+                if int(batch_notify.number) <= len(notifications) or \
+                        int(batch_notify.duration) <= int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds):
                     aggregated_notification = AggregatedNotification(**{"notification": notifications})
                     # TODO: send aggregated_notification
+                    self.subscriptions_info[sub.resourceID]["levt"] = current_time
                     self.subscriptions_info[sub.resourceID]["not"] = []
         except AttributeError:
             pass
