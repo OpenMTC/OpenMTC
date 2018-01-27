@@ -714,7 +714,6 @@ class AggregatedNotification(OneM2MEntity):
 
     notification = ListAttribute(Notification)
 
-
 ################################################################################
 # subscription
 ################################################################################

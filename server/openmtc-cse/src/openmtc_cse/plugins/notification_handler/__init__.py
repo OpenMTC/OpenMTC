@@ -287,19 +287,22 @@ class NotificationHandler(Plugin):
                 current_time = datetime.datetime.now()
                 notifications = self.subscriptions_info[sub.resourceID]["not"]
 
-                notifications.append(
-                    Notification(
-                        notificationEvent=NotificationEventC(
-                            representation=resource
+                for uri in sub.notificationURI:
+                    notifications.append(
+                        Notification(
+                            notificationEvent=NotificationEventC(
+                                representation=resource
+                            ),
+                            subscriptionReference=self._get_subscription_reference(uri, sub.path),
+                            creator=sub.creator
                         )
                     )
-                )
 
                 if int(batch_notify.number) <= len(notifications) or \
                         int(batch_notify.duration) <= int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds):
                     aggregated_notification = AggregatedNotification(**{"notification": notifications})
 
-                    self._send_notification(aggregated_notification, sub)
+                    self._send_notification(resource, sub)
                     self.subscriptions_info[sub.resourceID]["levt"] = current_time
                     self.subscriptions_info[sub.resourceID]["not"] = []
         except AttributeError:
@@ -376,16 +379,16 @@ class NotificationHandler(Plugin):
         # a transit CSE needs to send pending Notify request primitives, it
         # shall send the latest Notify request primitive.
 
+    def _get_subscription_reference(self, to, path):
+        if to.startswith('//'):
+            return self._abs_cse_id + '/' + path
+        elif to.startswith('/'):
+            return self._rel_cse_id + '/' + path
+        else:
+            return path
+
     def _send_notification(self, resource, sub):
         self.logger.debug("sending notification for resource: %s", resource)
-
-        def get_subscription_reference(to, path):
-            if to.startswith('//'):
-                return self._abs_cse_id + '/' + path
-            elif to.startswith('/'):
-                return self._rel_cse_id + '/' + path
-            else:
-                return path
 
         if isinstance(resource, AggregatedNotification):
             for uri in sub.notificationURI:
@@ -403,7 +406,7 @@ class NotificationHandler(Plugin):
                         notificationEvent=NotificationEventC(
                             representation=resource
                         ),
-                        subscriptionReference=get_subscription_reference(uri, sub.path),
+                        subscriptionReference=self._get_subscription_reference(uri, sub.path),
                         # TODO(rst): check if this is the sub creator or the creator of the notification
                         # TODO          in this case the CSE
                         creator=sub.creator

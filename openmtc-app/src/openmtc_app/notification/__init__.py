@@ -8,6 +8,7 @@ from openmtc_onem2m.model import (
     NotificationEventTypeE,
     Subscription,
     BatchNotify,
+    AggregatedNotification,
 )
 from openmtc_onem2m.serializer import get_onem2m_decoder
 from urlparse import urlparse
@@ -101,7 +102,12 @@ class NotificationManager(LoggerMixin):
             else lambda _, **notification: func(notification['rep'])
 
     def _handle_callback(self, originator, **notification):
-        sur = notification.pop('sur')
+        try:
+            n = notification["not"][0]
+        except KeyError:
+            n = notification
+
+        sur = n.pop('sur')
         sur = self._normalize_path(sur)
 
         try:
@@ -239,8 +245,18 @@ class HttpNotificationHandler(BaseNotificationHandler):
             assert 'x-m2m-ri' in request.headers, 'Missing request id'
             assert 'content-type' in request.headers, 'Unspecified content type'
 
-            notification = self._unpack_notification(
-                get_onem2m_decoder(request.content_type).decode(request.data))
+            notification = {}
+            notification_type = get_onem2m_decoder(request.content_type).decode(request.data)
+
+            if isinstance(notification_type, AggregatedNotification):
+                notification["not"] = []
+
+                for n in notification_type.values["notification"]:
+                    notification["not"].append(
+                        self._unpack_notification(n)
+                    )
+            else:
+                notification = self._unpack_notification(notification_type)
             self._callback(request.headers['x-m2m-origin'], **notification)
 
             return Response(
