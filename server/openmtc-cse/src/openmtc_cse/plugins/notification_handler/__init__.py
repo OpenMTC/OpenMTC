@@ -286,12 +286,20 @@ class NotificationHandler(Plugin):
             else:
                 current_time = datetime.datetime.now()
                 notifications = self.subscriptions_info[sub.resourceID]["not"]
-                notifications.append(Notification())
+
+                notifications.append(
+                    Notification(
+                        notificationEvent=NotificationEventC(
+                            representation=resource
+                        )
+                    )
+                )
 
                 if int(batch_notify.number) <= len(notifications) or \
                         int(batch_notify.duration) <= int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds):
                     aggregated_notification = AggregatedNotification(**{"notification": notifications})
-                    # TODO: send aggregated_notification
+
+                    self._send_notification(aggregated_notification, sub)
                     self.subscriptions_info[sub.resourceID]["levt"] = current_time
                     self.subscriptions_info[sub.resourceID]["not"] = []
         except AttributeError:
@@ -379,17 +387,25 @@ class NotificationHandler(Plugin):
             else:
                 return path
 
-        for uri in sub.notificationURI:
-            self.api.handle_onem2m_request(OneM2MRequest(
-                op=OneM2MOperation.notify,
-                to=uri,
-                pc=Notification(
-                    notificationEvent=NotificationEventC(
-                        representation=resource
+        if isinstance(resource, AggregatedNotification):
+            for uri in sub.notificationURI:
+                self.api.handle_onem2m_request(OneM2MRequest(
+                    op=OneM2MOperation.notify,
+                    to=uri,
+                    pc=resource
+                ))
+        else:
+            for uri in sub.notificationURI:
+                self.api.handle_onem2m_request(OneM2MRequest(
+                    op=OneM2MOperation.notify,
+                    to=uri,
+                    pc=Notification(
+                        notificationEvent=NotificationEventC(
+                            representation=resource
+                        ),
+                        subscriptionReference=get_subscription_reference(uri, sub.path),
+                        # TODO(rst): check if this is the sub creator or the creator of the notification
+                        # TODO          in this case the CSE
+                        creator=sub.creator
                     ),
-                    subscriptionReference=get_subscription_reference(uri, sub.path),
-                    # TODO(rst): check if this is the sub creator or the creator of the notification
-                    # TODO          in this case the CSE
-                    creator=sub.creator
-                ),
-            ))
+                ))
