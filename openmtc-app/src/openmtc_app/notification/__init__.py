@@ -98,13 +98,10 @@ class NotificationManager(LoggerMixin):
         self._init = nop
 
     def register_callback(self, func, sur):
-        if len(getargspec(func)[0]) > 1:
-            self.callbacks[sur] = func
-        else:
-            try:
-                self.callbacks[sur] = lambda _, **notification: func(notification['not'])
-            except KeyError:
-                self.callbacks[sur] = lambda _, **notification: func(notification['rep'])
+        # Not as beautifull as it should be but it works ......
+        self.callbacks[sur] = func if len(getargspec(func)[0]) > 1 \
+        else lambda _, **notification: func(notification['not']) if 'not' in notification.keys() \
+        else func(notification['rep'])
 
     def _handle_callback(self, originator, **notification):
         try:
