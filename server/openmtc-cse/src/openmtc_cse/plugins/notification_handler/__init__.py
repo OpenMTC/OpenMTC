@@ -302,7 +302,7 @@ class NotificationHandler(Plugin):
                         int(batch_notify.duration) <= int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds):
                     aggregated_notification = AggregatedNotification(**{"notification": notifications})
 
-                    self._send_notification(resource, sub)
+                    self._send_notification(aggregated_notification, sub)
                     self.subscriptions_info[sub.resourceID]["levt"] = current_time
                     self.subscriptions_info[sub.resourceID]["not"] = []
         except AttributeError:
