@@ -21,9 +21,13 @@ class OrionContextBroker(ResourceManagementXAE):
     def _on_register(self):
         self._discover_openmtc_ipe_entities()
 
-    def _sensor_filter(self, sensor):
+    def _new_actuator(self, actuator_info):
+        # handle OCB actuator here
+        pass
+
+    def _sensor_filter(self, sensor_info):
         if self.labels:
-            return len(self.labels.intersection(sensor.labels)) > 0
+            return len(self.labels.intersection(sensor_info['sensor_labels'])) > 0
         else:
             return True
 
