@@ -32,7 +32,7 @@ class OneM2MTransportDomain(Component):
         else:
             self.originator = "//" + self.sp_id + "/" + self.cse_id
 
-        ssl_certs = self.config.get("onem2m", {}).get("ssl_certs")
+        ssl_certs = self.config.get("onem2m", {}).get("ssl_certs", {})
         self.key_file = ssl_certs.get("key")
         self.cert_file = ssl_certs.get("crt")
         self.ca_file = ssl_certs.get("ca")
@@ -53,26 +53,18 @@ class OneM2MTransportDomain(Component):
         self.events = api.events
 
         # addresses
-        self._api.events.interface_created.register_handler(
-            self._handle_interface_created)
-        self._api.events.interface_removed.register_handler(
-            self._handle_interface_removed)
-        self._api.events.address_created.register_handler(
-            self._handle_address_created)
-        self._api.events.address_removed.register_handler(
-            self._handle_address_removed)
+        self._api.events.interface_created.register_handler(self._handle_interface_created)
+        self._api.events.interface_removed.register_handler(self._handle_interface_removed)
+        self._api.events.address_created.register_handler(self._handle_address_created)
+        self._api.events.address_removed.register_handler(self._handle_address_removed)
 
         # remote CSEs
-        self.events.resource_created.register_handler(
-            self._handle_cse_created, RemoteCSE)
-        self.events.resource_updated.register_handler(
-            self._handle_cse_updated, RemoteCSE)
-        self.events.resource_deleted.register_handler(
-            self._handle_cse_deleted, RemoteCSE)
+        self.events.resource_created.register_handler(self._handle_cse_created, RemoteCSE)
+        self.events.resource_updated.register_handler(self._handle_cse_updated, RemoteCSE)
+        self.events.resource_deleted.register_handler(self._handle_cse_deleted, RemoteCSE)
 
         interfaces = self._api.network_manager.get_interfaces().get()
-        self._addresses = {i.name: filter(self._filter_out_link_local,
-                                          i.addresses)
+        self._addresses = {i.name: filter(self._filter_out_link_local, i.addresses)
                            for i in interfaces}
 
     @staticmethod
@@ -108,8 +100,7 @@ class OneM2MTransportDomain(Component):
 
     # interface handling
     def _handle_interface_created(self, interface):
-        self._addresses[interface.name] = filter(self._filter_out_link_local,
-                                                 interface.addresses)
+        self._addresses[interface.name] = filter(self._filter_out_link_local, interface.addresses)
         self._create_endpoints()
 
     def _handle_interface_removed(self, interface):
@@ -123,25 +114,25 @@ class OneM2MTransportDomain(Component):
 
     def _handle_address_removed(self, interface_name, address):
         if self._filter_out_link_local(address):
-            self._addresses[interface_name].remove(address)
+            try:
+                self._addresses[interface_name].remove(address)
+            except ValueError:
+                pass
             self._create_endpoints()
 
     # cse handling
     # TODO(rst): find out if IDs starting with slash or not
     def _handle_cse_created(self, instance, req=None):
-        self.logger.debug("_handle_cse_created(instance=%s, req=%s)",
-                          instance, req)
-        self.add_poa_list(instance.CSE_ID[1:], instance.pointOfAccess)
+        self.logger.debug("_handle_cse_created(instance=%s, req=%s)", instance, req)
+        self.add_poa_list(instance.CSE_ID.lstrip('/'), instance.pointOfAccess)
 
     def _handle_cse_updated(self, instance, req=None):
-        self.logger.debug("_handle_cse_updated(instance=%s, req=%s)",
-                          instance, req)
-        # self._remove_poas(req_ind.path)
-        # self.add_poa_list(instance.pointOfAccess, instance.path)
+        self.logger.debug("_handle_cse_updated(instance=%s, req=%s)", instance, req)
+        self.add_poa_list(instance.CSE_ID.lstrip('/'), instance.pointOfAccess)
 
     def _handle_cse_deleted(self, instance, req):
-        self.logger.debug("_handle_cse_deleted(req_ind=%s)", req)
-        # self._remove_poas(req.path)
+        self.logger.debug("_handle_cse_deleted(req=%s)", req)
+        self.remove_poa_list(instance.CSE_ID.lstrip('/'))
 
     # api functions
     def register_client(self, schemes, get_client):
@@ -213,3 +204,9 @@ class OneM2MTransportDomain(Component):
 
     def add_poa_list(self, identifier, poa_list):
         self._poa_lists[identifier] = poa_list
+
+    def remove_poa_list(self, identifier):
+        try:
+            del self._poa_lists[identifier]
+        except KeyError:
+            pass
