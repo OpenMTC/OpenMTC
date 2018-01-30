@@ -764,6 +764,7 @@ class ResourceManagementXAE(XAE):
         self._known_remote_cses = {}
         self._discovered_devices = {}
         self._discovered_sensors = {}
+        self._discovered_actuators = {}
 
     def _discover_openmtc_ipe_entities(self):
         # connected to backend or gateway?
@@ -819,6 +820,8 @@ class ResourceManagementXAE(XAE):
         sleep(0.3)
         self.periodic_discover(cse_base, {'labels': self._sensor_labels}, self.interval,
                                self._discover_sensors, err_cb, auto_cra=False)
+        self.periodic_discover(cse_base, {'labels': self._actuator_labels}, self.interval,
+                               self._discover_actuators, err_cb, auto_cra=False)
 
     def _discover_devices(self, discovery):
         for device_path in set(discovery) - set(self._discovered_devices):
@@ -833,7 +836,7 @@ class ResourceManagementXAE(XAE):
             except IndexError:
                 continue
             sensor = self.get_resource(sensor_path)
-            self._discovered_sensors[sensor_path] = {
+            sensor_info = self._discovered_sensors[sensor_path] = {
                 'ID': sensor_path,
                 'dev_name': dev_path.split('/')[-1],
                 'cse_id': sensor_path.split('/')[1],
@@ -844,7 +847,7 @@ class ResourceManagementXAE(XAE):
                 'u': None,
                 'blacklisted': False
             }
-            if self._sensor_filter(sensor):
+            if self._sensor_filter(sensor_info):
                 self._handle_new_sensor(sensor_path)
             else:
                 self._discovered_sensors[sensor_path]['blacklisted'] = True
@@ -883,10 +886,31 @@ class ResourceManagementXAE(XAE):
 
         self._sensor_data_cb(sensor_info, sensor_data)
 
+    def _discover_actuators(self, discovery):
+        for actuator_path in set(discovery) - set(self._discovered_actuators):
+            try:
+                dev_path = [x for x in self._discovered_devices.keys()
+                            if actuator_path.startswith(x)][0]
+            except IndexError:
+                continue
+            actuator = self.get_resource(actuator_path)
+            actuator_info = self._discovered_actuators[actuator_path] = {
+                'ID': actuator_path,
+                'dev_name': dev_path.split('/')[-1],
+                'cse_id': actuator_path.split('/')[1],
+                'dev_labels': self._discovered_devices[dev_path].labels,
+                'actuator_labels': actuator.labels,
+                'type': 'actuator'
+            }
+            self._new_actuator(actuator_info)
+
     @abstractmethod
-    def _sensor_data_cb(self, sensor, sensor_data):
+    def _sensor_data_cb(self, sensor_info, sensor_data):
         pass
 
     @abstractmethod
-    def _sensor_filter(self, sensor):
+    def _sensor_filter(self, sensor_info):
+        pass
+
+    def _new_actuator(self, actuator_info):
         pass
