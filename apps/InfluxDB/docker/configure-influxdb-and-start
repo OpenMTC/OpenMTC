@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+CONFIG_FILE="/etc/openmtc/influxdb/config.json"
+
+NAME=${NAME-"InfluxDB"}
+EP=${EP-"http://localhost:8000"}
+CSE_BASE=${CSE_BASE-"onem2m"}
+POAS=${POAS-'["http://auto:23706"]'}
+ORIGINATOR_PRE=${ORIGINATOR_PRE-"//openmtc.org/mn-cse-1"}
+SSL_CRT=${SSL_CRT-"/etc/openmtc/certs/influxdb.cert.pem"}
+SSL_KEY=${SSL_KEY-"/etc/openmtc/certs/influxdb.key.pem"}
+SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
+LABELS=${LABELS-'[]'}
+INFLUX_HOST=${INFLUX_HOST-"localhost"}
+INFLUX_PORT=${INFLUX_PORT-"8086"}
+INFLUX_USER=${INFLUX_USER-"root"}
+INFLUX_PASSWORD=${INFLUX_PASSWORD-"root"}
+DBNAME=${DBNAME-"example"},
+DBUSER=${DBUSER-"test"},
+DBUSER_PW=${DBUSER_PW-"test"}
+
+# defaults logging
+LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/influxdb.log"}
+LOGGING_LEVEL=${LOGGING_LEVEL-"ERROR"}
+
+# ensure correct level
+case ${LOGGING_LEVEL} in
+    FATAL|ERROR|WARN|INFO|DEBUG)
+    ;;
+    *)
+    LOGGING_LEVEL="ERROR"
+    ;;
+esac
+
+# local ip
+LOCAL_IP=$(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}')
+
+# set hostname
+HOST_NAME=${EXTERNAL_IP-${LOCAL_IP}}
+
+# Configuration of the service.
+CONFIG_TEMP=${CONFIG_FILE}".tmp"
+echo -n "Configuring M2M influxdb..."
+JQ_STRING='.'
+
+# basics
+JQ_STRING=${JQ_STRING}' |
+    .name = "'${NAME}'" |
+    .ep = "'${EP}'" |
+    .cse_base = "'${CSE_BASE}'" |
+    .poas = '${POAS}' |
+    .originator_pre = "'${ORIGINATOR_PRE}'" |
+    .ssl_certs.cert_file = "'${SSL_CRT}'" |
+    .ssl_certs.key_file = "'${SSL_KEY}'" |
+    .ssl_certs.ca_certs = "'${SSL_CA}'" |
+    .logging.file |= "'${LOGGING_FILE}'" |
+    .logging.level |= "'${LOGGING_LEVEL}'" |
+    .labels |= '${LABELS}' |
+    .influx_host = "'${INFLUX_HOST}'" |
+    .influx_port = "'${INFLUX_PORT}'" |
+    .influx_user = "'${INFLUX_USER}'" |
+    .influx_password = "'${INFLUX_PASSWORD}'" |
+    .dbname = "'${DBNAME}'" |
+    .dbuser = "'${DBUSER}'" |
+    .dbuser_pw = "'${DBUSER_PW}'" 
+'
+
+cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}
+mv ${CONFIG_TEMP} ${CONFIG_FILE}
+
+echo "done"
+
+exec python -m influxdb $@

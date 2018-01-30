@@ -1,0 +1,26 @@
+{
+    "name": "InfluxDB",
+    "ep": "http://localhost:8000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:23706"
+    ],
+    "originator_pre": "//openmtc.org/mn-cse-1",
+    "ssl_certs": {
+        "cert_file": "/etc/openmtc/certs/influxdb.cert.pem",
+        "key_file": "/etc/openmtc/certs/influxdb.key.pem",
+        "ca_certs": "/etc/openmtc/certs/ca-chain.cert.pem"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "/var/log/openmtc/influxdb.log"
+    },
+    "labels": [],
+    "influx_host": "localhost",
+    "influx_port": "8086",
+    "influx_user": "root",
+    "influx_password": "root",
+    "dbname": "example",
+    "dbuser": "test",
+    "dbuser_pw": "test"
+}

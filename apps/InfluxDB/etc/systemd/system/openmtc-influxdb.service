@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenMTC InfluxDB
+After=network.target
+Wants=ntp.service
+
+[Service]
+ExecStart=/usr/local/bin/influx-db
+
+[Install]
+WantedBy=multi-user.target
