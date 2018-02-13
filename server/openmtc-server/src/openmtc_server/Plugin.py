@@ -97,6 +97,7 @@ class Plugin(BasicPlugin):
 
         self.api = api
         self.events = api.events
+        self.name = self.__class__.__name__
 
     def get_shelve(self, name):
         return self.api.db.get_shelve("%s_%s" % (type(self).__name__, name))

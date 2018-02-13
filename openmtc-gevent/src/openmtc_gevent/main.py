@@ -178,7 +178,9 @@ def stop_plugin(plugin):
 
 
 def stop_plugins():
-    map(stop_plugin, _plugins)
+    # stop transport plugins after the others
+    map(stop_plugin, filter(lambda p: not p.name.endswith('TransportPlugin'), _plugins))
+    map(stop_plugin, filter(lambda p: p.name.endswith('TransportPlugin'), _plugins))
 
 
 def init_component(component, api):
