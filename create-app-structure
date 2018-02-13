@@ -95,6 +95,12 @@ if [ -e "${APP_FOLDER}" ]; then
     exit 1
 fi
 
+# check if APP_NAME and APP_SCRIPT are the same. Testing lowercase for case-insensitive filesystems
+if [ "${APP_NAME,,}" == "${APP_SCRIPT,,}" ]; then
+    echo "APP_NAME and APP_SCRIPT shouldn't be the same, specially in case-insensitive systems. Aborting\n"
+    exit 1
+fi
+
 # change to root folder
 cd "$(dirname ${0})"
 
