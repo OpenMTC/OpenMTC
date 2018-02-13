@@ -1,21 +1,24 @@
+import logging
+import re
+import time
 from abc import abstractmethod
 from base64 import (
     b64decode,
     b64encode,
 )
 from datetime import datetime
+from json import (
+    dumps as json_dumps,
+    loads as json_loads,
+)
+
 from gevent import (
     spawn,
     sleep,
 )
 from iso8601 import parse_date
-from json import (
-    dumps as json_dumps,
-    loads as json_loads,
-)
-from futile.logging import LoggerMixin
-import logging
 
+from futile.logging import LoggerMixin
 from openmtc.util import (
     UTC,
     datetime_now,
@@ -34,14 +37,14 @@ from openmtc_onem2m.model import (
     Container,
     ContentInstance,
     EncodingTypeE,
-    get_short_member_name,
     NotificationEventTypeE,
-    EventNotificationCriteria, CSETypeIDE, RemoteCSE)
+    EventNotificationCriteria,
+    CSETypeIDE,
+    RemoteCSE,
+    FilterCriteria
+)
 from openmtc_onem2m.serializer import get_onem2m_decoder
 from openmtc_onem2m.transport import OneM2MErrorResponse
-import time
-import re
-from urllib import urlencode
 
 logging.getLogger("iso8601").setLevel(logging.ERROR)
 
@@ -365,18 +368,11 @@ class XAE(LoggerMixin):
         # TODO(rst): use filter_criteria from model
         if not filter_criteria:
             filter_criteria = {}
-        path += "?fu=1"
-        if filter_criteria:
-            path += "&" + urlencode(
-                {
-                    get_short_member_name(k): v for k, v in filter_criteria.iteritems()
-                },
-                True
-            )
 
-        path += '&drt=' + str(1 if unstructured else 2)
+        filter_criteria['filterUsage'] = 1
 
-        discovery = self.mapper.get(path)
+        discovery = self.mapper.get(path, FilterCriteria(**filter_criteria),
+                                    drt=1 if unstructured else 2)
 
         return discovery.CONTENT
 

@@ -122,7 +122,8 @@ class NotificationManager(LoggerMixin):
         try:
             if notification.get('sud'):
                 del self.callbacks[sur]
-                spawn(callback['del_cb'], sur)
+                if callback['del_cb']:
+                    spawn(callback['del_cb'], sur)
             else:
                 spawn(callback['cb'], sur, **notification)
         except:
@@ -206,12 +207,15 @@ class MqttNotificationHandler(BaseNotificationHandler):
         def wrapper(request):
             notification = self._unpack_notification(request.content)
             self._callback(request.originator, **notification)
-            return OneM2MResponse(status_code=get_response_status(2002), request=request)
+            return OneM2MResponse(status_code=get_response_status(2000), request=request)
 
         self._client = get_client(self._endpoint.geturl(), handle_request_func=wrapper)
 
+        if not self._client.handle_request_func:
+            self._client.handle_request_func = wrapper
+
     def stop(self):
-        self._client.stop()
+        pass
 
 
 register_handler(MqttNotificationHandler, ('mqtt', 'mqtts', 'secure-mqtt'))

@@ -54,13 +54,13 @@ class BasicMapper(LoggerMixin):
     def _do_update(self, instance, fields):
         raise NotImplementedError()
 
-    def get(self, path):
+    def get(self, path, fc=None, **request_options):
         raise NotImplementedError()
 
     def delete(self, instance):
         raise NotImplementedError()
 
-    def _get_data(self, path):
+    def _get_data(self, path, fc=None, **request_options):
         raise NotImplementedError()
 
     def _map(self, path, typename, data):

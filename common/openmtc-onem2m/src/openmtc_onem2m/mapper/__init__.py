@@ -13,16 +13,22 @@ def _is_persistent(instance):
 
 
 class OneM2MMapper(BasicMapper):
-    def __init__(self, cse, originator=None, ca_certs=None, cert_file=None, key_file=None, *args, **kw):
+    def __init__(self, cse, originator=None, ca_certs=None, cert_file=None, key_file=None,
+                 *args, **kw):
         super(OneM2MMapper, self).__init__(*args, **kw)
 
         scheme = urlparse(cse).scheme.lower()
         if scheme in ("", "https", "http"):
             from openmtc_onem2m.client.http import get_client
-            self._send_request = get_client(cse, use_xml=False, ca_certs=ca_certs, cert_file=cert_file, key_file=key_file).send_onem2m_request
+            self._send_request = get_client(
+                cse, use_xml=False, ca_certs=ca_certs, cert_file=cert_file, key_file=key_file
+            ).send_onem2m_request
         elif scheme in ("mqtt", "mqtts", "secure-mqtt"):
             from openmtc_onem2m.client.mqtt import get_client
-            self._send_request = get_client(cse, use_xml=False, client_id=originator).send_onem2m_request
+            self._send_request = get_client(
+                cse, use_xml=False, client_id=originator, ca_certs=ca_certs, cert_file=cert_file,
+                key_file=key_file
+            ).send_onem2m_request
         elif scheme == "coap":
             raise NotImplementedError
         else:
@@ -33,7 +39,8 @@ class OneM2MMapper(BasicMapper):
 
     def create(self, path, instance):
         instance.__dict__.update({
-           attribute.name: None for attribute in type(instance).attributes if attribute.accesstype == attribute.RO
+            attribute.name: None for attribute in type(instance).attributes
+            if attribute.accesstype == attribute.RO
         })
 
         # TODO(rst): add resource_type
@@ -86,11 +93,20 @@ class OneM2MMapper(BasicMapper):
 
         return response.content
 
-    def get(self, path):
-        response = self._get_data(path)
+    def get(self, path, fc=None, **request_options):
+        response = self._get_data(path, fc, **request_options)
         response.content.path = path
         self.logger.debug("Received response: %s", response.content)
         return response.content
+
+    def _get_data(self, path, fc=None, **request_options):
+        return self._send_request(OneM2MRequest(
+            OneM2MOperation.retrieve,
+            path,
+            self.originator,
+            filter_criteria=fc,
+            **request_options
+        )).get()
 
     def delete(self, instance):
         self._send_request(OneM2MRequest(
@@ -98,13 +114,6 @@ class OneM2MMapper(BasicMapper):
             getattr(instance, "path", instance),
             self.originator
         ))
-
-    def _get_data(self, path):
-        return self._send_request(OneM2MRequest(
-            OneM2MOperation.retrieve,
-            path,
-            self.originator
-        )).get()
 
     # TODO(rst): check if this can be removed in parent class
     @classmethod

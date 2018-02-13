@@ -144,7 +144,10 @@ class OneM2MHTTPClient(OneM2MClient):
                 for name, val in filter_criteria.get_values(True).iteritems()
             })
 
-        path = normalize_path(onem2m_request.to)
+        if onem2m_request.ae_notifying:
+            path = ''
+        else:
+            path = normalize_path(onem2m_request.to)
 
         if params:
             path += '?' + urllib.urlencode(params, True)

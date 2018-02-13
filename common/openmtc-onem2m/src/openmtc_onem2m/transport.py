@@ -5,7 +5,7 @@ from enum import Enum, unique
 
 from futile.logging import get_logger
 from openmtc.model import StrEnum
-from openmtc_onem2m.exc import OneM2MError
+from openmtc_onem2m.exc import OneM2MError, STATUS, get_response_status
 
 
 @unique
@@ -197,13 +197,14 @@ class OneM2MOperation(StrEnum):
 class OneM2MRequest(object):
     internal = False
     cascading = False
+    ae_notifying = False
 
     """Class representing a OneM2M request"""
 
     def __init__(self, op, to, fr=None, rqi=None, ty=None, pc=None, rol=None,
                  ot=None, rqet=None, rset=None, oet=None, rt=None, rp=None,
                  rcn=None, ec=None, da=None, gid=None, filter_criteria=None,
-                 drt=None):
+                 fc=None, drt=None):
         # Operation
         self.operation = op
         # Target uri
@@ -226,7 +227,7 @@ class OneM2MRequest(object):
         self.event_category = ec
         self.delivery_aggregation = da
         self.group_request_identifier = gid
-        self.filter_criteria = filter_criteria
+        self.filter_criteria = filter_criteria or fc
         # Optional Discovery result type
         self.discovery_result_type = drt
 
@@ -386,7 +387,10 @@ class OneM2MResponse(object):
     def __init__(self, status_code, request=None, rqi=None, pc=None, to=None,
                  fr=None, rsc=None):
         # Operation result
-        self.response_status_code = status_code
+        if isinstance(status_code, STATUS):
+            self.response_status_code = status_code
+        else:
+            self.response_status_code = get_response_status(status_code)
         if request:
             self.request_identifier = request.rqi
             # Target uri

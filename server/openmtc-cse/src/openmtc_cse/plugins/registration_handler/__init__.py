@@ -89,6 +89,7 @@ class RegistrationHandler(Plugin):
 
         try:
             self._handle_remote_cses()
+            self._registered = True
         except CSEError as e:
             self._handle_registration_error(e)
 
@@ -310,9 +311,6 @@ class RegistrationHandler(Plugin):
         """ Stops the plugin.
             DELETES CSE resource.
         """
-        self._handle_remote_cses(
-            handle_remote_cse_method=self._handle_remote_cse_delete)
-
         try:
             self.api.cancel_timer(self.__timer)
         except AttributeError:
@@ -324,6 +322,7 @@ class RegistrationHandler(Plugin):
             pass
 
         if self._registered:
-            pass
+            self._handle_remote_cses(
+                handle_remote_cse_method=self._handle_remote_cse_delete)
 
         self._stopped()

@@ -78,25 +78,29 @@ class OneM2MTransportDomain(Component):
         self._endpoints = []
 
         for poa_t in self._poa_templates:
-            def map_func(address):
-                if address.family == AF_INET6:
-                    a = '[' + address.address + ']'
-                else:
-                    a = address.address
-                return poa_t.scheme + '://' + a + ':' + str(poa_t.port)
-
-            if poa_t.server_address == "::":
-                def filter_func(x):
-                    return x
-            elif poa_t.server_address in ("", "0.0.0.0"):
-                def filter_func(x):
-                    return x.family == AF_INET
+            if poa_t.scheme.startswith("mqtt"):
+                self._endpoints.append(poa_t.scheme + '://' + poa_t.server_address +
+                                       ':' + str(poa_t.port))
             else:
-                def filter_func(x):
-                    return x.address == poa_t.server_address
+                def map_func(address):
+                    if address.family == AF_INET6:
+                        a = '[' + address.address + ']'
+                    else:
+                        a = address.address
+                    return poa_t.scheme + '://' + a + ':' + str(poa_t.port)
 
-            self._endpoints += map(map_func, filter(filter_func,
-                                                    self._get_address_list()))
+                if poa_t.server_address == "::":
+                    def filter_func(x):
+                        return x
+                elif poa_t.server_address in ("", "0.0.0.0"):
+                    def filter_func(x):
+                        return x.family == AF_INET
+                else:
+                    def filter_func(x):
+                        return x.address == poa_t.server_address
+
+                self._endpoints += map(map_func, filter(filter_func,
+                                                        self._get_address_list()))
 
     # interface handling
     def _handle_interface_created(self, interface):
@@ -162,8 +166,12 @@ class OneM2MTransportDomain(Component):
                     'key_file': self.key_file
                 }
                 # TODO(hve): add scheme test.
-                client = self._get_clients[urlparse(poa).scheme](
-                    poa, use_xml, insecure=self.accept_insecure_certs, **ssl_certs)
+                try:
+                    client = self._get_clients[urlparse(poa).scheme](
+                        poa, use_xml, insecure=self.accept_insecure_certs, **ssl_certs)
+                except KeyError:
+                    self.logger.error("Scheme %s not configured" % urlparse(poa).scheme)
+                    continue
                 try:
                     response = client.send_onem2m_request(onem2m_request).get()
                     p.fulfill(response)
@@ -178,7 +186,7 @@ class OneM2MTransportDomain(Component):
         return p
 
     def send_notify(self, notify_request, poa_list=None):
-        notify_request.to = ''
+        notify_request.ae_notifying = True
         return self._send_request_to_endpoints(notify_request, poa_list)
 
     def send_onem2m_request(self, onem2m_request):
