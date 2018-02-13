@@ -103,7 +103,7 @@ All subsequent examples should be modifiable in the same fashion in order to ena
 Please note the particle of the endpoint's URL being the name of a CSE. Due to the addressing scheme in oneM2M/MQTT, a requesting entity has to know the responding entities name in advance. It should be duly noted that this is a workaround neither mandated nor sanctioned by TS-0010. In fact, the semantics of particles in MQTT-URLs are [entirely undefined](https://github.com/mqtt/mqtt.github.io/wiki/URI-Scheme). This inconvenience may or may not vanish in future releases.
 
 #### Using Training Applications
-Also the existing training applications can be re-used which can be found under [doc/training/apps/onem2m](doc/training/apps/onem2m). The four applications which end with `-final.py` can be changed in order to use the starting script under [doc/training/start-app.sh](doc/training/start-app.sh).
+Also the existing training applications can be re-used which can be found under [doc/training/apps/onem2m](./training/apps/onem2m). The four applications which end with `-final.py` can be changed in order to use the starting script under [doc/training/start-app.sh](./training/start-app.sh).
 
 One example would be `onem2m-gui-sensors-final.py`. Change the last few lines from
 
