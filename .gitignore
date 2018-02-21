@@ -37,3 +37,7 @@ gen
 MANIFEST
 docker/tmp/*
 *.egg-info
+GPATH
+GRTAGS
+GTAGS
+.python-version
