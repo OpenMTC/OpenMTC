@@ -12,6 +12,7 @@ SSL_KEY=${SSL_KEY-"/etc/openmtc/certs/orioncontextbroker.key.pem"}
 SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
 ORION_HOST=${ORION_HOST-"http://localhost:1026"}
 ORION_API=${ORION_API-"v2"}
+ACCUMULATE_ADDRESS=${ACCUMULATE_ADDRESS-"http://localhost:8080"}
 
 # defaults logging
 LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/orioncontextbroker.log"}
@@ -46,6 +47,7 @@ JQ_STRING=${JQ_STRING}' |
     .originator_pre = "'${ORIGINATOR_PRE}'" |
     .orion_host = "'${ORION_HOST}'" |
     .orion_api = "'${ORION_API}'" |
+    .accumulate_address = "'${ACCUMULATE_ADDRESS}'" |
     .ssl_certs.cert_file = "'${SSL_CRT}'" |
     .ssl_certs.key_file = "'${SSL_KEY}'" |
     .ssl_certs.ca_certs = "'${SSL_CA}'" |
