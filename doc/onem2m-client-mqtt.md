@@ -105,7 +105,7 @@ Please note the particle of the endpoint's URL being the name of a CSE. Due to t
 #### Using Training Applications
 Also the existing training applications can be re-used which can be found under [doc/training/apps/onem2m](./training/apps/onem2m). The four applications which end with `-final.py` can be changed in order to use the starting script under [doc/training/start-app.sh](./training/start-app.sh).
 
-One example would be `onem2m-gui-sensors-final.py`. Change the last few lines from
+One example would be `onem2m-gui-sensors-final.py`. Beware, that this AE is configured to be connected to the backend. If you want to change this, you can use `mn-cse-1` instead of `in-cse-1` or use the TestIPE AEs. Change the last few lines from
 
 ```python
 host = 'http://localhost:18000'
