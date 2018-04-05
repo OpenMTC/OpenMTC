@@ -54,6 +54,15 @@
                 }
             },
             {
+                "name": "MQTTTransportPlugin",
+                "package": "openmtc_cse.plugins.transport_gevent_mqtt",
+                "disabled": true,
+                "config": {
+                    "interface": "localhost",
+                    "port": 1883
+                }
+            },
+            {
                 "name": "NotificationHandler",
                 "package": "openmtc_cse.plugins.notification_handler",
                 "disabled": false

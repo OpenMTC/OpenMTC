@@ -26,6 +26,10 @@ ONEM2M_HTTP_TRANSPORT_PORT=${ONEM2M_HTTP_TRANSPORT_PORT-18000}
 ONEM2M_HTTP_TRANSPORT_SSL_ENABLED=${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED-false}
 ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT=${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT-true}
 
+ONEM2M_MQTT_TRANSPORT_DISABLED=${ONEM2M_MQTT_TRANSPORT_DISABLED-true}
+ONEM2M_MQTT_TRANSPORT_PORT=${ONEM2M_MQTT_TRANSPORT_PORT-1883}
+ONEM2M_MQTT_TRANSPORT_INTERFACE=${ONEM2M_MQTT_TRANSPORT_INTERFACE-localhost}
+
 ONEM2M_NOTIFICATION_DISABLED=${ONEM2M_NOTIFICATION_DISABLED-true}
 
 # ensure correct level
@@ -74,7 +78,10 @@ JQ_STRING=${JQ_STRING}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.port) |= '${ONEM2M_HTTP_TRANSPORT_PORT}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.enable_https) |= '${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.require_cert) |= '${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT}' |
-    (.plugins.openmtc_cse[] | select(.name == "NotificationHandler") | .disabled) |= '${ONEM2M_NOTIFICATION_DISABLED}'
+    (.plugins.openmtc_cse[] | select(.name == "NotificationHandler") | .disabled) |= '${ONEM2M_NOTIFICATION_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .disabled) |= '${ONEM2M_MQTT_TRANSPORT_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.port) |= '${ONEM2M_MQTT_TRANSPORT_PORT}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.interface) |= '${ONEM2M_MQTT_TRANSPORT_INTERFACE}'
 '
 
 cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}

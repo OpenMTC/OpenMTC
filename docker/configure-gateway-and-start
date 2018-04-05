@@ -32,13 +32,17 @@ ONEM2M_HTTP_TRANSPORT_PORT=${ONEM2M_HTTP_TRANSPORT_PORT-8000}
 ONEM2M_HTTP_TRANSPORT_SSL_ENABLED=${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED-false}
 ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT=${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT-true}
 
+ONEM2M_MQTT_TRANSPORT_DISABLED=${ONEM2M_MQTT_TRANSPORT_DISABLED-true}
+ONEM2M_MQTT_TRANSPORT_PORT=${ONEM2M_MQTT_TRANSPORT_PORT-1883}
+ONEM2M_MQTT_TRANSPORT_INTERFACE=${ONEM2M_MQTT_TRANSPORT_INTERFACE-"localhost"}
+
 ONEM2M_NOTIFICATION_DISABLED=${ONEM2M_NOTIFICATION_DISABLED-true}
 
 ONEM2M_REGISTRATION_DISABLED=${ONEM2M_REGISTRATION_DISABLED-true}
 ONEM2M_REMOTE_CSE_ID=${ONEM2M_REMOTE_CSE_ID-"in-cse-1"}
 ONEM2M_REMOTE_CSE_POA=${ONEM2M_REMOTE_CSE_POA-"http://localhost:18000"}
-${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED} && SCHEME="https" || SCHEME="http"
-ONEM2M_REMOTE_CSE_OWN_POA="${SCHEME}://${HOST_NAME}:${ONEM2M_HTTP_TRANSPORT_PORT}"
+#${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED} && SCHEME="https" || SCHEME="http"
+#ONEM2M_REMOTE_CSE_OWN_POA="${SCHEME}://${HOST_NAME}:${ONEM2M_HTTP_TRANSPORT_PORT}"
 ONEM2M_REMOTE_CSE_BASE=${ONEM2M_REMOTE_CSE_BASE-"onem2m"}
 ONEM2M_REMOTE_CSE_TYPE=${ONEM2M_REMOTE_CSE_TYPE-"IN-CSE"}
 
@@ -82,6 +86,9 @@ JQ_STRING=${JQ_STRING}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.port) |= '${ONEM2M_HTTP_TRANSPORT_PORT}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.enable_https) |= '${ONEM2M_HTTP_TRANSPORT_SSL_ENABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "HTTPTransportPlugin") | .config.require_cert) |= '${ONEM2M_HTTP_TRANSPORT_REQUIRE_CERT}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .disabled) |= '${ONEM2M_MQTT_TRANSPORT_DISABLED}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.port) |= '${ONEM2M_MQTT_TRANSPORT_PORT}' |
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.interface) |= "'${ONEM2M_MQTT_TRANSPORT_INTERFACE}'" |
     (.plugins.openmtc_cse[] | select(.name == "NotificationHandler") | .disabled) |= '${ONEM2M_NOTIFICATION_DISABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "RegistrationHandler") | .disabled) |= '${ONEM2M_REGISTRATION_DISABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "RegistrationHandler") | .config.remote_cses) |= [{cse_id: "'${ONEM2M_REMOTE_CSE_ID}'", poa: ["'${ONEM2M_REMOTE_CSE_POA}'"], own_poa: ["'${ONEM2M_REMOTE_CSE_OWN_POA}'"], cse_base: "'${ONEM2M_REMOTE_CSE_BASE}'", cse_type: "'${ONEM2M_REMOTE_CSE_TYPE}'"}]

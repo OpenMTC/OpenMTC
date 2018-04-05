@@ -29,7 +29,7 @@ SETUP_REQUIRES = [
     "flask", "pyxb (==1.2.3)", "enum34", "dtls", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps"
+    "fyzz", "yapps", "paho_mqtt"
 ]
 SETUP_INSTALL_REQUIRES = [
     "urllib3", "gevent >= 1.0", "iso8601 >= 0.1.5", "werkzeug >= 0.9",
@@ -37,7 +37,7 @@ SETUP_INSTALL_REQUIRES = [
     "flask", "pyxb == 1.2.3", "enum34", "dtls", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps"
+    "fyzz", "yapps", "paho_mqtt"
 ]
 
 # packages
