@@ -13,6 +13,7 @@ SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
 ORION_HOST=${ORION_HOST-"http://localhost:1026"}
 ORION_API=${ORION_API-"v2"}
 ACCUMULATE_ADDRESS=${ACCUMULATE_ADDRESS-"http://localhost:8080"}
+LABELS=${LABELS-'["openmtc:sensor_data"]'}
 
 # defaults logging
 LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/orioncontextbroker.log"}
@@ -48,6 +49,7 @@ JQ_STRING=${JQ_STRING}' |
     .orion_host = "'${ORION_HOST}'" |
     .orion_api = "'${ORION_API}'" |
     .accumulate_address = "'${ACCUMULATE_ADDRESS}'" |
+    .labels = '${LABELS}' |
     .ssl_certs.cert_file = "'${SSL_CRT}'" |
     .ssl_certs.key_file = "'${SSL_KEY}'" |
     .ssl_certs.ca_certs = "'${SSL_CA}'" |

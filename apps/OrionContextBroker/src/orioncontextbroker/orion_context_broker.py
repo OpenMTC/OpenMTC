@@ -10,7 +10,7 @@ class OrionContextBroker(ResourceManagementXAE):
     def __init__(self,
                  orion_host="http://localhost:1026",
                  orion_api="v2",
-                 labels=None,
+                 labels=["openmtc:sensor_data"],
                  accumulate_address="http://localhost:8080",
                  *args,
                  **kw):
@@ -38,7 +38,7 @@ class OrionContextBroker(ResourceManagementXAE):
             methods=["POST"])
         accumulate_ip, accumulate_port = accumulate_address.split('//')[
             1].split(':')
-        self.server = wsgi.WSGIServer((accumulate_ip, int(accumulate_port)),
+        self.server = wsgi.WSGIServer(("0.0.0.0", int(accumulate_port)),
                                       self.app)
         self.server.start()
 

@@ -15,7 +15,7 @@
         "level": "INFO",
         "file": "/var/log/openmtc/orioncontextbroker.log"
     },
-    "labels": [],
+    "labels": ["openmtc:sensor_data"],
     "interval": 10,
     "orion_host": "http://localhost:1026",
     "orion_api": "v2"
