@@ -81,7 +81,7 @@ JQ_STRING=${JQ_STRING}' |
     (.plugins.openmtc_cse[] | select(.name == "NotificationHandler") | .disabled) |= '${ONEM2M_NOTIFICATION_DISABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .disabled) |= '${ONEM2M_MQTT_TRANSPORT_DISABLED}' |
     (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.port) |= '${ONEM2M_MQTT_TRANSPORT_PORT}' |
-    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.interface) |= '${ONEM2M_MQTT_TRANSPORT_INTERFACE}'
+    (.plugins.openmtc_cse[] | select(.name == "MQTTTransportPlugin") | .config.interface) |= "'${ONEM2M_MQTT_TRANSPORT_INTERFACE}'"
 '
 
 cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}
