@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenMTC csvInjector
+After=network.target
+Wants=ntp.service
+
+[Service]
+ExecStart=/usr/local/bin/csv-injector
+
+[Install]
+WantedBy=multi-user.target

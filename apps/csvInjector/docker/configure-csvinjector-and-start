@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+CONFIG_FILE="/etc/openmtc/csvinjector/config.json"
+
+NAME=${NAME-"csvInjector"}
+EP=${EP-"http://localhost:8000"}
+CSE_BASE=${CSE_BASE-"onem2m"}
+POAS=${POAS-'["http://auto:28300"]'}
+ORIGINATOR_PRE=${ORIGINATOR_PRE-"//openmtc.org/mn-cse-1"}
+SSL_CRT=${SSL_CRT-"/etc/openmtc/certs/csvinjector.cert.pem"}
+SSL_KEY=${SSL_KEY-"/etc/openmtc/certs/csvinjector.key.pem"}
+SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
+CSV_PATH=${CSV_PATH-"/test.csv"}
+CSV_DELIM=${CSV_DELIM-","}
+CSV_QUOTECHAR=${CSV_QUOTECHAR-"|"}
+CSV_DEVICE_CLASSIFIER=${CSV_DEVICE_CLASSIFIER-""}
+CSV_DATE_CLASSIFIER=${CSV_DATE_CLASSIFIER-""}
+CSV_TIME_FORMAT=${CSV_TIME_FORMAT-"%d/%m/%Y-%H:%M"}
+DURATION=${DURATION-300}
+REPEAT=${REPEAT-"False"}
+
+# defaults logging
+LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/csvinjector.log"}
+LOGGING_LEVEL=${LOGGING_LEVEL-"ERROR"}
+
+# ensure correct level
+case ${LOGGING_LEVEL} in
+    FATAL|ERROR|WARN|INFO|DEBUG)
+    ;;
+    *)
+    LOGGING_LEVEL="ERROR"
+    ;;
+esac
+
+# local ip
+LOCAL_IP=$(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}')
+
+# set hostname
+HOST_NAME=${EXTERNAL_IP-${LOCAL_IP}}
+
+# Configuration of the service.
+CONFIG_TEMP=${CONFIG_FILE}".tmp"
+echo -n "Configuring M2M csvinjector..."
+JQ_STRING='.'
+
+# basics
+JQ_STRING=${JQ_STRING}' |
+    .name = "'${NAME}'" |
+    .ep = "'${EP}'" |
+    .cse_base = "'${CSE_BASE}'" |
+    .poas = '${POAS}' |
+    .originator_pre = "'${ORIGINATOR_PRE}'" |
+    .ssl_certs.cert_file = "'${SSL_CRT}'" |
+    .ssl_certs.key_file = "'${SSL_KEY}'" |
+    .ssl_certs.ca_certs = "'${SSL_CA}'" |
+    .logging.file = "'${LOGGING_FILE}'" |
+    .logging.level = "'${LOGGING_LEVEL}'" |
+    .csv_path = "'${CSV_PATH}'" |
+    .csv_delim = "'${CSV_DELIM}'" |
+    .csv_quotechar = "'${CSV_QUOTECHAR}'" |
+    .device_classifier = '${CSV_DEVICE_CLASSIFIER}' |
+    .date_classifier = '${CSV_DATE_CLASSIFIER}' |
+    .time_format = '${CSV_TIME_FORMAT}' |
+    .duration = '${DURATION}' |
+    .repeat = "'${REPEAT}'"
+'
+
+cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}
+mv ${CONFIG_TEMP} ${CONFIG_FILE}
+
+echo "done"
+
+exec python -m csvinjector $@

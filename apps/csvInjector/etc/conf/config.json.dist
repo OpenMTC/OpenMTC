@@ -1,0 +1,26 @@
+{
+    "name": "csvInjector",
+    "ep": "http://localhost:8000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:28300"
+    ],
+    "originator_pre": "//openmtc.org/mn-cse-1",
+    "ssl_certs": {
+        "cert_file": "/etc/openmtc/certs/csvinjector.cert.pem",
+        "key_file": "/etc/openmtc/certs/csvinjector.key.pem",
+        "ca_certs": "/etc/openmtc/certs/ca-chain.cert.pem"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "/var/log/openmtc/csvinjector.log"
+    },
+    "csv_path": "~/test.csv",
+    "csv_delim": ",",
+    "csv_quotechar": "|",
+    "device_classifier": "sensor_id",
+    "date_classifier": "sensor_id",
+    "time_format":"%d/%m/%Y-%H:%M",
+    "duration": 300,
+    "repeat": false
+}
