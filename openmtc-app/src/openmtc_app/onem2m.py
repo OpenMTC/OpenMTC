@@ -765,6 +765,7 @@ class ResourceManagementXAE(XAE):
     def _discover_openmtc_ipe_entities(self):
         # connected to backend or gateway?
         cse_base = self.get_resource(self.cse_base)
+        self._cse_id = cse_base.CSE_ID
         self.logger.debug("CSE_BASE: %s", cse_base)
 
         if cse_base.cseType in (CSETypeIDE.MN_CSE, CSETypeIDE.AEN_CSE):
@@ -859,6 +860,8 @@ class ResourceManagementXAE(XAE):
         self._discovered_sensors[sensor_path]['sub_ref'] = sub_ref
 
     def _handle_delete(self, sub_ref):
+        if sub_ref[0] != '/':
+            sub_ref = self._cse_id + '/' + sub_ref
         self._discovered_sensors = {k: v for k, v in self._discovered_sensors.items()
                                     if v['sub_ref'] != sub_ref}
         self._discovered_devices = {k: v for k, v in self._discovered_devices.items()
