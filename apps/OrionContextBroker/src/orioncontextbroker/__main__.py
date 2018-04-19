@@ -51,7 +51,7 @@ orion_host = get_value("orion_host", (unicode, str), default_orion_host, args,
 orion_api = get_value("orion_api", (unicode, str), default_orion_api, args,
                       config)
 accumulate_address = get_value("accumulate_address", (unicode, str),
-                              default_accumulate_address, args, config)
+                               default_accumulate_address, args, config)
 
 # start
 app = OrionContextBroker(

@@ -18,5 +18,6 @@
     "labels": ["openmtc:sensor_data:temperature", "openmtc:sensor_data:humidity"],
     "interval": 10,
     "orion_host": "http://localhost:1026",
-    "orion_api": "v2"
+    "orion_api": "v2",
+    "accumulate_address": "http://localhost:8080"
 }
