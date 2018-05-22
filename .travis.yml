@@ -12,15 +12,11 @@ before_script:
 - "./create-binary-docker influxdb -a arm"
 - "./create-binary-docker cul868ipe"
 - "./create-binary-docker cul868ipe -a arm"
-- "./create-binary-docker csvinjector"
-- "./create-binary-docker csvinjector -a arm"
 script:
 - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
 - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
 - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
 - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
-- docker tag openmtc/csvinjector-amd64 openmtc/csv-injector-app-amd64
-- docker tag openmtc/csvinjector-arm openmtc/csv-injector-app-arm
 - docker tag openmtc/influxdb-amd64 openmtc/influxdb-app-amd64
 - docker tag openmtc/influxdb-arm openmtc/influxdb-app-arm
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
@@ -32,8 +28,6 @@ script:
 - docker push openmtc/orion-context-broker-app-arm
 - docker push openmtc/cul868-ipe-amd64
 - docker push openmtc/cul868-ipe-arm
-- docker push openmtc/csv-injector-app-amd64
-- docker push openmtc/csv-injector-app-arm
 - docker push openmtc/influxdb-app-amd64
 - docker push openmtc/influxdb-app-arm
 env:
