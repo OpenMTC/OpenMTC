@@ -4,7 +4,7 @@
 # or   $ sudo pip install --requirement dependencies.txt
 
 urllib3
-gevent>=1.0
+gevent>=1.1
 iso8601>=0.1.5
 werkzeug>=0.9
 funcy

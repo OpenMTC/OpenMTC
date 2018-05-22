@@ -6,7 +6,7 @@ from operator import itemgetter
 from socket import AF_INET, AF_INET6, getaddrinfo, SOCK_STREAM, inet_pton
 
 from funcy import pluck
-from gevent.wsgi import WSGIHandler, WSGIServer
+from gevent.pywsgi import WSGIHandler, WSGIServer
 from werkzeug.wrappers import (BaseRequest, CommonRequestDescriptorsMixin,
                                UserAgentMixin, AcceptMixin, Response)
 

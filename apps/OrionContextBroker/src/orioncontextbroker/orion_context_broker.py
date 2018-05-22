@@ -1,6 +1,6 @@
 import re
 from flask import Flask, Response, request
-from gevent import wsgi
+from gevent.pywsgi import WSGIServer
 
 from openmtc_app.onem2m import ResourceManagementXAE
 from orion_api import OrionAPI
@@ -10,7 +10,7 @@ class OrionContextBroker(ResourceManagementXAE):
     def __init__(self,
                  orion_host="http://localhost:1026",
                  orion_api="v2",
-                 labels=["openmtc:sensor_data"],
+                 labels=None,
                  accumulate_address="http://localhost:8080",
                  *args,
                  **kw):
@@ -19,11 +19,12 @@ class OrionContextBroker(ResourceManagementXAE):
             self.labels = {labels}
         elif hasattr(labels, '__iter__'):
             self.labels = set(labels)
+        elif labels is None:
+            self.labels = ["openmtc:sensor_data"]
         else:
             self.labels = None
         self._entity_names = {}
         self._subscriptions = {}
-        self.logger.critical(accumulate_address)
         self.orion_api = OrionAPI(
             orion_host=orion_host,
             api_version=orion_api,
@@ -38,8 +39,8 @@ class OrionContextBroker(ResourceManagementXAE):
             methods=["POST"])
         accumulate_ip, accumulate_port = accumulate_address.split('//')[
             1].split(':')
-        self.server = wsgi.WSGIServer(("0.0.0.0", int(accumulate_port)),
-                                      self.app)
+        self.server = WSGIServer(("0.0.0.0", int(accumulate_port)),
+                                 self.app)
         self.server.start()
 
     def process_notification(self):
@@ -59,7 +60,8 @@ class OrionContextBroker(ResourceManagementXAE):
         else:
             return True
 
-    def _get_entity_name(self, sensor_info):
+    @staticmethod
+    def _get_entity_name(sensor_info):
         device_type = "sensor" if sensor_info.get("sensor_labels",
                                                   None) else "actuator"
         try:
@@ -113,6 +115,6 @@ class OrionContextBroker(ResourceManagementXAE):
         self.orion_api.update_attributes(
             entity_name, data_dummy, fiware_service=fiware_service)
 
-        subscriptionId = self.orion_api.subscribe(
+        subscription_id = self.orion_api.subscribe(
             entity_name, fiware_service=fiware_service)
-        self._subscriptions[subscriptionId] = actuator_info['ID']
+        self._subscriptions[subscription_id] = actuator_info['ID']
