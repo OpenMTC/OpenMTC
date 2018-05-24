@@ -1,4 +1,9 @@
 import re
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 
@@ -11,7 +16,7 @@ class OrionContextBroker(ResourceManagementXAE):
                  orion_host="http://localhost:1026",
                  orion_api="v2",
                  labels=None,
-                 accumulate_address="http://localhost:8080",
+                 accumulate_address=None,
                  *args,
                  **kw):
         super(OrionContextBroker, self).__init__(*args, **kw)
@@ -24,7 +29,14 @@ class OrionContextBroker(ResourceManagementXAE):
         else:
             self.labels = None
         self._entity_names = {}
-        self._subscriptions = {}
+        self._subscription_endpoints = {}
+        self._subscription_services = {}
+
+        # accumulate address
+        if not accumulate_address:
+            accumulate_address = "http://" + self._get_auto_host(orion_host) + ":8080"
+
+        # Orion API
         self.orion_api = OrionAPI(
             orion_host=orion_host,
             api_version=orion_api,
@@ -37,21 +49,44 @@ class OrionContextBroker(ResourceManagementXAE):
             'process_notification',
             self.process_notification,
             methods=["POST"])
-        accumulate_ip, accumulate_port = accumulate_address.split('//')[
-            1].split(':')
+        accumulate_ip, accumulate_port = urlparse(accumulate_address).netloc.rsplit(':', 1)
         self.server = WSGIServer(("0.0.0.0", int(accumulate_port)),
                                  self.app)
         self.server.start()
 
+    @staticmethod
+    def _get_auto_host(ep):
+        try:
+            import socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            netloc = urlparse(ep).netloc.split(':')
+            s.connect((netloc[0], int(netloc[1])))
+            host = s.getsockname()[0]
+            s.close()
+        except:
+            host = "127.0.0.1"
+
+        return host
+
     def process_notification(self):
         self.logger.debug("Got from Subscription {}".format(request.json))
-        actuator = self.get_resource(
-            self._subscriptions[request.json["subscriptionId"]])
-        self.push_content(actuator, request.json["data"][0]["cmd"]["value"])
+        try:
+            actuator = self.get_resource(
+                self._subscription_endpoints[request.json["subscriptionId"]]
+            )
+        except KeyError:
+            # ignore not deleted old subscriptions
+            pass
+        else:
+            self.push_content(actuator, request.json["data"][0]["cmd"]["value"])
         return Response(status=200, headers={})
 
     def _on_register(self):
         self._discover_openmtc_ipe_entities()
+
+    def _on_shutdown(self):
+        for subscription_id, fiware_service in self._subscription_services.items():
+            self.orion_api.unsubscribe(subscription_id, fiware_service)
 
     def _sensor_filter(self, sensor_info):
         if self.labels:
@@ -117,4 +152,5 @@ class OrionContextBroker(ResourceManagementXAE):
 
         subscription_id = self.orion_api.subscribe(
             entity_name, fiware_service=fiware_service)
-        self._subscriptions[subscription_id] = actuator_info['ID']
+        self._subscription_endpoints[subscription_id] = actuator_info['ID']
+        self._subscription_services[subscription_id] = fiware_service

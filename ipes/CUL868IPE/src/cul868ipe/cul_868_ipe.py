@@ -42,7 +42,7 @@ class CUL868IPE(XAE):
 
         self._old_fs20_values = {}
 
-        self.cul = CUL868Coordinator(device=device)
+        self.cul = CUL868Coordinator(device=device, sim=sim)
 
         for d in map(lambda s: CULDevice(*s.split(":")[:2]), cul_devices):
             if d.type == "fs20":

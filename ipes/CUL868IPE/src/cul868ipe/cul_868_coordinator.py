@@ -25,7 +25,7 @@ class CUL868Coordinator(LoggerMixin):
     PROTOCOL_FS20 = "F"
     PROTOCOL_HMS = "H"
 
-    def __init__(self, device="/dev/ttyACM1"):
+    def __init__(self, device="/dev/ttyACM1", sim=True):
         super(CUL868Coordinator, self).__init__()
         self.running = False
         self.device = device
@@ -37,6 +37,7 @@ class CUL868Coordinator(LoggerMixin):
             "H": HMSParser()
         }
 
+        self.sim = sim
         self.sim_parsers = {
             "K": SIMParser(),
             # "E": SIMParser(),
@@ -140,10 +141,16 @@ class CUL868Coordinator(LoggerMixin):
         self.logger.debug("Command sent")
 
     def switch_on(self, house_code, device_code):
-        self._send_fs20(house_code, device_code, self.COMMAND_ON)
+        self.logger.info("Switch on %s-%s" % (house_code, device_code))
+        if not self.sim:
+            self._send_fs20(house_code, device_code, self.COMMAND_ON)
 
     def switch_off(self, house_code, device_code):
-        self._send_fs20(house_code, device_code, self.COMMAND_OFF)
+        self.logger.info("Switch off %s-%s" % (house_code, device_code))
+        if not self.sim:
+            self._send_fs20(house_code, device_code, self.COMMAND_OFF)
 
     def toggle(self, house_code, device_code):
-        self._send_fs20(house_code, device_code, self.COMMAND_TOGGLE)
+        self.logger.info("Toggle %s-%s" % (house_code, device_code))
+        if not self.sim:
+            self._send_fs20(house_code, device_code, self.COMMAND_TOGGLE)

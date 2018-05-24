@@ -13,7 +13,7 @@ SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
 LABELS=${LABELS-'["openmtc:sensor_data"]'}
 ORION_HOST=${ORION_HOST-"http://localhost:1026"}
 ORION_API=${ORION_API-"v2"}
-ACCUMULATE_ADDRESS=${ACCUMULATE_ADDRESS-"http://localhost:8080"}
+ACCUMULATE_ADDRESS=${ACCUMULATE_ADDRESS}
 LABELS=${LABELS-'["openmtc:sensor_data"]'}
 
 # defaults logging
