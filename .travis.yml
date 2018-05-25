@@ -1,5 +1,8 @@
 services:
 - docker
+addons:
+  apt:
+    update: true
 before_script:
 - sudo apt install qemu-user-static
 - "./create-binary-docker backend"
