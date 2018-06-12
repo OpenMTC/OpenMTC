@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenMTC mqttConnector
+After=network.target
+Wants=ntp.service
+
+[Service]
+ExecStart=/usr/local/bin/mqtt-connector
+
+[Install]
+WantedBy=multi-user.target

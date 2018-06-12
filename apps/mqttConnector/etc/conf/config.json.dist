@@ -1,0 +1,28 @@
+{
+    "name": "mqttConnector",
+    "ep": "http://localhost:18000",
+    "cse_base": "onem2m",
+    "poas": [
+        "http://auto:21753"
+    ],
+    "originator_pre": "//openmtc.org/in-cse-1",
+    "ssl_certs": {
+        "cert_file": "/etc/openmtc/certs/mqttconnector.cert.pem",
+        "key_file": "/etc/openmtc/certs/mqttconnector.key.pem",
+        "ca_certs": "/etc/openmtc/certs/ca-chain.cert.pem"
+    },
+    "broker_ep": "localhost:8883",
+    "topic_pre": "exampleTopic",
+    "topic_index_location": 1,
+    "topic_index_device": -1,
+    "fiware_service": null,
+    "broker_user": "foo",
+    "broker_user_pw": "bar",
+    "mqtts_ca_certs": null,
+    "mqtts_certfile": null,
+    "mqtts_keyfile": null,
+    "logging": {
+        "level": "INFO",
+        "file": "/var/log/openmtc/mqttconnector.log"
+    }
+}

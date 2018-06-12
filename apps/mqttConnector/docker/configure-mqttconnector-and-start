@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+CONFIG_FILE="/etc/openmtc/mqttconnector/config.json"
+
+NAME=${NAME-"mqttConnector"}
+EP=${EP-"http://localhost:8000"}
+CSE_BASE=${CSE_BASE-"onem2m"}
+POAS=${POAS-'["http://auto:21753"]'}
+ORIGINATOR_PRE=${ORIGINATOR_PRE-"//openmtc.org/mn-cse-1"}
+SSL_CRT=${SSL_CRT-"/etc/openmtc/certs/mqttconnector.cert.pem"}
+SSL_KEY=${SSL_KEY-"/etc/openmtc/certs/mqttconnector.key.pem"}
+SSL_CA=${SSL_CA-"/etc/openmtc/certs/ca-chain.cert.pem"}
+BROKER_EP=${BROKER_EP-"localhost:1883"}
+TOPIC_PRE=${TOPIC_PRE-"exampleTopic"}
+TOPIC_INDEX_LOCATION=${TOPIC_INDEX_LOCATION}
+TOPIC_INDEX_DEVICE=${TOPIC_INDEX_DEVICE}
+FIWARE_SERVICE=${FIWARE_SERVICE}
+BROKER_USER=${BROKER_USER-"foo"}
+BROKER_USER_PW=${BROKER_USER_PW-"bar"}
+MQTTS_CA_CERTS=${MQTTS_CA_CERTS}
+MQTTS_CERTFILE=${MQTTS_CERTFILE}
+MQTTS_KEYFILE=${MQTTS_KEYFILE}
+
+# defaults logging
+LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/mqttconnector.log"}
+LOGGING_LEVEL=${LOGGING_LEVEL-"ERROR"}
+
+# ensure correct level
+case ${LOGGING_LEVEL} in
+    FATAL|ERROR|WARN|INFO|DEBUG)
+    ;;
+    *)
+    LOGGING_LEVEL="ERROR"
+    ;;
+esac
+
+# local ip
+LOCAL_IP=$(ip r get 8.8.8.8 | awk 'NR==1 {print $NF}')
+
+# set hostname
+HOST_NAME=${EXTERNAL_IP-${LOCAL_IP}}
+
+# Configuration of the service.
+CONFIG_TEMP=${CONFIG_FILE}".tmp"
+echo -n "Configuring M2M mqttconnector..."
+JQ_STRING='.'
+
+# basics
+JQ_STRING=${JQ_STRING}' |
+    .name = "'${NAME}'" |
+    .ep = "'${EP}'" |
+    .cse_base = "'${CSE_BASE}'" |
+    .poas = '${POAS}' |
+    .originator_pre = "'${ORIGINATOR_PRE}'" |
+    .ssl_certs.cert_file = "'${SSL_CRT}'" |
+    .ssl_certs.key_file = "'${SSL_KEY}'" |
+    .ssl_certs.ca_certs = "'${SSL_CA}'" |
+    .broker_ep = "'${BROKER_EP}'" |
+    .topic_pre = "'${TOPIC_PRE}'" |
+    .topic_index_location = '${TOPIC_INDEX_LOCATION}' |
+    .topic_index_device = '${TOPIC_INDEX_DEVICE}' |
+    .fiware_service = "'${FIWARE_SERVICE}'" |
+    .broker_user = "'${BROKER_USER}'" |
+    .broker_user_pw = "'${BROKER_USER_PW}'" |
+    .mqtts_ca_certs = "'${MQTTS_CA_CERTS}'" |
+    .mqtts_certfile = "'${MQTTS_CERTFILE}'" |
+    .mqtts_keyfile = "'${MQTTS_KEYFILE}'" |
+    .logging.file |= "'${LOGGING_FILE}'" |
+    .logging.level |= "'${LOGGING_LEVEL}'"
+'
+
+cat ${CONFIG_FILE} | jq -M "${JQ_STRING}"> ${CONFIG_TEMP}
+mv ${CONFIG_TEMP} ${CONFIG_FILE}
+
+echo "done"
+
+exec python -m mqttconnector $@
