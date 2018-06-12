@@ -15,23 +15,24 @@ In order to get an overview of the possible paramters of the app:
 
 The most relevant paramters are the following:
 
-EP (Endpoint): URL of the OpenMTC endpoint to use (backend or gateway)
-Example: "http://localhost:18000"
+**EP** (Endpoint): URL of the OpenMTC endpoint to use (backend or gateway)
+Example: "http://localhost:18000**
 
-BROKER_EP (MQTT Endpoint): URL of the MQTT-Broker
-Example: "http://localhost:1883"
+**BROKER_EP** (MQTT Endpoint): URL of the MQTT-Broker
+Example: "http://localhost:1883**
 
-TOPIC_PRE: definition of the first topic level in order to filter for relevant topics
-Example: "OfficeBuilding"
+**TOPIC_PRE**: definition of the first topic level in order to filter for relevant topics
+Example: "OfficeBuilding**
 
-TOPIC_INDEX_LOCATION: topic level representing the location
+**TOPIC_INDEX_LOCATION**: topic level representing the location
 Example: 1
 
-TOPIC_INDEX_DEVICE: topic level representing the device
+**TOPIC_INDEX_DEVICE**: topic level representing the device
 Example: 2
 
-BROKER_USER: username to connect to the MQTT Broker
-BROKER_USER_PW: password to connect to the MQTT Broker
+**BROKER_USER**: username to connect to the MQTT Broker
+
+**BROKER_USER_PW**: password to connect to the MQTT Broker
 
 If used to together with the OpenMTC OrionContextBroker app, it is also possible to configure a specific fiware service.
 
@@ -42,7 +43,7 @@ In order to work data needs to be published to the MQTT-Broker in an onem2m spec
 ```json
 {
     "m2m:cin": {
-        "con": B64_ENCODED_SENML_PAYLOAD
+        "con": "B64_ENCODED_SENML_PAYLOAD"
     }
 }
 ```
@@ -88,7 +89,7 @@ services:
             - "1883:1883"
 
     mqtt-ipe:
-        image: openmtc/mqttconnector-amd64
+        image: openmtc/mqtt-connector-app-amd64
         environment:
             - EP=http://backend:18000
             - BROKER_EP=mosquitto:1883
