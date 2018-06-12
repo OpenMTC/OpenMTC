@@ -105,10 +105,12 @@ class OneM2MHTTPClient(OneM2MClient):
         else:
             ssl_options = None
 
-        client = HTTPClient(host, port, connection_timeout=120.0,
-                            concurrency=50, ssl=is_https,
-                            ssl_options=ssl_options, insecure=insecure)
-        self.request = client.request
+        def get_http_client():
+            return HTTPClient(host, port, connection_timeout=120.0,
+                              concurrency=50, ssl=is_https,
+                              ssl_options=ssl_options, insecure=insecure)
+
+        self._get_client = get_http_client
 
         self.content_type = 'application/' + ('xml' if use_xml else 'json')
 
@@ -201,9 +203,10 @@ class OneM2MHTTPClient(OneM2MClient):
         with Promise() as p:
             http_request = self.map_onem2m_request_to_http_request(onem2m_request)
             t = time()
+            client = self._get_client()
 
             try:
-                response = self.request(**http_request)
+                response = client.request(**http_request)
             except (socket_error, gaierror) as exc:
                 self._handle_network_error(exc, p, http_request, t, ConnectionFailed)
             except Exception as exc:
@@ -218,5 +221,7 @@ class OneM2MHTTPClient(OneM2MClient):
                         p.fulfill(onem2m_response)
                 finally:
                     response.release()
+            finally:
+                client.close()
 
         return p
