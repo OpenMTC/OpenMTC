@@ -260,6 +260,14 @@ rm -f "${target_docker_binary}"
 rm -f "${docker_tmp}/${name}-dependencies.txt"
 ${docker_cmd} rm -f ${build_container_name} &> /dev/null
 printf "done\n"
+
+# remove dangling images
+separator_line
+printf "### Removing dangled images..."
+for image in $(${docker_cmd} images -qa -f "dangling=true"); do
+    ${docker_cmd} rmi -f ${image} > /dev/null
+done
+printf "done\n"
 }
 
 trap cleanup SIGINT SIGTERM
@@ -391,7 +399,7 @@ printf "%s\n" $(get_requirements_from_setup_file) | tr " " "\n" > \
 separator_line
 printf "### Building %s-%s container...\n" ${name} ${machine}
 
-${docker_cmd} build -t ${target_docker_name} \
+${docker_cmd} build --force-rm -t ${target_docker_name} \
     -f ${target_docker_file} ${docker_path}
 if [ $? -gt 0 ]; then
     printf "### Building %s-%s container failed. Exiting now.\n" \
@@ -404,15 +412,6 @@ printf "### Base %s-%s container built successfully.\n" ${name} ${machine}
 ##############################################################################
 # cleanup
 cleanup
-
-##############################################################################
-# remove dangling images
-separator_line
-printf "### Removing dangled images..."
-for image in $(${docker_cmd} images -qa -f "dangling=true"); do
-    ${docker_cmd} rmi -f ${image} > /dev/null
-done
-printf "done\n"
 
 ##############################################################################
 # example to run the docker file
