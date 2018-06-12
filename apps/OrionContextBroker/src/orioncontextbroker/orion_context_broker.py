@@ -1,6 +1,11 @@
 import re
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 from flask import Flask, Response, request
-from gevent import wsgi
+from gevent.pywsgi import WSGIServer
 
 from openmtc_app.onem2m import ResourceManagementXAE
 from orion_api import OrionAPI
@@ -10,8 +15,8 @@ class OrionContextBroker(ResourceManagementXAE):
     def __init__(self,
                  orion_host="http://localhost:1026",
                  orion_api="v2",
-                 labels=["openmtc:sensor_data"],
-                 accumulate_address="http://localhost:8080",
+                 labels=None,
+                 accumulate_address=None,
                  *args,
                  **kw):
         super(OrionContextBroker, self).__init__(*args, **kw)
@@ -19,11 +24,19 @@ class OrionContextBroker(ResourceManagementXAE):
             self.labels = {labels}
         elif hasattr(labels, '__iter__'):
             self.labels = set(labels)
+        elif labels is None:
+            self.labels = ["openmtc:sensor_data"]
         else:
             self.labels = None
         self._entity_names = {}
-        self._subscriptions = {}
-        self.logger.critical(accumulate_address)
+        self._subscription_endpoints = {}
+        self._subscription_services = {}
+
+        # accumulate address
+        if not accumulate_address:
+            accumulate_address = "http://" + self._get_auto_host(orion_host) + ":8080"
+
+        # Orion API
         self.orion_api = OrionAPI(
             orion_host=orion_host,
             api_version=orion_api,
@@ -36,21 +49,44 @@ class OrionContextBroker(ResourceManagementXAE):
             'process_notification',
             self.process_notification,
             methods=["POST"])
-        accumulate_ip, accumulate_port = accumulate_address.split('//')[
-            1].split(':')
-        self.server = wsgi.WSGIServer(("0.0.0.0", int(accumulate_port)),
-                                      self.app)
+        accumulate_ip, accumulate_port = urlparse(accumulate_address).netloc.rsplit(':', 1)
+        self.server = WSGIServer(("0.0.0.0", int(accumulate_port)),
+                                 self.app)
         self.server.start()
+
+    @staticmethod
+    def _get_auto_host(ep):
+        try:
+            import socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            netloc = urlparse(ep).netloc.split(':')
+            s.connect((netloc[0], int(netloc[1])))
+            host = s.getsockname()[0]
+            s.close()
+        except:
+            host = "127.0.0.1"
+
+        return host
 
     def process_notification(self):
         self.logger.debug("Got from Subscription {}".format(request.json))
-        actuator = self.get_resource(
-            self._subscriptions[request.json["subscriptionId"]])
-        self.push_content(actuator, request.json["data"][0]["cmd"]["value"])
+        try:
+            actuator = self.get_resource(
+                self._subscription_endpoints[request.json["subscriptionId"]]
+            )
+        except KeyError:
+            # ignore not deleted old subscriptions
+            pass
+        else:
+            self.push_content(actuator, request.json["data"][0]["cmd"]["value"])
         return Response(status=200, headers={})
 
     def _on_register(self):
         self._discover_openmtc_ipe_entities()
+
+    def _on_shutdown(self):
+        for subscription_id, fiware_service in self._subscription_services.items():
+            self.orion_api.unsubscribe(subscription_id, fiware_service)
 
     def _sensor_filter(self, sensor_info):
         if self.labels:
@@ -59,7 +95,8 @@ class OrionContextBroker(ResourceManagementXAE):
         else:
             return True
 
-    def _get_entity_name(self, sensor_info):
+    @staticmethod
+    def _get_entity_name(sensor_info):
         device_type = "sensor" if sensor_info.get("sensor_labels",
                                                   None) else "actuator"
         try:
@@ -113,6 +150,7 @@ class OrionContextBroker(ResourceManagementXAE):
         self.orion_api.update_attributes(
             entity_name, data_dummy, fiware_service=fiware_service)
 
-        subscriptionId = self.orion_api.subscribe(
+        subscription_id = self.orion_api.subscribe(
             entity_name, fiware_service=fiware_service)
-        self._subscriptions[subscriptionId] = actuator_info['ID']
+        self._subscription_endpoints[subscription_id] = actuator_info['ID']
+        self._subscription_services[subscription_id] = fiware_service

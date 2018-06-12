@@ -2,11 +2,14 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
+import logging
 
 import requests
-import json
 
 from futile.logging import LoggerMixin
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class OrionAPI(LoggerMixin):
@@ -151,6 +154,12 @@ class OrionAPI(LoggerMixin):
                 self.version))
         # return the subscriptionId
         return response["headers"]["Location"].split('/')[3]
+
+    def unsubscribe(self, subscription_id, fiware_service=""):
+        self._request(self.host + "/v2/subscriptions/" + subscription_id,
+                      method='delete',
+                      headers={"fiware-service": fiware_service},
+                      raw=True)
 
     def _request(self,
                  url,
