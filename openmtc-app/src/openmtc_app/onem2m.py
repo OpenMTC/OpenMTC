@@ -765,6 +765,7 @@ class ResourceManagementXAE(XAE):
     def _discover_openmtc_ipe_entities(self):
         # connected to backend or gateway?
         cse_base = self.get_resource(self.cse_base)
+        self._cse_id = cse_base.CSE_ID
         self.logger.debug("CSE_BASE: %s", cse_base)
 
         if cse_base.cseType in (CSETypeIDE.MN_CSE, CSETypeIDE.AEN_CSE):
@@ -832,21 +833,22 @@ class ResourceManagementXAE(XAE):
             except IndexError:
                 continue
             sensor = self.get_resource(sensor_path)
-            sensor_info = self._discovered_sensors[sensor_path] = {
-                'ID': sensor_path,
-                'dev_name': dev_path.split('/')[-1],
-                'cse_id': sensor_path.split('/')[1],
-                'dev_labels': self._discovered_devices[dev_path].labels,
-                'sensor_labels': sensor.labels,
-                'type': 'sensor',
-                'n': None,
-                'u': None,
-                'blacklisted': False
-            }
-            if self._sensor_filter(sensor_info):
-                self._handle_new_sensor(sensor_path)
-            else:
-                self._discovered_sensors[sensor_path]['blacklisted'] = True
+            if sensor:
+                sensor_info = self._discovered_sensors[sensor_path] = {
+                    'ID': sensor_path,
+                    'dev_name': dev_path.split('/')[-1],
+                    'cse_id': sensor_path.split('/')[1],
+                    'dev_labels': self._discovered_devices[dev_path].labels,
+                    'sensor_labels': sensor.labels,
+                    'type': 'sensor',
+                    'n': None,
+                    'u': None,
+                    'blacklisted': False
+                }
+                if self._sensor_filter(sensor_info):
+                    self._handle_new_sensor(sensor_path)
+                else:
+                    self._discovered_sensors[sensor_path]['blacklisted'] = True
 
     def _handle_new_sensor(self, sensor_path):
         latest = self.get_resource(sensor_path + '/latest')
@@ -859,6 +861,8 @@ class ResourceManagementXAE(XAE):
         self._discovered_sensors[sensor_path]['sub_ref'] = sub_ref
 
     def _handle_delete(self, sub_ref):
+        if sub_ref[0] != '/':
+            sub_ref = self._cse_id + '/' + sub_ref
         self._discovered_sensors = {k: v for k, v in self._discovered_sensors.items()
                                     if v['sub_ref'] != sub_ref}
         self._discovered_devices = {k: v for k, v in self._discovered_devices.items()
@@ -890,15 +894,16 @@ class ResourceManagementXAE(XAE):
             except IndexError:
                 continue
             actuator = self.get_resource(actuator_path)
-            actuator_info = self._discovered_actuators[actuator_path] = {
-                'ID': actuator_path,
-                'dev_name': dev_path.split('/')[-1],
-                'cse_id': actuator_path.split('/')[1],
-                'dev_labels': self._discovered_devices[dev_path].labels,
-                'actuator_labels': actuator.labels,
-                'type': 'actuator'
-            }
-            self._new_actuator(actuator_info)
+            if actuator:
+                actuator_info = self._discovered_actuators[actuator_path] = {
+                    'ID': actuator_path,
+                    'dev_name': dev_path.split('/')[-1],
+                    'cse_id': actuator_path.split('/')[1],
+                    'dev_labels': self._discovered_devices[dev_path].labels,
+                    'actuator_labels': actuator.labels,
+                    'type': 'actuator'
+                }
+                self._new_actuator(actuator_info)
 
     @abstractmethod
     def _sensor_data_cb(self, sensor_info, sensor_data):
