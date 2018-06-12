@@ -37,11 +37,10 @@ The OpenMTC SDK is written in and for the Python programming language. Users sho
 
 - [The Python Homepage](http://www.python.org)
 - [Expert Python Programming by Tarek Ziadé](http://www.e-reading.by/bookreader.php/138816/Ziade_-_Expert_Python_programming.pdf)
-- [Code Like a Pythonista: Idiomatic Python by David Goodger](http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html)
+- [Code Like a Pythonista: Idiomatic Python](http://www.omahapython.org/IdiomaticPython.html)
 
 # Feedback
 
 Please create issues for any problems and direct any comments or feedback you are having to <a href="mailto:support@openmtc.org">support@openmtc.org</a>
 
 Please let us know what you think. We are also very interested in any use case you are *not* able to implement with the SDK or if you find it difficult to do so.
-
