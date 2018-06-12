@@ -1,4 +1,4 @@
-docker/sdk-amd64############################################################
+############################################################
 # Dockerfile for openmtc sdk binary environment
 ############################################################
 
@@ -11,7 +11,7 @@ ENV MOD_NAME=sdk
 MAINTAINER rst/tgu
 
 # update pip to latest version
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools
 
 # install openmtc dependencies
 COPY tmp/$MOD_NAME-dependencies.txt /tmp/requirements.txt
