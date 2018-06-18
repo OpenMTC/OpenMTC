@@ -203,6 +203,8 @@ EOF
 The state will be automatically forwarded to OpenMTC. Therefore you should see something like the following in the log:
 ```
 culipe | 172.24.0.6 - - [2018-05-26 17:24:29] "POST / HTTP/1.1" 200 160 0.037561
+```
+To get the current state at the OpenMTC Backend use this:
 
 ```
 curl -X "GET" localhost:18000/~/mn-cse-1/onem2m/CUL868IPE/FS20_ST3_16108_1/switch/latest -s | jq '."m2m:cin".con'
