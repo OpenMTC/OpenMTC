@@ -11,8 +11,8 @@ default_topic_pre = "exampleTopic"
 default_topic_index_location = 1
 default_topic_index_device = -1
 default_fiware_service = None
-default_broker_user = "foo"
-default_broker_user_pw = "bar"
+default_broker_user = ""
+default_broker_user_pw = ""
 default_mqtts_ca_certs = None
 default_mqtts_certfile = None
 default_mqtts_keyfile = None
@@ -24,20 +24,18 @@ parser = ArgumentParser(
     formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("-n", "--name", help="Name used for the AE.")
 parser.add_argument("-s", "--ep", help="URL of the local Endpoint.")
-parser.add_argument("--topic_pre", help="Topic you want to be subscribed to")
+parser.add_argument("--topic-pre", help="Topic you want to be subscribed to")
 parser.add_argument(
-    "--topic_index_location", help="Index of location in topic string")
+    "--topic-index-location", help="Index of location in topic string")
 parser.add_argument(
-    "--topic_index_device", help="Index of device name in topic string")
-parser.add_argument("--broker_user", help="credentials for MQTT broker")
-parser.add_argument("--broker_user_pw", help="credentials for MQTT broker")
-parser.add_argument("--mqtts", dest='mqtts_enabled', action='store_true')
-parser.add_argument("--no-mqtts", dest='mqtts_enabled', action='store_false')
-parser.set_defaults(mqtts_enabled=False)
+    "--topic-index-device", help="Index of device name in topic string")
+parser.add_argument("--broker-user", help="credentials for MQTT broker")
+parser.add_argument("--broker-user-pw", help="credentials for MQTT broker")
+parser.add_argument("--mqtts-enabled", action='store_true')
 parser.add_argument(
-    "--mqtts_ca_certs", help="Path to CA certs or tuple of paths")
-parser.add_argument("--mqtts_certfile", help="Path to own mqtts cert")
-parser.add_argument("--mqtts_keyfile", help="Path to own mqtts key")
+    "--mqtts-ca-certs", help="Path to CA certs or tuple of paths")
+parser.add_argument("--mqtts-certfile", help="Path to own mqtts cert")
+parser.add_argument("--mqtts-keyfile", help="Path to own mqtts key")
 # args, config and logging
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
@@ -49,7 +47,7 @@ poas = config.get("poas", ["http://auto:21753"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
 
-broker_ep = config.get("broker_ep", "openmtc.smartorchestra.de:8883")
+broker_ep = config.get("broker_ep", "localhost:8883")
 
 topic_pre = get_value("topic_pre", (unicode, str), default_topic_pre, args,
                       config)

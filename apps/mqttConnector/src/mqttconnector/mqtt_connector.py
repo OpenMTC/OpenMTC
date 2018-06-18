@@ -41,9 +41,9 @@ class mqttConnector(XAE):
         self.broker_user = broker_user
         self.broker_user_pw = broker_user_pw
         self.mqtts_enabled = mqtts_enabled
-        self.mqtts_ca_certs = mqtts_ca_certs
-        self.mqtts_certfile = mqtts_certfile
-        self.mqtts_keyfile = mqtts_keyfile
+        self.mqtts_ca_certs = mqtts_ca_certs or None
+        self.mqtts_certfile = mqtts_certfile or None
+        self.mqtts_keyfile = mqtts_keyfile or None
 
         super(mqttConnector, self).__init__(*args, **kw)
 
