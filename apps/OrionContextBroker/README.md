@@ -241,18 +241,18 @@ curl -X POST localhost:18000/onem2m/EXAMPLE_APP_NAME/EXAMPLE_DEVICE_NAME/ -H "Co
 Upload SenML Data to OpenMTC:
 
 ```json
-{
+[{
   "n": "temperature",
   "bn": "openmtc:zigbee:temp",
   "v": 24,
   "u": "Cel",
   "t": "2017-04-13 12:45:12.787239"
-}
+}]
 ```
-translated to base64: eyJuIjogInRlbXBlcmF0dXJlIiwgImJuIjogIm9wZW5tdGM6emlnYmVlOnRlbXAiLCAidiI6IDI0LCAidSI6ICJDZWwiLCAidCI6ICIyMDE3LTA0LTEzIDEyOjQ1OjEyLjc4NzIzOSJ9Cg==
+translated to base64: W3sibiI6ICJ0ZW1wZXJhdHVyZSIsImJuIjogIm9wZW5tdGM6emlnYmVlOnRlbXAiLCJ2IjogMjQsInUiOiAiQ2VsIiwidCI6ICIyMDE3LTA0LTEzIDEyOjQ1OjEyLjc4NzIzOSJ9XQo=
 
 ```
-curl -X POST localhost:18000/onem2m/EXAMPLE_APP_NAME/EXAMPLE_DEVICE_NAME/EXAMPLE_MEASUREMENT_NAME/ -H "Content-Type: application/vnd.onem2m-res+json" -d '{"m2m:cin": {"con": "eyJuIjogInRlbXBlcmF0dXJlIiwgImJuIjogIm9wZW5tdGM6emlnYmVlOnRlbXAiLCAidiI6IDI0LCAidSI6ICJDZWwiLCAidCI6ICIyMDE3LTA0LTEzIDEyOjQ1OjEyLjc4NzIzOSJ9Cg==", "cnf": "application/json:1"}}'
+curl -X POST localhost:18000/onem2m/EXAMPLE_APP_NAME/EXAMPLE_DEVICE_NAME/EXAMPLE_MEASUREMENT_NAME/ -H "Content-Type: application/vnd.onem2m-res+json" -d '{"m2m:cin": {"con": "W3sibiI6ICJ0ZW1wZXJhdHVyZSIsImJuIjogIm9wZW5tdGM6emlnYmVlOnRlbXAiLCJ2IjogMjQsInUiOiAiQ2VsIiwidCI6ICIyMDE3LTA0LTEzIDEyOjQ1OjEyLjc4NzIzOSJ9XQo=", "cnf": "application/json:1"}}'
 ```
 
 ### Query Data Orion CB
@@ -264,7 +264,7 @@ curl localhost:1026/v2/entities/ | jq '.'
 ```json
 [
   {
-    "id": "EXAMPLE_DEVICE_NAME",
+    "id": "in-cse-1-EXAMPLE_DEVICE_NAME",
     "type": "openmtc",
     "temperature": {
       "type": "Int",
