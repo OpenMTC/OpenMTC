@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-CONFIG_FILE="/etc/openmtc/influxdb/config.json"
+CONFIG_FILE="/etc/openmtc/influxdbapp/config.json"
 
-NAME=${NAME-"InfluxDB"}
+NAME=${NAME-"InfluxdbApp"}
 EP=${EP-"http://localhost:8000"}
 CSE_BASE=${CSE_BASE-"onem2m"}
 POAS=${POAS-'["http://auto:23706"]'}
@@ -20,7 +20,7 @@ DBUSER=${DBUSER-"test"},
 DBUSER_PW=${DBUSER_PW-"test"}
 
 # defaults logging
-LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/influxdb.log"}
+LOGGING_FILE=${LOGGING_FILE-"/var/log/openmtc/influxdbapp.log"}
 LOGGING_LEVEL=${LOGGING_LEVEL-"ERROR"}
 
 # ensure correct level
@@ -40,7 +40,7 @@ HOST_NAME=${EXTERNAL_IP-${LOCAL_IP}}
 
 # Configuration of the service.
 CONFIG_TEMP=${CONFIG_FILE}".tmp"
-echo -n "Configuring M2M influxdb..."
+echo -n "Configuring M2M influxdbapp..."
 JQ_STRING='.'
 
 # basics
@@ -70,4 +70,4 @@ mv ${CONFIG_TEMP} ${CONFIG_FILE}
 
 echo "done"
 
-exec python -m influxdb $@
+exec python -m influxdbapp $@

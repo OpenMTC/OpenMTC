@@ -2,7 +2,7 @@ from openmtc_app.onem2m import ResourceManagementXAE
 from connector import InfluxDBConnector
 
 
-class InfluxDB(ResourceManagementXAE):
+class InfluxdbApp(ResourceManagementXAE):
 
     def __init__(
             self,
@@ -17,7 +17,7 @@ class InfluxDB(ResourceManagementXAE):
             *args,
             **kw
             ):
-        super(InfluxDB, self).__init__(*args, **kw)
+        super(InfluxdbApp, self).__init__(*args, **kw)
         if isinstance(labels, basestring):
             self.labels = {labels}
         elif hasattr(labels, '__iter__') and len(labels):

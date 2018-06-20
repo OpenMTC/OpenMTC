@@ -8,7 +8,7 @@ import sys
 from utils import get_packages, get_pkg_files, OpenMTCSdist, move_config_files
 
 # name and dir
-NAME = "influxdb"
+NAME = "influxdbapp"
 BASE_DIR = "."
 
 # import pkg

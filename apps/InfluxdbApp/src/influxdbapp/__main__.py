@@ -2,17 +2,17 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from openmtc_app.util import prepare_app, get_value
 from openmtc_app.runner import AppRunner as Runner
-from .influx_db import InfluxDB
+from .influxdb_app import InfluxdbApp
 
 # defaults
-default_name = "InfluxDB"
+default_name = "InfluxdbApp"
 default_ep = "http://localhost:8000"
 default_labels = []
 
 # args parser
 parser = ArgumentParser(
-    description="An IPE called InfluxDB",
-    prog="InfluxDB",
+    description="An IPE called InfluxdbApp",
+    prog="InfluxdbApp",
     formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("-n", "--name", help="Name used for the AE.")
 parser.add_argument("-s", "--ep", help="URL of the local Endpoint.")
@@ -47,7 +47,7 @@ db_user = get_value("db_user", (unicode, str), "test", args, config)
 db_pw = get_value("db_pw", (unicode, str), "test", args, config)
 
 # start
-app = InfluxDB(
+app = InfluxdbApp(
     name=nm, cse_base=cb, poas=poas,
     labels=lbl,
     originator_pre=originator_pre, 

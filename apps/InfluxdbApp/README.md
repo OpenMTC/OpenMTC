@@ -7,7 +7,7 @@ This App will subscribe to OpenMTC data and tranfer it to an instance of the Inf
 You need a running instance of InfluxDB and configure the following parameters according to your setup.
 
 ```
-apps/influx-db \
+apps/influxdb-app \
     --ep "http://127.0.0.1:8000" \
     --influx_host "127.0.0.1" \
     --influx-port "8086" \

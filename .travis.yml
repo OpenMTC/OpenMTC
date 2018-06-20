@@ -8,8 +8,8 @@ before_script:
 - "./create-binary-docker gateway -a arm"
 - "./create-binary-docker orioncontextbroker"
 - "./create-binary-docker orioncontextbroker -a arm"
-- "./create-binary-docker influxdb"
-- "./create-binary-docker influxdb -a arm"
+- "./create-binary-docker influxdbapp"
+- "./create-binary-docker influxdbapp -a arm"
 - "./create-binary-docker cul868ipe"
 - "./create-binary-docker cul868ipe -a arm"
 script:
@@ -17,8 +17,8 @@ script:
 - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
 - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
 - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
-- docker tag openmtc/influxdb-amd64 openmtc/influxdb-app-amd64
-- docker tag openmtc/influxdb-arm openmtc/influxdb-app-arm
+- docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
+- docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
 - docker push openmtc/backend-amd64
 - docker push openmtc/backend-arm
