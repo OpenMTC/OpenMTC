@@ -126,7 +126,7 @@ After the setup is started, the CUL868IPE will simulate sensor data. In order to
 
 *OpenMTC Backend*
 ```
-curl -X "GET" localhost:18000/~/mn-cse-1/onem2m/CUL868IPE/S300TH_1/temperature/latest -s | \
+curl -X "GET" localhost:18000/~/TESTUSER~TESTTENANT/onem2m/CUL868IPE/S300TH_1/temperature/latest -s | \
   jq -r '."m2m:cin".con' | \
   base64 -d | jq '.'
 ```
@@ -163,7 +163,7 @@ curl -X "GET" localhost:8000/onem2m/CUL868IPE/S300TH_1/temperature/latest -s | \
 *OrionContextBroker*
 
 ```
-curl localhost:1026/v2/entities/mn-cse-1-Wohnzimmer/ -s -S | jq '."temperature"'
+curl localhost:1026/v2/entities/TESTTENANT-kitchen/ -s -S --header 'fiware-service: TESTUSER' | jq '."temperature"'
 ```
 ```json
 {
@@ -189,8 +189,8 @@ curl localhost:1026/v2/entities/mn-cse-1-Wohnzimmer/ -s -S | jq '."temperature"'
 The following command will switch the current state of the actuator to "ON" by sending a request to the OCB:
 
 ```bash
-curl localhost:1026/v2/entities/mn-cse-1-Bad/attrs -s -S \
-     --header 'Content-Type: application/json' \
+curl localhost:1026/v2/entities/TESTTENANT-bath/attrs -s -S \
+     --header 'Content-Type: application/json' --header 'fiware-service: TESTUSER' \
      -X PATCH -d @- <<EOF
 {
   "cmd": {
@@ -207,7 +207,7 @@ culipe | 172.24.0.6 - - [2018-05-26 17:24:29] "POST / HTTP/1.1" 200 160 0.037561
 To get the current state at the OpenMTC Backend use this:
 
 ```
-curl -X "GET" localhost:18000/~/mn-cse-1/onem2m/CUL868IPE/FS20_ST3_16108_1/switch/latest -s | jq '."m2m:cin".con'
+curl -X "GET" localhost:18000/~/TESTUSER~TESTTENANT/onem2m/CUL868IPE/FS20_ST3_16108_1/switch/latest -s | jq '."m2m:cin".con'
 ```
 ```
 "ON"
