@@ -13,7 +13,7 @@ from utils import (get_packages, OpenMTCSdist, OpenMTCBuildPy,
 
 # name and version
 SETUP_NAME = "openmtc-all"
-SETUP_VERSION = "4.99.0"
+SETUP_VERSION = "1.1.0"
 SETUP_DESCRIPTION = "The OpenMTC Backend and Gateway (GEvent version)"
 
 # meta

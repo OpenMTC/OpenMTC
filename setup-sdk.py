@@ -7,7 +7,7 @@ from utils import get_packages, OpenMTCSdist
 # name and version
 NAME = "sdk"
 SETUP_NAME = "openmtc-" + NAME
-SETUP_VERSION = "4.99.0"
+SETUP_VERSION = "1.1.0"
 SETUP_DESCRIPTION = "The OpenMTC Python SDK"
 
 # meta
