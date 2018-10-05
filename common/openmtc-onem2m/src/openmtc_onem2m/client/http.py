@@ -167,6 +167,8 @@ class OneM2MHTTPClient(OneM2MClient):
         }
         headers['content-type'] = content_type
 
+        headers['accept'] = self.content_type
+
         self.logger.debug("Added request params: %s", params)
 
         return {

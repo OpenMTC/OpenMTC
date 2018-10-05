@@ -22,7 +22,8 @@ from openmtc_onem2m.exc import (CSEOperationNotAllowed, STATUS_OK, CSETypeError,
                                 CSEMissingValue, CSEValueError, STATUS_CREATED,
                                 CSEError, CSESyntaxError, CSEBadRequest,
                                 CSEPermissionDenied, STATUS_NOT_FOUND, CSEConflict,
-                                CSEContentsUnacceptable, CSETargetNotReachable)
+                                CSEContentsUnacceptable, CSETargetNotReachable,
+                                STATUS_UPDATED, STATUS_DELETED)
 from openmtc_onem2m.model import (ExpiringResource, Notification,
                                   AccessControlOperationE, ResourceTypeE,
                                   NotificationContentTypeE, FilterUsageE,
@@ -1000,7 +1001,7 @@ class OneM2MDefaultController(LoggerMixin):
                                      self.request)
 
     def _send_update_response(self):
-        return OneM2MResponse(STATUS_OK, pc=self.resource,
+        return OneM2MResponse(STATUS_UPDATED, pc=self.resource,
                               request=self.request)
 
     # DELETE
@@ -1045,7 +1046,7 @@ class OneM2MDefaultController(LoggerMixin):
         self.events.resource_deleted.fire(self.resource, self.request)
 
     def _send_delete_response(self):
-        return OneM2MResponse(STATUS_OK, request=self.request)
+        return OneM2MResponse(STATUS_DELETED, request=self.request)
 
 
 # see TS-0004 7.4.4
