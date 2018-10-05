@@ -952,7 +952,7 @@ class ContentInstance(AnnounceableSubordinateResourceC,
                       SubscribableResource):
     """See TS-0001 section 9.6.7"""
 
-    stateTag = UnicodeAttribute(accesstype=Attribute.RO)
+    stateTag = Attribute(int, accesstype=Attribute.RO)
     creator = UnicodeAttribute()        # m2m:ID
     # contentInfo = typeOfContent(:EncodingType)
     # typeOfContent => Media Types
@@ -969,7 +969,7 @@ class ContentInstance(AnnounceableSubordinateResourceC,
 
 
 class ContentInstanceAnnc(AnnouncedSubordinateResourceC):
-    stateTag = UnicodeAttribute(accesstype=Attribute.RO)
+    stateTag = Attribute(int, accesstype=Attribute.RO)
     contentInfo = UnicodeAttribute(EncodingTypeE)    # m2m:contentInfo
     contentSize = Attribute(int, accesstype=Attribute.WO)
     ontologyRef = UnicodeAttribute(accesstype=Attribute.WO)
@@ -983,7 +983,7 @@ class ContentInstanceAnnc(AnnouncedSubordinateResourceC):
 class Container(AnnounceableResourceC, SubscribableResource):
     """See TS-0001 section 9.6.6"""
 
-    stateTag = UnicodeAttribute(accesstype=Attribute.RO)
+    stateTag = Attribute(int, accesstype=Attribute.RO)
     creator = UnicodeAttribute()
     maxNrOfInstances = Attribute(int)
     maxByteSize = Attribute(int)
@@ -1012,7 +1012,7 @@ Container.__child_types__ = (
 
 class ContainerAnnc(AnnouncedResourceC, SubscribableResource):
 
-    stateTag = UnicodeAttribute(accesstype=Attribute.RO)
+    stateTag = Attribute(int, accesstype=Attribute.RO)
     maxNrOfInstances = Attribute(int)
     maxByteSize = Attribute(int)
     maxInstanceAge = UnicodeAttribute(mandatory=False)  # todo
