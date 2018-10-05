@@ -249,11 +249,21 @@ class OpenMTCWSGIApplication(LoggerMixin):
         #  request and response primitives, and vice versa, if applicable.
         ec = get_header("x-m2m-ec")
 
+        # The X-M2M-CTS header shall be mapped to the Content Status parameter
+        # of response primitives and vice versa, if applicable.
+        rvi = get_header("x-m2m-rvi")
+
+        # The X-M2M-CTS header shall be mapped to the Content Status parameter
+        # of response primitives and vice versa, if applicable.
+        vsi = get_header("x-m2m-vsi")
+
         onem2m_request = OneM2MRequest(op=op, to=to, fr=fr, rqi=rqi, ty=ty,
                                        pc=pc, ot=ot, rqet=rqet, rset=rset,
-                                       oet=oet, rt=rt, ec=ec, gid=gid)
+                                       oet=oet, rt=rt, ec=ec, gid=gid, rvi=rvi,
+                                       vsi=vsi)
 
-        not_filter_params = ('rt', 'rp', 'rcn', 'da', 'drt')
+        not_filter_params = ('rt', 'rp', 'rcn', 'da', 'drt', 'rids', 'tids',
+                             'ltids', 'tqi')
         multiple_params = ('lbl', 'ty', 'cty', 'atr')
 
         if http_request.query_string:
@@ -315,8 +325,17 @@ class OpenMTCWSGIApplication(LoggerMixin):
 
         headers = {
             "x-m2m-ri": str(response.rqi),
-            "x-m2m-rsc": str(response.rsc)
+            "x-m2m-rsc": str(response.rsc),
+            'x-m2m-rvi': str(response.rvi)
         }
+
+        if response.fr:
+            headers['x-m2m-origin'] = str(response.fr)
+
+        response_fields = ['ot', 'rset', 'ec', 'cts', 'cto', 'vsi']
+        for f in response_fields:
+            if getattr(response, f):
+                headers['x-m2m-%s' % f] = str(getattr(response, f))
 
         try:
             headers['Content-Location'] = (resource_id_pre + response.content.resourceID)
@@ -370,7 +389,8 @@ class OpenMTCWSGIApplication(LoggerMixin):
 
             headers = {
                 "x-m2m-ri": str(response.rqi),
-                "x-m2m-rsc": str(response.rsc)
+                "x-m2m-rsc": str(response.rsc),
+                'x-m2m-rvi': str(response.rvi)
             }
         except AttributeError:
             status_code = STATUS_INTERNAL_SERVER_ERROR.http_status_code

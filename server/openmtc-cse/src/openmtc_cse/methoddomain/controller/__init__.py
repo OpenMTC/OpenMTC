@@ -106,6 +106,10 @@ class OneM2MDefaultController(LoggerMixin):
         self._dynamic_authorization_supported = dynamic_authorization.get('enabled', False)
         self._dynamic_authorization_poa = dynamic_authorization.get('poa', [])
 
+        # release version indicator
+        if not self.request.rvi:
+            self.request.rvi = '2a'
+
         return self._handle_request()
 
     def _handle_request(self):
