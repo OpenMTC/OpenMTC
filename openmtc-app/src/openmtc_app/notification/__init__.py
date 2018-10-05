@@ -256,6 +256,13 @@ class HttpNotificationHandler(BaseNotificationHandler):
             assert 'x-m2m-ri' in request.headers, 'Missing request id'
             assert 'content-type' in request.headers, 'Unspecified content type'
 
+            if not request.data:
+                if request.environ.get('HTTP_TRANSFER_ENCODING') == 'chunked':
+                    request.data = request.environ['wsgi.input'].read()
+                else:
+                    cl = int(request.environ.get('CONTENT_LENGTH'), 0)
+                    request.data = request.environ['wsgi.input'].read(cl)
+
             notification = get_onem2m_decoder(request.content_type).decode(request.data)
             if not notification.verificationRequest:
                 notification = self._unpack_notification(notification)
