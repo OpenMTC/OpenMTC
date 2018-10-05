@@ -6,7 +6,7 @@ from openmtc.model import (Resource as Res, UnicodeAttribute, DatetimeAttribute,
 from openmtc.model.exc import ModelTypeError
 from futile import issubclass
 
-LATEST_VERSION = "1.6"
+LATEST_VERSION = "2a"
 
 
 class OneM2MIntEnum(IntEnum):
@@ -24,7 +24,7 @@ class OneM2MContentResource(ContentResource, OneM2MEntity):
 
 class OneM2MResource(Res, OneM2MEntity):
     __model_name__ = "onem2m"
-    __model_version__ = "1.6"
+    __model_version__ = "2a"
 
 
 ################################################################################
@@ -41,8 +41,8 @@ class ResourceTypeE(OneM2MIntEnum):
     eventConfig = 7
     execInstance = 8
     group = 9
-    localPolicy = 10
-    m2mServiceSubscriptionProfile = 11
+    locationPolicy = 10
+    m2mServiceSubscription = 11
     mgmtCmd = 12
     mgmtObj = 13
     node = 14
@@ -56,6 +56,16 @@ class ResourceTypeE(OneM2MIntEnum):
     statsConfig = 22
     subscription = 23
     semanticDescriptor = 24
+    notificationTargetMgmtPolicyRef = 25
+    notificationTargetPolicy = 26
+    policyDeletionRules = 27
+    flexContainer = 28
+    timeSeries = 29
+    timeSeriesInstance = 30
+    role = 31
+    token = 32
+    trafficPattern = 33
+    dynamicAuthorizationConsultation = 34
     accessControlPolicyAnnc = 10001
     AEAnnc = 10002
     containerAnnc = 10003
@@ -66,6 +76,12 @@ class ResourceTypeE(OneM2MIntEnum):
     nodeAnnc = 10014
     remoteCSEAnnc = 10016
     scheduleAnnc = 10018
+    semanticDescriptorAnnc = 10024
+    flexContainerAnnc = 10028
+    timeSeriesAnnc = 10029
+    timeSeriesInstanceAnnc = 10030
+    trafficPatternAnnc = 10033
+    dynamicAuthorizationConsultationAnnc = 10034
 
 
 @unique
@@ -136,6 +152,7 @@ class RequestStatusE(OneM2MIntEnum):
 
 @unique
 class MemberTypeE(OneM2MIntEnum):
+    mixed = 0
     accessControlPolicy = 1
     AE = 2
     container = 3
@@ -159,7 +176,16 @@ class MemberTypeE(OneM2MIntEnum):
     statsCollect = 21
     statsConfig = 22
     subscription = 23
+    semanticDescriptor = 24
+    notificationTargetMgmtPolicyRef = 25
+    notificationTargetPolicy = 26
+    policyDeletionRules = 27
+    flexContainer = 28
+    timeSeries = 29
+    timeSeriesInstance = 30
+    role = 31
     token = 32
+    trafficPattern = 33
     dynamicAuthorizationConsultation = 34
     accessControlPolicyAnnc = 10001
     AEAnnc = 10002
@@ -170,11 +196,15 @@ class MemberTypeE(OneM2MIntEnum):
     mgmtObjAnnc = 10013
     nodeAnnc = 10014
     remoteCSEAnnc = 10016
-    scheduleAnnc = 10019
+    scheduleAnnc = 10018
+    semanticDescriptorAnnc = 10024
+    flexContainerAnnc = 10028
+    timeSeriesAnnc = 10029
+    timeSeriesInstanceAnnc = 10030
+    trafficPatternAnnc = 10033
     dynamicAuthorizationConsultationAnnc = 10034
-    mixed = 24
-    # Mixed is a mixture of the resource types from 1 to 23, 10001 to 10004, 10009 to  10010,
-    # 10013 to 10014 and 10016 to 10018 as listed above.
+    oldest = 20001
+    latest = 20002
 
 
 @unique
