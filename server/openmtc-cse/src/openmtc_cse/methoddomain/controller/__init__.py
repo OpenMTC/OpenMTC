@@ -1298,10 +1298,7 @@ class ContentInstanceController(OneM2MDefaultController):
     def _create_resource(self):
         super(ContentInstanceController, self)._create_resource()
 
-        # handle_old_instances
-        max_nr_of_instances = self.parent.maxNrOfInstances
-        current_nr_of_instances = self.parent.currentNrOfInstances
-        if 0 < max_nr_of_instances <= current_nr_of_instances:
+        def remove_oldest_child():
             self.parent.currentNrOfInstances -= 1
             self.parent.currentByteSize -= self.parent.oldest.contentSize
 
@@ -1316,6 +1313,14 @@ class ContentInstanceController(OneM2MDefaultController):
                 self.logger.debug("Setting oldest to None")
                 self.parent.oldest = None
 
+        # handle_old_instances
+        if 0 < self.parent.maxNrOfInstances <= self.parent.currentNrOfInstances:
+            remove_oldest_child()
+
+        while (0 < self.parent.maxByteSize <
+               self.parent.currentByteSize + self.resource.contentSize):
+            remove_oldest_child()
+
         # handle_new_instance
         self.parent.currentNrOfInstances += 1
         self.parent.currentByteSize += self.resource.contentSize
@@ -1325,6 +1330,12 @@ class ContentInstanceController(OneM2MDefaultController):
             self.parent.oldest = self.resource
         self.parent.latest = self.resource
         self._update(self.parent)
+
+    def _check_create_representation(self):
+        super(ContentInstanceController, self)._check_create_representation()
+
+        if self.request.content.resourceName in ('la', 'ol'):
+            raise CSEConflict()
 
     def _set_mandatory_create_attributes(self, vals):
         self.request.name = None
@@ -1347,10 +1358,12 @@ class ContentInstanceController(OneM2MDefaultController):
             cnt.latest = None
             cnt.oldest = None
             cnt.currentNrOfInstances = 0
+            cnt.currentByteSize = 0
         else:
             cnt.latest = ci_l
             cnt.oldest = ci_o
             cnt.currentNrOfInstances -= 1
+            cnt.currentByteSize -= self.resource.contentSize
 
         return self._update(cnt)
 
