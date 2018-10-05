@@ -122,15 +122,17 @@ class ResponseType(OneM2MIntEnum):
 
 
 # @unique
-# class ResultConentE(OneM2MIntEnum):
-#    nothing = 0
-#    attributes = 1
-#    hierarchical_address = 2
-#    hierarchical_address_and_attributes = 3
-#    attributes_and_child_resources = 4
-#    attributes_and_child_resource_references = 6
-#    child_resource_references = 6
-#    original_resource = 7
+class ResultContentE(OneM2MIntEnum):
+    nothing = 0
+    attributes = 1
+    hierarchical_address = 2
+    hierarchical_address_and_attributes = 3
+    attributes_and_child_resources = 4
+    attributes_and_child_resource_references = 5
+    child_resource_references = 6
+    original_resource = 7
+    child_resources = 8
+    modified_attributes = 9
 
 
 @unique

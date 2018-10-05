@@ -339,7 +339,8 @@ class OpenMTCWSGIApplication(LoggerMixin):
         try:
             content_type, payload = encode_onem2m_content(response.content,
                                                           accept, pretty,
-                                                          path=resource_id_pre)
+                                                          path=resource_id_pre,
+                                                          fields=response.fields)
         except CSEContentsUnacceptable as e:
             status_code = e.status_code
             content_type = "text/plain"

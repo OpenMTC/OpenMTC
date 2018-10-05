@@ -105,6 +105,7 @@ class OneM2MMapper(BasicMapper):
             path,
             self.originator,
             filter_criteria=fc,
+            rcn=5,
             **request_options
         )).get()
 

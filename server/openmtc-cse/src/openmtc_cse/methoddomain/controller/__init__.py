@@ -31,7 +31,7 @@ from openmtc_onem2m.model import (ExpiringResource, Notification,
                                   DiscResTypeE, Container, AccessControlPolicy,
                                   AccessControlPolicyIDHolder, AccessControlRuleC,
                                   DynAuthDasRequestC, SecurityInfo, SecurityInfoTypeE,
-                                  AE, ContentInstance)
+                                  AE, ResultContentE, ContentInstance)
 from openmtc_onem2m.transport import (OneM2MResponse, OneM2MRequest,
                                       OneM2MOperation, OneM2MErrorResponse)
 from openmtc_onem2m.util import split_onem2m_address
@@ -805,6 +805,12 @@ class OneM2MDefaultController(LoggerMixin):
 
     def _handle_retrieve(self):
         try:
+            self.request.rcn = ResultContentE(int(self.request.rcn))
+        except ValueError:
+            raise CSEBadRequest()
+        except TypeError:
+            self.request.rcn = ResultContentE.attributes
+        try:
             fu = self.request.filter_criteria.filterUsage
         except AttributeError:
             fu = None
@@ -887,10 +893,15 @@ class OneM2MDefaultController(LoggerMixin):
         if self.fields and isinstance(self.fields, list):
             res.set_values({k: v if k in self.fields else None for
                             k, v in res.get_values().items()})
-        return self._retrieve_children()
+
+        if self.request.rcn == ResultContentE.attributes_and_child_resource_references:
+            self._retrieve_children()
 
     def _send_retrieve_response(self):
-        return OneM2MResponse(STATUS_OK, pc=self.result, request=self.request)
+        fields = self.resource.values.keys()
+        if self.request.rcn != ResultContentE.attributes_and_child_resource_references:
+            fields = [k for k in fields if k != 'childResource']
+        return OneM2MResponse(STATUS_OK, pc=self.result, request=self.request, fields=fields)
 
     def _retrieve_children(self):
         return self._retrieve_children_for_resource(self.resource)

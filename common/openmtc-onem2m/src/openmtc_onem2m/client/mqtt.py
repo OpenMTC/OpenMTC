@@ -370,7 +370,8 @@ class OneM2MMQTTClient(OneM2MClient):
                 sp_id, cse_id, _ = split_onem2m_address(response.to)
                 response.content = self._decode(
                     encode_onem2m_content(response.content, 'application/json',
-                                          path=sp_id + cse_id)[1]
+                                          path=sp_id + cse_id,
+                                          fields=response.fields)[1]
                 )
 
             self._publish_message(

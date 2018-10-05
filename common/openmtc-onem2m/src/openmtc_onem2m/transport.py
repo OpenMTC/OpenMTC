@@ -385,7 +385,7 @@ class OneM2MResponse(object):
     """Class representing a OneM2M response"""
 
     def __init__(self, status_code, request=None, rqi=None, pc=None, to=None,
-                 fr=None, rsc=None):
+                 fr=None, rsc=None, fields=None):
         # Operation result
         if isinstance(status_code, STATUS):
             self.response_status_code = status_code
@@ -405,6 +405,7 @@ class OneM2MResponse(object):
             self.originator = fr
         # Resource content to be transferred.
         self.content = pc
+        self.fields = fields
 
     @property
     def status_code(self):
