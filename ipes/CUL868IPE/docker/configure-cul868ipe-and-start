@@ -64,4 +64,4 @@ mv ${CONFIG_TEMP} ${CONFIG_FILE}
 
 echo "done"
 
-exec python -m cul868ipe $@
+exec python3 -m cul868ipe $@

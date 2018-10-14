@@ -6,4 +6,4 @@ cd $(dirname ${0})
 
 cd mqttConnector
 
-PYTHONPATH=${PYTHONPATH}:src exec python -m mqttconnector $@
+PYTHONPATH=${PYTHONPATH}:src exec python3 -m mqttconnector $@

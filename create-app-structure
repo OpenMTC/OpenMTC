@@ -289,7 +289,7 @@ cd \$(dirname \${0})
 
 cd ${APP_NAME}
 
-PYTHONPATH=\${PYTHONPATH}:src exec python -m ${PKG_NAME} \$@
+PYTHONPATH=\${PYTHONPATH}:src exec python3 -m ${PKG_NAME} \$@
 EOF
 
 chmod +x "${START_SCRIPT}"
@@ -301,7 +301,7 @@ BIN_SCRIPT="${APP_FOLDER}/bin/openmtc-${APP_SCRIPT}"
 cat > "${BIN_SCRIPT}" << EOF
 #!/usr/bin/env bash
 
-exec python -m ${PKG_NAME} \$@
+exec python3 -m ${PKG_NAME} \$@
 EOF
 
 chmod +x "${BIN_SCRIPT}"
@@ -333,7 +333,7 @@ fi
 # create setup file
 SETUP_FILE="${APP_FOLDER}/setup-${PKG_NAME}.py"
 cat > "${SETUP_FILE}" << EOF
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup
 from distutils.core import setup
@@ -489,7 +489,7 @@ mv \${CONFIG_TEMP} \${CONFIG_FILE}
 
 echo "done"
 
-exec python -m ${PKG_NAME} \$@
+exec python3 -m ${PKG_NAME} \$@
 EOF
 
 if [ ${WEB_APP} == "false" ]; then

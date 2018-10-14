@@ -4,4 +4,4 @@ cd $(dirname ${0})
 
 . ./prep-env.sh
 
-exec python src/openmtc_gevent/backend_main.py -f config-backend.json "$@"
+exec python3 src/openmtc_gevent/backend_main.py -f config-backend.json "$@"
