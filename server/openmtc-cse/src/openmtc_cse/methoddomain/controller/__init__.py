@@ -6,9 +6,10 @@ from random import choice
 from urlparse import urlparse
 import binascii
 import base64
+from xml.sax import SAXParseException
 
 from iso8601.iso8601 import parse_date, ParseError
-from fyzz import parse
+from pyparsing import ParseException
 from rdflib import Graph
 
 import openmtc_cse.api as api
@@ -1427,7 +1428,7 @@ class SemanticDescriptorController(OneM2MDefaultController):
         try:
             g = Graph()
             g.parse(data=data, format="application/rdf+xml")
-        except Exception:
+        except SAXParseException:
             raise CSEContentsUnacceptable("The descriptor attribute does not conform to the "
                                           "RDF/XML syntax as defined in RDF 1.1 XML Syntax.")
 
@@ -1455,9 +1456,10 @@ class SemanticDescriptorController(OneM2MDefaultController):
             self._check_descriptor_data(self.values["descriptor"])
         elif "semanticOpExec" in values:
             # verify if the semanticOpExec has a correct SPAROL syntax
+            g = Graph()
             try:
-                parse(values["semanticOpExec"])
-            except Exception:
+                g.parse(values["semanticOpExec"])
+            except ParseException:
                 raise CSEContentsUnacceptable("The semanticOpExec attribute does not conform to "
                                               "the SPARQL query syntax.")
         else:
