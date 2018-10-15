@@ -65,18 +65,18 @@ class NoDB2Session(BasicSession):
 
         if parent.__model_name__ == "onem2m":
             if resource_type is None:
-                resources = self.children[parent.path].values()
-                resources = map(dict.values, resources)
-                resources = reduce(list.__add__, resources, [])
+                resources = []
+                for v in self.children[parent.path].values():
+                    resources += list(v.values())
             elif isinstance(resource_type, (list, tuple, set)):
-                resources = [v for k, v in self.children[parent.path].items()
-                             if k in resource_type]
-                resources = map(dict.values, resources)
-                resources = reduce(list.__add__, resources, [])
+                resources = []
+                for k, v in self.children[parent.path].items():
+                    if k in resource_type:
+                        resources + list(v.values())
             else:
-                resources = self.children[parent.path][resource_type].values()
+                resources = list(self.children[parent.path][resource_type].values())
         else:
-            resources = self.children[parent.path][resource_type].values()
+            resources = list(self.children[parent.path][resource_type].values())
         self.logger.debug("Found children: %s", resources)
         return resources
 
