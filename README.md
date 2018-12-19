@@ -4,43 +4,93 @@
   </a>
 </p>
 
-The OpenMTC SDK aims to provide developers with a convenient yet flexible tool to write oneM2M compliant applications. This includes network applications (NAs), gateway application (GAs), device applications (DAs), as well as interworking proxy entities (IPEs).
+[![FIWARE IoT Agents](https://nexus.lab.fiware.org/static/badges/chapters/iot-agents.svg)](https://www.fiware.org/developers/catalogue/)
+[![License: Eclipse](https://img.shields.io/github/license/OpenMTC/OpenMTC.svg)](https://www.eclipse.org/legal/epl-v10.html)
+[![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/iot-agents.svg)](https://stackoverflow.com/questions/tagged/fiware+iot)
+<br/>
+[![Documentation badge](https://img.shields.io/readthedocs/fiware-openmtc.svg)](http://fiware-openmtc.readthedocs.org/en/latest/?badge=latest)
+![Status](https://nexus.lab.fiware.org/static/badges/statuses/iot-openmtc.svg)
 
-# Table of Content
+The OpenMTC SDK aims to provide developers with a convenient yet flexible tool
+to write oneM2M compliant applications. This includes network applications
+(NAs), gateway application (GAs), device applications (DAs), as well as
+interworking proxy entities (IPEs).
 
-- [Quick Start](doc/openmtc-get-started.md)
-- [Introduction](doc/introduction.md)
-- [Deployment](doc/deployment-guide.md)
-- [The MQTT Client](doc/onem2m-client-mqtt.md)
-- [Authentication Guide](doc/authentication.md)
-- [Installation of the OpenMTC SDK](doc/install-sdk.md)
-- [Overview REST API](doc/overview-rest-api.md)
-- [Write your first OpenMTC applications](doc/training/training-index.md)
-- [SDK - Using the Application Framework](doc/sdk-framework.md)
-- [SDK - The low-level CSE Client](doc/sdk-client.md)
-- [SDK - The Data Model](doc/sdk-datamodel.md)
-- Examples
-    - [IoT Data Visualization](doc/example-apps/IoT-data-visualization.py)
-    - [Data Aggregation](doc/example-apps/data-aggregation.py)
-    - [Simple Decision](doc/example-apps/simple-decision.py)
-    - [Simple Decision 2](doc/example-apps/simple-decision-2.py)
-- Scripts
-    - [Create App Structure Script](doc/create-app-structure.md)
-    - [Create binary docker images Script](doc/create-binary-docker.md)
-- [Code Repository Structure](doc/repository-structure.md)
-- [Developer FAQ](doc/developer-faq.md)
+This project is part of [FIWARE](https://www.fiware.org/). For more information
+check the FIWARE Catalogue entry for the
+[IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
+
+# Content
+
+-   [Install](#install)
+-   [Usage](#usage)
+-   [API](#api)
+-   [Quality Assurance](#quality-assurance)
+-   [License](#license)
 
 
-# Python
+## Install
 
-The OpenMTC SDK is written in and for the Python programming language. Users should therefore have at least a certain knowledge of Python and its paradigms. For this matter, the following material is recommended:
+Information about how to install the JSON IoTAgent can be found at the
+corresponding section of the
+[Installation & Administration Guide](https://fiware-openmtc.readthedocs.io/en/latest/deployment-guide).
 
-- [The Python Homepage](http://www.python.org)
-- [Expert Python Programming by Tarek Ziadé](http://www.e-reading.by/bookreader.php/138816/Ziade_-_Expert_Python_programming.pdf)
-- [Code Like a Pythonista: Idiomatic Python](http://www.omahapython.org/IdiomaticPython.html)
+## Usage
 
-# Feedback
+Information about how to use the IoT Agent can be found in the
+[User & Programmers Manual](https://fiware-openmtc.readthedocs.io/en/latest/introduction).
 
-Please create issues for any problems and direct any comments or feedback you are having to <a href="mailto:support@openmtc.org">support@openmtc.org</a>
+## API
 
-Please let us know what you think. We are also very interested in any use case you are *not* able to implement with the SDK or if you find it difficult to do so.
+Information about the REST API can be found in the
+[API Section](https://fiware-openmtc.readthedocs.io/en/latest/overview-rest-api)
+
+
+## Python
+
+The OpenMTC SDK is written in and for the Python programming language. Users
+should therefore have at least a certain knowledge of Python and its paradigms.
+For this matter, the following material is recommended:
+
+-   [The Python Homepage](http://www.python.org)
+-   [Expert Python Programming by Tarek Ziadé](http://www.e-reading.by/bookreader.php/138816/Ziade_-_Expert_Python_programming.pdf)
+-   [Code Like a Pythonista: Idiomatic Python](http://www.omahapython.org/IdiomaticPython.html)
+
+## Feedback
+
+Please create issues for any problems and direct any comments or feedback you
+are having to <a href="mailto:support@openmtc.org">support@openmtc.org</a>
+
+Please let us know what you think. We are also very interested in any use case
+you are _not_ able to implement with the SDK or if you find it difficult to do
+so.
+
+
+## Quality Assurance
+
+This project is part of [FIWARE](https://fiware.org/) and has been rated as
+follows:
+
+-   **Version Tested:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Version&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.version&colorB=blue)
+-   **Documentation:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Completeness&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.docCompleteness&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Usability&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.docSoundness&colorB=blue)
+-   **Responsiveness:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Time%20to%20Respond&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.timeToCharge&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Time%20to%20Fix&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.timeToFix&colorB=blue)
+-   **FIWARE Testing:**
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Tests%20Passed&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.failureRate&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Scalability&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.scalability&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Performance&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.performance&colorB=blue)
+    ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Stability&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.stability&colorB=blue)
+
+---
+
+## Licence
+
+The OpenMTC SDK is licensed under the Eclipse Public License (EPL)
+version 1.
+
+© 2018 OpenMTC
+
