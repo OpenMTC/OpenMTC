@@ -3,7 +3,7 @@
 ############################################################
 
 # Set the base image to use debian
-FROM resin/rpi-raspbian:jessie
+FROM resin/rpi-raspbian:stretch
 
 # Set the file maintainer
 MAINTAINER rst/tgu
