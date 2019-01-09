@@ -49,3 +49,4 @@ pages:
        -   Installation of the OpenMTC SDK: install-sdk.md
     - Appendix : various.md
     - Resource Names & Types : reference-doc/resource-names-and-types.md
+    - Gateway & Backend Configuration : reference-doc/gateway-and-backend-configuration.md
