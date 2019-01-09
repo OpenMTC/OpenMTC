@@ -10,6 +10,7 @@
 <br/>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-openmtc.svg)](http://fiware-openmtc.readthedocs.org/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/iot-openmtc.svg)
+[![](https://img.shields.io/docker/pulls/openmtc/gateway-amd64.svg)](https://hub.docker.com/u/openmtc)
 [![Build Status](https://travis-ci.org/OpenMTC/OpenMTC.svg?branch=master)](https://travis-ci.org/OpenMTC/OpenMTC)
 
 The OpenMTC SDK aims to provide developers with a convenient yet flexible tool
