@@ -10,6 +10,7 @@
 <br/>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-openmtc.svg)](http://fiware-openmtc.readthedocs.org/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/iot-openmtc.svg)
+[![Build Status](https://travis-ci.org/OpenMTC/OpenMTC.svg?branch=master)](https://travis-ci.org/OpenMTC/OpenMTC)
 
 The OpenMTC SDK aims to provide developers with a convenient yet flexible tool
 to write oneM2M compliant applications. This includes network applications
