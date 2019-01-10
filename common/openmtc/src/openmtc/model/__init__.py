@@ -26,7 +26,7 @@ class Collection(Sequence, Mapping):
 
     def __getitem__(self, index):
         if isinstance(index, (int, slice)):
-            return self._map.values()[index]
+            return list(self._map.values())[index]
         return self._map[index]
 
     def __contains__(self, v):
@@ -47,7 +47,7 @@ class Collection(Sequence, Mapping):
         return self._map.get(k, default)
 
     def __iter__(self):
-        return self._map.itervalues()
+        return iter(self._map.values())
 
     def __len__(self):
         return len(self._map)
@@ -427,24 +427,22 @@ class ResourceType(ABCMeta):
     # TODO: caching
     @property
     def attribute_names(self):
-        return map(attrgetter("name"), self.attributes)
+        return list(map(attrgetter("name"), self.attributes))
 
     @property
     def collection_names(self):
-        return map(attrgetter("name"), self.collections)
+        return list(map(attrgetter("name"), self.collections))
 
     @property
     def subresource_names(self):
-        return map(attrgetter("name"), self.subresources)
+        return list(map(attrgetter("name"), self.subresources))
 
     @property
     def member_names(self):
-        return map(attrgetter("name"), self.__members__)
+        return list(map(attrgetter("name"), self.__members__))
 
 
-class Entity(LoggerMixin):
-    __metaclass__ = ResourceType
-
+class Entity(LoggerMixin, metaclass=ResourceType):
     def __init__(self, *args, **kw):
         self.set_values(kw)
 
@@ -467,7 +465,7 @@ class Entity(LoggerMixin):
                     # TODO: proper solution?
                     if (v is not None and isinstance(member, ListAttribute) and
                             not isinstance(v, (list, tuple, set))):
-                        v = v.values()[0]
+                        v = list(v.values())[0]
                     setattr(self, member.name, v)
                 except KeyError:
                     pass
@@ -487,7 +485,7 @@ class Entity(LoggerMixin):
         """
         if values:
             raise ModelTypeError("%s resource has no attribute %s" %
-                                 (self.typename, values.keys()[0]))
+                                 (self.typename, list(values.keys())[0]))
 
     @classmethod
     def get_typename(cls):
@@ -569,7 +567,7 @@ class Resource(Entity):
     __model_version__ = None
 
     def __init__(self, path=None, parent=None, *args, **kw):
-        if path is not None and not isinstance(path, basestring):
+        if path is not None and not isinstance(path, str):
             raise TypeError(path)
         self.__path = path
         self.parent = parent
@@ -629,7 +627,7 @@ class Resource(Entity):
                 # FIXME: move into de-serializer and handle dicts
                 if (v is not None and isinstance(member, ListAttribute) and
                         not isinstance(v, (list, tuple, set))):
-                    v = v.values()[0]
+                    v = list(v.values())[0]
                 setattr(self, member.name, v)
             except KeyError:
                 try:
@@ -637,7 +635,7 @@ class Resource(Entity):
                     # TODO: proper solution?
                     if (v is not None and isinstance(member, ListAttribute) and
                             not isinstance(v, (list, tuple, set))):
-                        v = v.values()[0]
+                        v = list(v.values())[0]
                     setattr(self, member.name, v)
                 except KeyError:
                     pass

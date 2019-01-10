@@ -32,7 +32,7 @@ from simplejson import (
     JSONDecodeError,
 )
 from socket import error as SocketError
-from urlparse import urlparse
+from urllib.parse import urlparse
 from openmtc_onem2m.util import split_onem2m_address
 
 #: Dictionary mapping supported schemes to port numbers
@@ -353,7 +353,7 @@ class OneM2MMQTTClient(OneM2MClient):
 
             self.logger.debug('Decoded JSON request: %s' % (request, ))
 
-            op = OneM2MOperation._member_map_.values()[request['op'] - 1]
+            op = list(OneM2MOperation._member_map_.values())[request['op'] - 1]
             to = request['to']
             del request['op'], request['to']
 
@@ -485,7 +485,8 @@ class OneM2MMQTTClient(OneM2MClient):
         else:
             request.ty = None
 
-        request.op = 1 + OneM2MOperation._member_map_.keys().index(OneM2MOperation[request.op].name)
+        request.op = 1 + list(OneM2MOperation._member_map_.keys()).index(
+            OneM2MOperation[request.op].name)
         if request.pc:
             request.pc = self._decode(
                 encode_onem2m_content(request.pc, 'application/json', path=request.to)[1]

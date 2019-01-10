@@ -94,7 +94,7 @@ class XAE(LoggerMixin):
         self.key_file = key_file
 
         if expiration_time is not None:
-            if isinstance(expiration_time, (str, unicode)):
+            if isinstance(expiration_time, str):
                 expiration_time = parse_date(expiration_time)
             elif isinstance(expiration_time, (int, float)):
                 expiration_time = datetime.fromtimestamp(expiration_time, UTC)
@@ -483,7 +483,7 @@ class XAE(LoggerMixin):
         """
         path = getattr(container, "path", container)
 
-        if isinstance(content, (str, unicode)):
+        if isinstance(content, str):
             fmt = 'text/plain' if fmt is None else fmt
             text = True if text is None else text
         elif isinstance(content, (dict, list)):
@@ -529,7 +529,7 @@ class XAE(LoggerMixin):
             content = cin.content
             try:
                 if int(encoding_type) == EncodingTypeE.base64String:
-                    content = b64decode(content)
+                    content = b64decode(content).decode('utf-8')
 
                 if media_type == 'application/json':
                     content = json_loads(content)
@@ -567,10 +567,8 @@ class XAE(LoggerMixin):
 
     def _remove_route(self, route):
         self.logger.debug("removing route: %s", route)
-        self.runner.flask_app.url_map._rules = filter(
-            lambda x: x.rule != route,
-            self.runner.flask_app.url_map._rules
-        )
+        self.runner.flask_app.url_map._rules = [x for x in self.runner.flask_app.url_map._rules
+                                                if x.rule != route]
 
     def _add_subscription(self, path, _, handler, delete_handler, filter_criteria=None,
                           expiration_time=None):
@@ -865,9 +863,9 @@ class ResourceManagementXAE(XAE):
             sub_ref = self._cse_id + '/' + sub_ref
         self._discovered_sensors = {k: v for k, v in self._discovered_sensors.items()
                                     if v['sub_ref'] != sub_ref}
-        self._discovered_devices = {k: v for k, v in self._discovered_devices.items()
-                                    if any(filter(lambda x: x.startswith(k),
-                                                  self._discovered_sensors.keys()))
+        self._discovered_devices = {k: v for k, v in list(self._discovered_devices.items())
+                                    if any([x for x in list(self._discovered_sensors.keys())
+                                            if x.startswith(k)])
                                     or not sub_ref.startswith(k)}
 
     def _handle_sensor_data(self, container, data):

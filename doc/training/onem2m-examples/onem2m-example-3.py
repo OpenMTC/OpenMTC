@@ -4,5 +4,5 @@ from openmtc_onem2m.transport import OneM2MRequest
 
 request = OneM2MRequest("retrieve", to="onem2m")
 
-print request.to
+print(request.to)
 #>>> onem2m

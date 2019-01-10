@@ -1,6 +1,6 @@
 from openmtc_app.onem2m import XAE
 from openmtc_onem2m.model import Container
-from csv_process import csvProcessor
+from .csv_process import csvProcessor
 import sched
 import time
 import datetime
@@ -95,7 +95,7 @@ class csvInjector(XAE):
             if k == "Date" or k == self.device_classifier or event[k] in (
                     "", None):
                 continue
-            if not k in self._recognized_measurement_containers[sensor].keys():
+            if k not in self._recognized_measurement_containers[sensor].keys():
                 self._create_measurement_container(sensor, k)
             timestamp = time.mktime(datetime.datetime.now().timetuple())
             senml = {

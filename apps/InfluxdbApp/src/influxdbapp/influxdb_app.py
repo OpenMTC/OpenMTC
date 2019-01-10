@@ -1,5 +1,5 @@
 from openmtc_app.onem2m import ResourceManagementXAE
-from connector import InfluxDBConnector
+from .connector import InfluxDBConnector
 
 
 class InfluxdbApp(ResourceManagementXAE):
@@ -18,7 +18,7 @@ class InfluxdbApp(ResourceManagementXAE):
             **kw
             ):
         super(InfluxdbApp, self).__init__(*args, **kw)
-        if isinstance(labels, basestring):
+        if isinstance(labels, str):
             self.labels = {labels}
         elif hasattr(labels, '__iter__') and len(labels):
             self.labels = set(labels)

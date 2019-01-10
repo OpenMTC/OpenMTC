@@ -1,11 +1,11 @@
+import base64
+import binascii
 import string
 from datetime import datetime
 from itertools import chain
 from operator import attrgetter
 from random import choice
-from urlparse import urlparse
-import binascii
-import base64
+from urllib.parse import urlparse
 from xml.sax import SAXParseException
 
 from iso8601.iso8601 import parse_date, ParseError
@@ -40,14 +40,13 @@ from openmtc_server.db import DBError
 from openmtc_server.db.exc import DBNotFound
 from openmtc_server.util import match_now_cron
 from openmtc_server.util import uri_safe
-from openmtc_server.util.async import async_all
-
+from openmtc_server.util.async_ import async_all
 
 _resource_id_counter = {}
 
 
 class OneM2MDefaultController(LoggerMixin):
-    RANDOM_SOURCE = string.letters + string.digits
+    RANDOM_SOURCE = string.ascii_letters + string.digits
 
     result_content_type = None
 
@@ -99,8 +98,7 @@ class OneM2MDefaultController(LoggerMixin):
         self._abs_cse_id = self._sp_id + self._rel_cse_id  # //openmtc.org/mn-cse-1
 
         # default policies
-        self._default_privileges = map(lambda x: AccessControlRuleC(**x),
-                                       self.onem2m_config.get("default_privileges", []))
+        self._default_privileges = [AccessControlRuleC(**x) for x in self.onem2m_config.get("default_privileges", [])]
 
         # dynamic authorization
         dynamic_authorization = self.onem2m_config.get("dynamic_authorization", {})
@@ -269,7 +267,7 @@ class OneM2MDefaultController(LoggerMixin):
                     self.logger.debug("Error getting policy: %s:", error)
                 return None
 
-        return filter(None, map(get_policy, access_control_policy_ids))
+        return [_f for _f in map(get_policy, access_control_policy_ids) if _f]
 
     # def _notify_das_server(self, notify_uri, payload):
     def _notify_das_server(self, resource):
@@ -903,7 +901,7 @@ class OneM2MDefaultController(LoggerMixin):
             self._retrieve_children()
 
     def _send_retrieve_response(self):
-        fields = self.resource.values.keys()
+        fields = list(self.resource.values.keys())
         if self.request.rcn != ResultContentE.attributes_and_child_resource_references:
             fields = [k for k in fields if k != 'childResource']
         return OneM2MResponse(STATUS_OK, pc=self.result, request=self.request, fields=fields)
@@ -1330,12 +1328,14 @@ class ContentInstanceController(OneM2MDefaultController):
                 self.parent.oldest = None
 
         # handle_old_instances
-        if 0 < self.parent.maxNrOfInstances <= self.parent.currentNrOfInstances:
-            remove_oldest_child()
+        if self.parent.maxNrOfInstances is not None:
+            if 0 < self.parent.maxNrOfInstances <= self.parent.currentNrOfInstances:
+                remove_oldest_child()
 
-        while (0 < self.parent.maxByteSize <
-               self.parent.currentByteSize + self.resource.contentSize):
-            remove_oldest_child()
+        if self.parent.maxByteSize is not None:
+            while (0 < self.parent.maxByteSize <
+                   self.parent.currentByteSize + self.resource.contentSize):
+                remove_oldest_child()
 
         # handle_new_instance
         self.parent.currentNrOfInstances += 1

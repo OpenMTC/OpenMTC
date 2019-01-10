@@ -57,16 +57,16 @@ loops = 1000
 enc_table = []
 dec_table = []
  
-print "Running tests (%d loops each)" % loops
+print("Running tests (%d loops each)" % loops)
  
 for title, mod, enc, dec in tests:
-    print title
+    print(title)
  
-    print "  [Encode]", enc 
+    print("  [Encode]", enc) 
     result = timeit(enc, mod, number=loops)
     enc_table.append([title, result])
  
-    print "  [Decode]", dec 
+    print("  [Decode]", dec) 
     result = timeit(dec, mod, number=loops)
     dec_table.append([title, result])
  
@@ -76,8 +76,8 @@ enc_table.insert(0, ['Package', 'Seconds'])
 dec_table.sort(key=lambda x: x[1])
 dec_table.insert(0, ['Package', 'Seconds'])
  
-print "\nEncoding Test (%d loops)" % loops
-print tabulate(enc_table, headers="firstrow")
+print("\nEncoding Test (%d loops)" % loops)
+print(tabulate(enc_table, headers="firstrow"))
  
-print "\nDecoding Test (%d loops)" % loops
-print tabulate(dec_table, headers="firstrow")
+print("\nDecoding Test (%d loops)" % loops)
+print(tabulate(dec_table, headers="firstrow"))

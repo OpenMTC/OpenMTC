@@ -5,9 +5,7 @@ from futile.logging import LoggerMixin
 from openmtc.model import Resource
 
 
-class Event(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class Event(LoggerMixin, metaclass=ABCMeta):
     @abstractmethod
     def fire(self, *event_data):
         raise NotImplementedError()
@@ -17,9 +15,7 @@ class Event(LoggerMixin):
         raise NotImplementedError()
 
 
-class EventSpec(object):
-    __metaclass__ = ABCMeta
-
+class EventSpec(object, metaclass=ABCMeta):
     @abstractmethod
     def matches(self, item):
         raise NotImplementedError()

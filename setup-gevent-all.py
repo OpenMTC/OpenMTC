@@ -77,8 +77,7 @@ CONFIG_DIR = "/etc/openmtc/gevent"
 CONFIG_DIST_FILES = ("openmtc-gevent/etc/conf/config-backend.json.dist",
                      "openmtc-gevent/etc/conf/config-gateway.json.dist")
 SSL_CERT_DIR = "/etc/openmtc/certs"
-SSL_CERT_FILES = tuple(map(lambda x: os.path.join('openmtc-gevent/certs/', x),
-                           os.listdir('openmtc-gevent/certs')))
+SSL_CERT_FILES = tuple([os.path.join('openmtc-gevent/certs/', x) for x in os.listdir('openmtc-gevent/certs')])
 DATA_FILES = [
     (DB_DIR, ""),
     (LOG_DIR, ""),

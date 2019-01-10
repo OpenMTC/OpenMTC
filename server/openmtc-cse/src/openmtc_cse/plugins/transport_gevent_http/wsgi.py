@@ -1,4 +1,4 @@
-import urlparse
+import urllib.parse
 import ssl
 from _socket import gaierror
 from datetime import datetime
@@ -104,8 +104,7 @@ class OpenMTCWSGIApplication(LoggerMixin):
             for interface in interfaces():
                 try:
                     ifdata = ifaddresses(interface)[family]
-                    ifaddrs = map(lambda x: x.split("%")[0], pluck("addr",
-                                                                   ifdata))
+                    ifaddrs = [x.split("%")[0] for x in pluck("addr", ifdata)]
                     addresses.update(ifaddrs)
                 except KeyError:
                     pass
@@ -268,7 +267,7 @@ class OpenMTCWSGIApplication(LoggerMixin):
 
         if http_request.query_string:
             from openmtc_cse.methoddomain.filtercriteria import filters
-            params = urlparse.parse_qs(http_request.query_string)
+            params = urllib.parse.parse_qs(http_request.query_string.decode("utf-8"))
             get_param = params.get
             f_c = {}
 
@@ -288,7 +287,7 @@ class OpenMTCWSGIApplication(LoggerMixin):
                     setattr(onem2m_request, param, values[0])
                 elif param_long_name == 'attributeList':
                     onem2m_request.pc = AttributeList(
-                        map(get_long_attribute_name, values[0].split(' ')))
+                        list(map(get_long_attribute_name, values[0].split(' '))))
                 elif param_long_name and hasattr(filters, param_long_name):
                     self.logger.debug("got values for '%s' ('%s'): %s",
                                       param_long_name, param, values)
@@ -414,9 +413,7 @@ class OpenMTCWSGIApplication(LoggerMixin):
             setattr(onem2m_request, "_authenticated", False)
             if subject_alt_name is not None:
                 setattr(onem2m_request, "_authenticated", True)
-                impersonation_error = not bool(len(filter(
-                    lambda x: x[0] == 'URI' and x[1] == onem2m_request.fr,
-                    subject_alt_name)))
+                impersonation_error = not bool(len([x for x in subject_alt_name if x[0] == 'URI' and x[1] == onem2m_request.fr]))
             if impersonation_error:
                 onem2m_response = OneM2MResponse(STATUS_IMPERSONATION_ERROR,
                                                  request=onem2m_request)
