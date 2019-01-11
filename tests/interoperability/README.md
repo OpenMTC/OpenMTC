@@ -17,7 +17,7 @@ The tests can be run from the command line. Make sure that a instance is running
 Assuming that a gateway is running at localhost, port 8000.
 
 ```bash
-$ pyresttest http://localhost:8000 tests/conformance/basic.yaml
+$ pyresttest http://localhost:8000 tests/interoperability/basic.yaml
 Test Group Openmtc Test 8.1.1 SUCCEEDED: : 1/1 Tests Passed!
 Test Group Openmtc Test 8.1.2 SUCCEEDED: : 4/4 Tests Passed!
 Test Group Openmtc Test 8.1.3 SUCCEEDED: : 4/4 Tests Passed!
