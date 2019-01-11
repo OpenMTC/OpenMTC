@@ -76,7 +76,7 @@ class Collection(Sequence, Mapping):
 
 
 class Member(LoggerMixin):
-    def __init__(self, type=unicode, version="1.0", *args, **kw):
+    def __init__(self, type=str, version="1.0", *args, **kw):
         super(Member, self).__init__(*args, **kw)
         self.type = type
         self.version = version
@@ -109,7 +109,7 @@ class Attribute(Member):
     RO = "RO"
     WO = "WO"
 
-    def __init__(self, type=unicode, default=None,
+    def __init__(self, type=str, default=None,
                  accesstype=None, mandatory=None,
                  update_mandatory=None,
                  id_attribute=None, path_attribute=None,
@@ -157,24 +157,22 @@ class Attribute(Member):
             return self.default
 
 
-try:
-    unicode
+class BytesAttribute(Attribute):
+    def __init__(self, default=None, accesstype=None,
+                 mandatory=None, *args, **kw):
+        super(BytesAttribute, self).__init__(type=bytes,
+                                             default=default,
+                                             accesstype=accesstype,
+                                             mandatory=mandatory, *args,
+                                             **kw)
 
-    class UnicodeAttribute(Attribute):
-        def __init__(self, default=None, accesstype=None,
-                     mandatory=False, *args, **kw):
-            super(UnicodeAttribute, self).__init__(type=unicode,
-                                                   default=default,
-                                                   accesstype=accesstype,
-                                                   mandatory=mandatory, *args,
-                                                   **kw)
+    def convert(self, value, instance):
+        if isinstance(value, str):
+            return bytes(value, "utf-8")
+        return super(BytesAttribute, self).convert(value, instance)
 
-        def convert(self, value, instance):
-            if isinstance(value, str):
-                return value.decode("utf-8")
-            return super(UnicodeAttribute, self).convert(value, instance)
-except NameError:
-    UnicodeAttribute = Attribute
+
+UnicodeAttribute = Attribute
 
 
 class DatetimeAttribute(Attribute):
@@ -187,7 +185,7 @@ class DatetimeAttribute(Attribute):
                                                 **kw)
 
     def convert(self, value, instance):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 return parse_date(value)
             except ParseError as e:
@@ -196,7 +194,7 @@ class DatetimeAttribute(Attribute):
 
 
 class ListAttribute(Attribute):
-    def __init__(self, content_type=unicode, type=list,
+    def __init__(self, content_type=str, type=list,
                  default=NOT_SET, *args, **kw):
         super(ListAttribute, self).__init__(type=type,
                                             default=default, *args, **kw)
@@ -239,7 +237,7 @@ class ListAttribute(Attribute):
 
 
 class StringListAttribute(Attribute):
-    def __init__(self, content_type=unicode, type=list,
+    def __init__(self, content_type=str, type=list,
                  default=NOT_SET, *args, **kw):
         super(StringListAttribute, self).__init__(type=type, default=default,
                                                   *args, **kw)

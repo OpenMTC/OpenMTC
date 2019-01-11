@@ -2,7 +2,8 @@ from enum import IntEnum, unique
 
 from openmtc.model import (Resource as Res, UnicodeAttribute, DatetimeAttribute,
                            Attribute, ListAttribute, Entity, EntityAttribute,
-                           AnyURI, StringListAttribute, ContentResource)
+                           AnyURI, StringListAttribute, ContentResource,
+                           BytesAttribute)
 from openmtc.model.exc import ModelTypeError
 from futile import issubclass
 
@@ -600,7 +601,7 @@ class ResourceC(LabeledResource):
 
     typename = None
 
-    resourceName = UnicodeAttribute(accesstype=Attribute.WO)
+    resourceName = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
 
     resourceType = EntityAttribute(ResourceTypeE, accesstype=Attribute.RO)
     resourceID = IDS(accesstype=Attribute.RO)
@@ -789,8 +790,7 @@ class Subscription(RegularResourceC):
     notificationForwardingURI = Attribute(AnyURI)
     batchNotify = EntityAttribute(BatchNotify)
     rateLimit = EntityAttribute(RateLimit)
-    preSubscriptionNotify = Attribute(int, accesstype=Attribute.WO,
-                                      mandatory=False)
+    preSubscriptionNotify = Attribute(int, accesstype=Attribute.WO, mandatory=False)
     pendingNotification = Attribute(PendingNotificationE)
     notificationStoragePriority = Attribute(int)
     latestNotify = Attribute(bool)
@@ -991,8 +991,8 @@ class ContentInstance(AnnounceableSubordinateResourceC,
     # ex: application/json:1
     contentInfo = UnicodeAttribute()    # m2m:contentInfo
     contentSize = Attribute(int, accesstype=Attribute.RO)
-    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO)
-    content = Attribute(bytes, accesstype=Attribute.WO, mandatory=True)
+    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
+    content = BytesAttribute(accesstype=Attribute.WO, mandatory=True)
 
     __child_types__ = (
         Subscription,
@@ -1004,8 +1004,8 @@ class ContentInstanceAnnc(AnnouncedSubordinateResourceC):
     stateTag = Attribute(int, accesstype=Attribute.RO)
     contentInfo = UnicodeAttribute(EncodingTypeE)    # m2m:contentInfo
     contentSize = Attribute(int, accesstype=Attribute.WO)
-    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO)
-    content = Attribute(bytes, accesstype=Attribute.WO, mandatory=True)
+    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
+    content = BytesAttribute(accesstype=Attribute.WO, mandatory=True)
 
 
 ################################################################################
@@ -1107,7 +1107,7 @@ class AEAnnc(AnnouncedResourceC, SubscribableResource):
 
     typename = "AEAnnc"
 
-    appName = UnicodeAttribute(accesstype=Attribute.WO)
+    appName = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
     App_ID = UnicodeAttribute()
     AE_ID = UnicodeAttribute()
     pointOfAccess = StringListAttribute()

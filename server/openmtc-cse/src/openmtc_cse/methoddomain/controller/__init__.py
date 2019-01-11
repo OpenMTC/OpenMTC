@@ -1358,7 +1358,7 @@ class ContentInstanceController(OneM2MDefaultController):
         super(ContentInstanceController,
               self)._set_mandatory_create_attributes(vals)
 
-        vals["contentSize"] = len(vals["content"].encode('utf-8'))
+        vals["contentSize"] = len(vals["content"])
         if not vals.get("contentInfo"):
             vals["contentInfo"] = 'text/plain:0'
 
@@ -1421,7 +1421,7 @@ class SemanticDescriptorController(OneM2MDefaultController):
     @staticmethod
     def _check_descriptor_data(descriptor_data):
         try:
-            data = base64.b64decode(descriptor_data)
+            data = base64.b64decode(descriptor_data).decode('utf-8')
         except binascii.Error:
             raise CSEContentsUnacceptable("The descriptor was not correctly base64 encoded.")
 

@@ -499,14 +499,14 @@ class XAE(LoggerMixin):
                 cnf = fmt + ':' + str(EncodingTypeE.plain.value)
                 # raise CSENotImplemented("Only json as b64 is supported!")
             else:
-                con = b64encode(json_dumps(content))
+                con = b64encode(json_dumps(content).encode('utf-8'))
                 cnf = fmt + ':' + str(EncodingTypeE.base64String.value)
         elif fmt == 'text/plain':
             if text:
                 con = content
                 cnf = fmt + ':' + str(EncodingTypeE.plain.value)
             else:
-                con = b64encode(content)
+                con = b64encode(content.encode('utf-8'))
                 cnf = fmt + ':' + str(EncodingTypeE.base64String.value)
         else:
             # TODO(rst): add handling of other formats or raise not implemented

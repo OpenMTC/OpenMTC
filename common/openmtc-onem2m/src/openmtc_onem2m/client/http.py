@@ -203,7 +203,7 @@ class OneM2MHTTPClient(OneM2MClient):
             get_response_status(rsc),
             request=onem2m_request,
             rsc=rsc,
-            pc=decode_onem2m_content(response.read(), response.get("content-type"))
+            pc=decode_onem2m_content(response.read().decode("utf-8"), response.get("content-type"))
         )
 
     def send_onem2m_request(self, onem2m_request):
