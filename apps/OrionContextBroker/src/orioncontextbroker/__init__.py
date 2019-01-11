@@ -3,7 +3,7 @@ This App will forward all incoming sensor traffic to the Fiware Orion Context
 Broker
 """
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __description__ = "OrionContextBroker"
 __author_name__ = "Christian Klopp"
 __author_mail__ = "christian.klopp@fokus.fraunhofer.de"
