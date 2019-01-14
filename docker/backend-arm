@@ -12,7 +12,7 @@ MAINTAINER rst/tgu
 
 # install openmtc dependencies
 COPY tmp/$MOD_NAME-dependencies.txt /tmp/requirements.txt
-RUN pip install --upgrade --requirement /tmp/requirements.txt
+RUN pip3 install --upgrade --requirement /tmp/requirements.txt
 
 # install openmtc-all
 COPY tmp/openmtc-$MOD_NAME.tar.gz /tmp/openmtc-$MOD_NAME.tar.gz

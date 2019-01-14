@@ -26,18 +26,18 @@ SETUP_LICENSE = "Fraunhofer FOKUS proprietary"
 SETUP_REQUIRES = [
     "urllib3", "gevent (>=1.0)", "iso8601 (>=0.1.5)", "werkzeug (>=0.9)",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
-    "flask", "pyxb (==1.2.3)", "enum34", "dtls", "geventhttpclient",
+    "flask", "enum34", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps", "paho_mqtt"
+     "yapps", "paho_mqtt"
 ]
 SETUP_INSTALL_REQUIRES = [
     "urllib3", "gevent >= 1.0", "iso8601 >= 0.1.5", "werkzeug >= 0.9",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
-    "flask", "pyxb == 1.2.3", "enum34", "dtls", "geventhttpclient",
+    "flask", "enum34", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps", "paho_mqtt"
+     "yapps", "paho_mqtt"
 ]
 
 # packages

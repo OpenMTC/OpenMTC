@@ -68,7 +68,7 @@ get_target_from_setup_file ()
 local module_name=${setup_file%.py}
 
 cd ${working_dir}
-python - << END_OF_PYTHON
+python3 - << END_OF_PYTHON
 from importlib import import_module
 setup = import_module('${module_name}', '${module_name}')
 print("%s-%s" % (setup.SETUP_NAME, setup.SETUP_VERSION))
@@ -92,7 +92,7 @@ rm -rf ${working_dir}/build
 
 # build
 cd ${working_dir}
-python ${setup_file} bdist --plat-name docker >/dev/null 2>${log_file}
+python3 ${setup_file} bdist --plat-name docker >/dev/null 2>${log_file}
 
 # clean up after
 rm -rf ${working_dir}/build
