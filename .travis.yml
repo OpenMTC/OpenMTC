@@ -14,6 +14,7 @@ before_script:
 - "./create-binary-docker cul868ipe"
 - "./create-binary-docker cul868ipe -a arm"
 script:
+if: branch = master
 - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
 - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
 - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
