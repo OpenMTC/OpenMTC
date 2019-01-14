@@ -47,7 +47,7 @@ if [ ${#find_result[*]} -eq 0 ]; then
 fi
 
 if [ ${#find_result[*]} -gt 1 ]; then
-    echo "Too many setup files matching the name. Exiting Now!."
+    echo "Too many setup files matching the name. Exiting Now!. "
     exit 1
 fi
 
