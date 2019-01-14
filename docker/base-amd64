@@ -20,9 +20,9 @@ RUN printf "Starting update...\n" && \
     build-essential \
     netbase \
     iproute2 \
-    python-setuptools \
-    python-pip \
-    python-dev \
+    python3-setuptools \
+    python3-pip \
+    python3-dev \
     jq > /dev/null && \
     apt-get clean && \
     printf "Installation and cleanup finished.\n"
