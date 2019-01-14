@@ -13,25 +13,24 @@ before_script:
 - "./create-binary-docker influxdbapp -a arm"
 - "./create-binary-docker cul868ipe"
 - "./create-binary-docker cul868ipe -a arm"
-if: branch = master
-  script:
-  - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
-  - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
-  - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
-  - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
-  - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
-  - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-  - docker push openmtc/backend-amd64
-  - docker push openmtc/backend-arm
-  - docker push openmtc/gateway-amd64
-  - docker push openmtc/gateway-arm
-  - docker push openmtc/orion-context-broker-app-amd64
-  - docker push openmtc/orion-context-broker-app-arm
-  - docker push openmtc/cul868-ipe-amd64
-  - docker push openmtc/cul868-ipe-arm
-  - docker push openmtc/influxdb-app-amd64
-  - docker push openmtc/influxdb-app-arm
+script:
+- docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
+- docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
+- docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
+- docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
+- docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
+- docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
+- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+- docker push openmtc/backend-amd64
+- docker push openmtc/backend-arm
+- docker push openmtc/gateway-amd64
+- docker push openmtc/gateway-arm
+- docker push openmtc/orion-context-broker-app-amd64
+- docker push openmtc/orion-context-broker-app-arm
+- docker push openmtc/cul868-ipe-amd64
+- docker push openmtc/cul868-ipe-arm
+- docker push openmtc/influxdb-app-amd64
+- docker push openmtc/influxdb-app-arm
 env:
   matrix:
     secure: oQe/MxxFrPPArxb6OFzOUwG2ZlA5GYekMR6qn0Y3101v82MdrIVgDILHR41iwykTtk1XpJPV9uabsRsvY4hBmbjYzihYZFOAzFf+/KU7wROtKum0fFfLjCPb8uGV41k1JTquB94FibXboVAP7rNL0Vrpl+FGUvMGatQBtwZnGvha6Ha07qTao+X9+0dJ4YvFlvcba/jfzBZBwHw7KHpRoiyKU0dPmXpHcqnZBFcNqRXhzdVrgx0auP/tghoshW5LQWkpTV11uSx/kYuby4oo8r8nB6L0rW1jYSXs9DHiTQCfCy24xlb9YJjCD9aFcjH0lIkVIqQwJYA67MzKYMK4XV684J/Jr3+jfVOoUt0bpZaTnk+r/uiFCtEsN7q0KUlvHLUAi1YNJhKs6CRrAH3GK25QByh+suzPzZoHP42F2LYP9URlzbDH+/v7CwNuw+9pHSmxEhs18LVmggwkMos3o3ArvzMLRNJ3QG1fdoxL/Ubqxhmvhy4rZi6vGQsiF64oX8PN0sRgXekTU/ma+6CTM6qhgkocMUYzT2r/6qd/9R3jmtxSZnikjkR6Iu9NLzAUY+cqnvvjohAvqYyj+tGlQfOPxAU9H4wXnbQWLBM8yn6yt2Ki+3+Jx4Owdv0oXVJpN0GWjMzIJ1nEus5odkWW+c4wcZb6m3Ak0PrzYPp2BgE=
