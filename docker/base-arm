@@ -20,6 +20,7 @@ RUN printf "Starting update...\n" && \
     build-essential \
     netbase \
     iproute2 \
+    python-setuptools \
     python-pip \
     python-dev \
     jq > /dev/null && \
