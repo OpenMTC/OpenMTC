@@ -6,7 +6,7 @@ Created on 15.07.2011
 
 from asyncore import dispatcher, loop
 from socket import AF_INET, SOCK_STREAM, error
-from sockethelper import socket
+from .sockethelper import socket
 from futile.exc import errorstr
 from collections import namedtuple
 import sys
@@ -38,9 +38,9 @@ def test_port(host, port, family = AF_INET, type = SOCK_STREAM):
 	try:
 		with socket(family, type) as s:
 			s.connect((host, port))
-	except error, e:
+	except error as e:
 		return TestResult(False, "%s (%d)" % (e.strerror, e.errno))
-	except Exception, e:
+	except Exception as e:
 		return TestResult(False, errorstr(e))
 	return TestResult(True)
 

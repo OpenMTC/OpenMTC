@@ -5,7 +5,7 @@ from enum import Enum
 from iso8601 import parse_date, ParseError
 from operator import attrgetter
 
-from futile import basestring, issubclass, NOT_SET
+from futile import issubclass, NOT_SET
 from futile.logging import LoggerMixin
 from openmtc.model.exc import ModelError, ModelTypeError
 

@@ -5,7 +5,7 @@ import sys
 import os
 import gevent.monkey
 
-if 'threading' in sys.modules and not os.environ.get('SUPPORT_GEVENT'):
+if 'threading' in sys.modules and not os.environ.get('GEVENT_SUPPORT'):
     raise Exception('threading module loaded before monkey patching in '
                     'gevent_main!')
 

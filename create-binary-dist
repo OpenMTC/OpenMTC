@@ -113,14 +113,14 @@ rm ${log_file}
 ################################################################################
 # clean binary_package
 binary_archive="${working_dir}/dist/${binary_prefix}.docker.tar.gz"
-printf "### Stripping .py files..."
+#printf "### Stripping .py files..."
 cp ${target_file} ${binary_archive}
-gzip -d ${binary_archive}
-tar --wildcards --delete -f ${binary_archive%".gz"} "*.py"
-gzip ${binary_archive%".gz"}
-printf "done\n"
+#gzip -d ${binary_archive}
+#tar --wildcards --delete -f ${binary_archive%".gz"} "*.py"
+#gzip ${binary_archive%".gz"}
+#printf "done\n"
 rm ${target_file}
-printf "### Created binary archive at %s.\n" ${binary_archive}
+#printf "### Created binary archive at %s.\n" ${binary_archive}
 
 ################################################################################
 # set correct permissions
