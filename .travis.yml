@@ -11,15 +11,15 @@ before_script:
 - sudo python3 -m pip install --upgrade setuptools
 - sudo python3 -m pip install --upgrade pyresttest
 - "./create-binary-docker backend"
-- "./create-binary-docker backend -a arm"
+#- "./create-binary-docker backend -a arm"
 - "./create-binary-docker gateway"
-- "./create-binary-docker gateway -a arm"
-- "./create-binary-docker orioncontextbroker"
-- "./create-binary-docker orioncontextbroker -a arm"
-- "./create-binary-docker influxdbapp"
-- "./create-binary-docker influxdbapp -a arm"
-- "./create-binary-docker cul868ipe"
-- "./create-binary-docker cul868ipe -a arm"
+#- "./create-binary-docker gateway -a arm"
+#- "./create-binary-docker orioncontextbroker"
+#- "./create-binary-docker orioncontextbroker -a arm"
+#- "./create-binary-docker influxdbapp"
+#- "./create-binary-docker influxdbapp -a arm"
+#- "./create-binary-docker cul868ipe"
+#- "./create-binary-docker cul868ipe -a arm"
 - docker run -d --name backend -p 0.0.0.0:18000:18000 -e "ONEM2M_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" openmtc/backend-amd64 -v
 - docker logs backend
 - docker run -d --name gateway -p 0.0.0.0:8000:8000 -e "ONEM2M_HTTP_TRANSPORT_PORT=8000" -e "ONEM2M_CSE_ID=gateway" -e "ONEM2M_REMOTE_CSE_POA=<POA>" -e "ONEM2M_REMOTE_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" -e "ONEM2M_REGISTRATION_DISABLED=false" openmtc/gateway-amd64 -v
