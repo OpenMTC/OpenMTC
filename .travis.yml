@@ -1,5 +1,6 @@
 services:
 - docker
+dist: xenial
 #install:
 #  - sudo apt-get install -y
 #  - sudo pip3 install --upgrade pip pyresttest
