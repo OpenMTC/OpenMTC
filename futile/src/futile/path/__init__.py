@@ -754,10 +754,10 @@ class path(_base):
 		os.renames(self, new)
 	# --- Create/delete operations on directories
 
-	def mkdir(self, mode=0750):
+	def mkdir(self, mode=0o750):
 		os.mkdir(self, mode)
 
-	def makedirs(self, mode=0750):
+	def makedirs(self, mode=0o750):
 		os.makedirs(self, mode)
 
 	def rmdir(self):
