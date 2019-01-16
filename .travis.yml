@@ -21,7 +21,9 @@ before_script:
 - "./create-binary-docker cul868ipe"
 - "./create-binary-docker cul868ipe -a arm"
 - docker run -d --name backend -p 0.0.0.0:18000:18000 -e "ONEM2M_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" openmtc/backend-amd64 -v
+- docker logs backend
 - docker run -d --name gateway -p 0.0.0.0:8000:8000 -e "ONEM2M_HTTP_TRANSPORT_PORT=8000" -e "ONEM2M_CSE_ID=gateway" -e "ONEM2M_REMOTE_CSE_POA=<POA>" -e "ONEM2M_REMOTE_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" -e "ONEM2M_REGISTRATION_DISABLED=false" openmtc/gateway-amd64 -v
+- docker logs gateway
 script:
   - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
   - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
