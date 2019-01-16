@@ -5,7 +5,7 @@ services:
 #  - sudo pip3 install --upgrade pip pyresttest
 before_script:
 - sudo apt update
-- sudo apt install qemu-user-static python3.6 python3-pip
+- sudo apt install qemu-user-static python3 python3-pip
 - sudo pip3 install --upgrade pip pyresttest
 - "./create-binary-docker backend"
 - "./create-binary-docker backend -a arm"
