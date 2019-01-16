@@ -31,6 +31,8 @@ script:
   - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
   - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
   - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
+  - docker logs gateway
+  - docker logs backend
   - pyresttest tests/interoperability/basic.yaml
 env:
   matrix:
