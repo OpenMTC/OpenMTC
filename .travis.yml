@@ -2,7 +2,7 @@ services:
 - docker
 install:
   - sudo apt-get install -y python3 python3-pip
-  - pip3 install pyresttest
+  - sudo pip3 install pyresttest
 before_script:
 - sudo apt update
 - sudo apt install qemu-user-static
