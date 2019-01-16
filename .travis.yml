@@ -8,7 +8,7 @@ before_script:
 - sudo apt update
 - sudo apt install qemu-user-static python3 python3-pip python3-setuptools
 - sudo pip3 install --upgrade pip
-- sudo python3 -m pip install --upgrade python3-setuptools
+- sudo python3 -m pip install --upgrade setuptools
 - sudo python3 -m pip install --upgrade pyresttest
 - "./create-binary-docker backend"
 - "./create-binary-docker backend -a arm"
