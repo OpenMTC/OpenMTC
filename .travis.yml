@@ -25,14 +25,15 @@ before_script:
 - docker run -d --name gateway -p 0.0.0.0:8000:8000 -e "ONEM2M_HTTP_TRANSPORT_PORT=8000" -e "ONEM2M_CSE_ID=gateway" -e "ONEM2M_REMOTE_CSE_POA=<POA>" -e "ONEM2M_REMOTE_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" -e "ONEM2M_REGISTRATION_DISABLED=false" openmtc/gateway-amd64 -v
 - docker logs gateway
 script:
-  - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
-  - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
-  - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
-  - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
-  - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
-  - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
+#  - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
+#  - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
+#  - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
+#  - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
+#  - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
+#  - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
   - docker logs gateway
   - docker logs backend
+after_script:
   - pyresttest http://localhost:8000   tests/interoperability/basic.yaml
 env:
   matrix:
