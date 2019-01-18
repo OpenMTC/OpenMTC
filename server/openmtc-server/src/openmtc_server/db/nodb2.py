@@ -57,7 +57,7 @@ class NoDB2Session(BasicSession):
         assert path is not None
         self.logger.debug("Getting resource: %s", path)
         resource = self._get(path)
-        return copy(resource)
+        return copy(self._get(path))
 
     def get_collection(self, resource_type, parent, filter_criteria=None):
         self.logger.debug("Getting %s children of %s (%s)", resource_type,

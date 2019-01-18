@@ -7,7 +7,7 @@
         "default_content_type": "application/json"
     },
     "database": {
-        "driver": "openmtc_server.db.nodb2.NoDB2",
+        "driver": "openmtc_server.db.mongodb.MongoDB",
         "dropDB": true
     },
     "logging": {
