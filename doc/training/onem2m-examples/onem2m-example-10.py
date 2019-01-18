@@ -26,13 +26,13 @@ promise = client.send_onem2m_request(onem2m_request)
 # reteive the OneM2MResponse from the returned promise
 onem2m_response = promise.get()
 
-print onem2m_response.to
+print(onem2m_response.to)
 #>>> onem2m
-print onem2m_response.response_status_code
+print(onem2m_response.response_status_code)
 #>>> STATUS(numeric_code=2001, description='CREATED', http_status_code=201)
-print onem2m_response.content
+print(onem2m_response.content)
 #>>> AE(path='None', id='ae0')
-print onem2m_response.content.App_ID
+print(onem2m_response.content.App_ID)
 #>>> myApp
-print onem2m_response.content.labels
+print(onem2m_response.content.labels)
 #>>> [u'keyword1', u'keyword2']

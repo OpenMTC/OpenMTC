@@ -3,6 +3,7 @@ from json import load as json_load
 from operator import getitem
 
 import futile
+from functools import reduce
 
 
 def prepare_app(parser, loader, name, default_config_file):
@@ -11,7 +12,7 @@ def prepare_app(parser, loader, name, default_config_file):
                              " specified multiple times.")
     args = parser.parse_args()
 
-    module_ = loader.fullname.split("." + name).pop(0)
+    module_ = loader.name.split("." + name).pop(0)
 
     futile.logging.set_default_level(futile.logging.DEBUG)
     logger = futile.logging.get_logger(name)

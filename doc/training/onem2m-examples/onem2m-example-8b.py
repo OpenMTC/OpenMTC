@@ -13,9 +13,9 @@ promise = client.send_onem2m_request(onem2m_request)
 # reteive the OneM2MResponse from the returned promise
 onem2m_response = promise.get()
 
-print onem2m_response.to
+print(onem2m_response.to)
 #>>> onem2m
-print onem2m_response.response_status_code
+print(onem2m_response.response_status_code)
 #>>> STATUS(numeric_code=2000, description='OK', http_status_code=200)
-print onem2m_response.content
+print(onem2m_response.content)
 #>>> CSEBase(path='None', id='cb0')

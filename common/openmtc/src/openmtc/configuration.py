@@ -31,9 +31,7 @@ class ExtraOptionsStrategy(Enum):
     fatal = "fatal"
 
 
-class ConfigurationOption(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class ConfigurationOption(LoggerMixin, metaclass=ABCMeta):
     def __init__(self, type, default=NOT_SET, converter=identity,
                  *args, **kw):
         super(ConfigurationOption, self).__init__(*args, **kw)
@@ -76,7 +74,7 @@ class ListOption(SimpleOption):
 
     def _convert(self, v):
         v = super(ListOption, self)._convert(v)
-        return map(self._convert_content, v)
+        return list(map(self._convert_content, v))
 
     def _convert_content(self, v):
         if not isinstance(v, self.content_type):
@@ -92,7 +90,7 @@ class BooleanOption(ConfigurationOption):
     def _convert(self, v):
         if isinstance(v, (bool, int)):
             return bool(v)
-        if isinstance(v, basestring):
+        if isinstance(v, str):
             return v and v.lower() not in ("0", "no", "n", "f", "false")
         raise ConfigurationValueError("Illegal value for boolean: %s" % (v, ))
 

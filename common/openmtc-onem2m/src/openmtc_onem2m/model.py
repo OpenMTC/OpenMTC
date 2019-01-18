@@ -2,7 +2,8 @@ from enum import IntEnum, unique
 
 from openmtc.model import (Resource as Res, UnicodeAttribute, DatetimeAttribute,
                            Attribute, ListAttribute, Entity, EntityAttribute,
-                           AnyURI, StringListAttribute, ContentResource)
+                           AnyURI, StringListAttribute, ContentResource,
+                           BytesAttribute)
 from openmtc.model.exc import ModelTypeError
 from futile import issubclass
 
@@ -407,7 +408,7 @@ class FilterUsageE(OneM2MIntEnum):
 @unique
 class CountryCodeE(OneM2MIntEnum):
     india = 91
-    usa = 01
+    usa = 1
 
 
 @unique
@@ -600,7 +601,7 @@ class ResourceC(LabeledResource):
 
     typename = None
 
-    resourceName = UnicodeAttribute(accesstype=Attribute.WO)
+    resourceName = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
 
     resourceType = EntityAttribute(ResourceTypeE, accesstype=Attribute.RO)
     resourceID = IDS(accesstype=Attribute.RO)
@@ -789,8 +790,7 @@ class Subscription(RegularResourceC):
     notificationForwardingURI = Attribute(AnyURI)
     batchNotify = EntityAttribute(BatchNotify)
     rateLimit = EntityAttribute(RateLimit)
-    preSubscriptionNotify = Attribute(int, accesstype=Attribute.WO,
-                                      mandatory=False)
+    preSubscriptionNotify = Attribute(int, accesstype=Attribute.WO, mandatory=False)
     pendingNotification = Attribute(PendingNotificationE)
     notificationStoragePriority = Attribute(int)
     latestNotify = Attribute(bool)
@@ -991,8 +991,8 @@ class ContentInstance(AnnounceableSubordinateResourceC,
     # ex: application/json:1
     contentInfo = UnicodeAttribute()    # m2m:contentInfo
     contentSize = Attribute(int, accesstype=Attribute.RO)
-    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO)
-    content = Attribute(bytes, accesstype=Attribute.WO, mandatory=True)
+    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
+    content = BytesAttribute(accesstype=Attribute.WO, mandatory=True)
 
     __child_types__ = (
         Subscription,
@@ -1004,8 +1004,8 @@ class ContentInstanceAnnc(AnnouncedSubordinateResourceC):
     stateTag = Attribute(int, accesstype=Attribute.RO)
     contentInfo = UnicodeAttribute(EncodingTypeE)    # m2m:contentInfo
     contentSize = Attribute(int, accesstype=Attribute.WO)
-    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO)
-    content = Attribute(bytes, accesstype=Attribute.WO, mandatory=True)
+    ontologyRef = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
+    content = BytesAttribute(accesstype=Attribute.WO, mandatory=True)
 
 
 ################################################################################
@@ -1107,7 +1107,7 @@ class AEAnnc(AnnouncedResourceC, SubscribableResource):
 
     typename = "AEAnnc"
 
-    appName = UnicodeAttribute(accesstype=Attribute.WO)
+    appName = UnicodeAttribute(accesstype=Attribute.WO, mandatory=False)
     App_ID = UnicodeAttribute()
     AE_ID = UnicodeAttribute()
     pointOfAccess = StringListAttribute()
@@ -1376,8 +1376,7 @@ long_to_short_attribute_mapping = {
     "relatedSemantics": "rels",
 }
 
-short_to_long_attribute_mapping = {v: k for k, v in
-                                   long_to_short_attribute_mapping.items()}
+short_to_long_attribute_mapping = {v: k for k, v in long_to_short_attribute_mapping.items()}
 
 
 def get_long_attribute_name(n):
@@ -1459,8 +1458,7 @@ long_to_short_resource_mapping = {
     "dynamicAuthorizationConsultation": "dac"
 }
 
-short_to_long_resource_mapping = {v: k for k, v in
-                                  long_to_short_resource_mapping.items()}
+short_to_long_resource_mapping = {v: k for k, v in long_to_short_resource_mapping.items()}
 
 
 def get_long_resource_name(n):
@@ -1584,8 +1582,7 @@ long_to_short_member_mapping = {
     "escertkeMessage": "eckm"
 }
 
-short_to_long_member_mapping = {v: k for k, v in
-                                long_to_short_member_mapping.items()}
+short_to_long_member_mapping = {v: k for k, v in long_to_short_member_mapping.items()}
 
 
 def get_long_member_name(n):
@@ -1601,8 +1598,7 @@ long_to_short_root_mapping = {
     "responsePrimitive": "rsp"
 }
 
-short_to_long_root_mapping = {v: k for k, v in
-                              long_to_short_root_mapping.items()}
+short_to_long_root_mapping = {v: k for k, v in long_to_short_root_mapping.items()}
 
 
 def get_long_root_name(n):
@@ -1636,8 +1632,7 @@ long_to_short_parameter_mapping = {
     "responseStatusCode": "rsc"
 }
 
-short_to_long_parameter_mapping = {v: k for k, v in
-                                   long_to_short_parameter_mapping.items()}
+short_to_long_parameter_mapping = {v: k for k, v in long_to_short_parameter_mapping.items()}
 
 
 def get_long_parameter_name(n):
@@ -1648,13 +1643,13 @@ def get_short_parameter_name(n):
     return long_to_short_parameter_mapping.get(n)
 
 
-_all_types = {k: v for k, v in globals().iteritems()
+_all_types = {k: v for k, v in globals().items()
               if issubclass(v, OneM2MEntity) and not v.__subclasses__()}
 
 _all_types_short = {}
 _all_types_long = {}
 
-for k, v in _all_types.iteritems():
+for k, v in _all_types.items():
     if get_short_resource_name(k):
         long_name = k
         short_name = get_short_resource_name(k)
@@ -1685,13 +1680,13 @@ for k, v in _all_types.iteritems():
     _all_types_long[long_name] = v
 
 
-_resource_types = {k: v for k, v in _all_types.iteritems()
+_resource_types = {k: v for k, v in _all_types.items()
                    if issubclass(v, ResourceC)}
 
 _resource_types_short = {}
 _resource_types_long = {}
 
-for k, v in _resource_types.iteritems():
+for k, v in _resource_types.items():
     if get_short_resource_name(k):
         long_name = k
         short_name = get_short_resource_name(k)
@@ -1725,8 +1720,8 @@ def get_onem2m_resource_type(typename):
 
 
 def get_onem2m_types():
-    return _all_types.values()
+    return list(_all_types.values())
 
 
 def get_onem2m_resource_types():
-    return _resource_types.values()
+    return list(_resource_types.values())

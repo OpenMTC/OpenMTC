@@ -1,7 +1,4 @@
-try:
-    from urllib.parse import urljoin
-except ImportError:
-    from urlparse import urljoin
+from urllib.parse import urljoin
 import logging
 from datetime import datetime
 
@@ -33,16 +30,16 @@ class OrionAPI(LoggerMixin):
 
     def _get_type(self, element):
         if isinstance(element, int):
-            return u"Int"
+            return "Int"
         elif isinstance(element, float):
-            return u"Float"
+            return "Float"
         elif isinstance(element, bool):
-            return u"Boolean"
-        elif isinstance(element, (str, unicode)):
-            return u"String"
+            return "Boolean"
+        elif isinstance(element, str):
+            return "String"
         else:
             self.logger.error('Type of "{}" unknown'.format(element))
-            return u"Unknown"
+            return "Unknown"
 
     def is_host_alive(self):
         req = self._request(

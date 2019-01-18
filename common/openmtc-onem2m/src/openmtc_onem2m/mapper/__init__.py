@@ -1,7 +1,4 @@
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 from openmtc.mapper import BasicMapper, MapperError
 from openmtc_onem2m import OneM2MRequest

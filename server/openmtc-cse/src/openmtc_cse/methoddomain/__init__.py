@@ -1,4 +1,4 @@
-import controller
+from . import controller
 import openmtc_onem2m.model as model
 from aplus import Promise
 from openmtc.util import datetime_now

@@ -65,4 +65,4 @@ class csvProcessor(LoggerMixin):
 if __name__ == "__main__":
     p = csvProcessor("example.csv", duration=300)
     for e in p.csv_data:
-        print e
+        print(e)

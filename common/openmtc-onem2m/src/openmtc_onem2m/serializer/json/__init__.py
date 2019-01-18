@@ -33,6 +33,8 @@ def _default(x):
         return x.strftime("%Y%m%dT%H%M%S")
     elif isinstance(x, ContentInstance):
         return x.resourceID
+    elif isinstance(x, bytes):
+        return x.decode('utf-8')
     else:
         try:  # handle model classes
             return x.values

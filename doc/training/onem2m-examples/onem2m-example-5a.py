@@ -7,7 +7,7 @@ my_app = AE(App_ID="myApp")
 
 request = OneM2MRequest("create", to="onem2m", pc="my_app")
 
-print request.to
+print(request.to)
 #>>> onem2m
-print request.pc
+print(request.pc)
 #>>> myApp

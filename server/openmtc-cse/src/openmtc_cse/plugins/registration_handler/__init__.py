@@ -111,7 +111,7 @@ class RegistrationHandler(Plugin):
                 remote_cse_poa = remote_cse.get("poa", [])
                 self.api.add_poa_list(remote_cse_id, remote_cse_poa)
 
-        return map(handle_remote_cse_method, remote_cses)
+        return list(map(handle_remote_cse_method, remote_cses))
 
     def _handle_remote_cse_delete(self, remote_cse):
         """ Sends a delete request for the RemoteCSE resource.

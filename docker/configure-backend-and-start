@@ -89,4 +89,4 @@ mv ${CONFIG_TEMP} ${CONFIG_FILE}
 
 echo "done"
 
-exec python -m openmtc_gevent.backend_main $@
+exec python3 -m openmtc_gevent.backend_main $@

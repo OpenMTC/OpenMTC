@@ -6,4 +6,4 @@ cd $(dirname ${0})
 
 cd csvInjector
 
-PYTHONPATH=${PYTHONPATH}:src exec python -m csvinjector $@
+PYTHONPATH=${PYTHONPATH}:src exec python3 -m csvinjector $@

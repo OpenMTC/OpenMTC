@@ -212,7 +212,9 @@ class OneM2MRequest(object):
         self.to = to
         # Originator ID
         self.originator = fr  # original long name is from
-        self.request_identifier = rqi or ''.join(random.sample(string.letters + string.digits, 16))
+        self.request_identifier = rqi or ''.join(
+            random.sample(string.ascii_letters + string.digits, 16)
+        )
         # Type of a created resource
         self.resource_type = ty
         # Resource content to be transferred.
@@ -423,7 +425,7 @@ class OneM2MRequest(object):
 
     def __str__(self):
         return '%s: %s' % (self.__class__.__name__, ' | '.join([
-            '%s: %s' % (str(k), str(v)) for k, v in self.__dict__.iteritems()
+            '%s: %s' % (str(k), str(v)) for k, v in self.__dict__.items()
         ]))
 
 
@@ -556,7 +558,7 @@ class OneM2MResponse(object):
 
     def __str__(self):
         return '%s: %s' % (self.__class__.__name__, ' | '.join([
-            '%s: %s' % (str(k), str(v)) for k, v in self.__dict__.iteritems()
+            '%s: %s' % (str(k), str(v)) for k, v in self.__dict__.items()
         ]))
 
 

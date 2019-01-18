@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 
 def decode_onem2m_content(content, content_type):
-    if content == "":
+    if not content:
         content = None
     if content_type and content is not None:
         serializer = get_onem2m_decoder(content_type)

@@ -22,9 +22,7 @@ def get_typename(tn):
     return _typename_matcher.findall(tn).pop()
 
 
-class OneM2MSerializer(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class OneM2MSerializer(LoggerMixin, metaclass=ABCMeta):
     @abstractmethod
     def encode_resource(self, resource, response, pretty=False,
                         encoding="utf-8", fields=None):
@@ -45,7 +43,7 @@ class OneM2MSerializer(LoggerMixin):
                     res_type = ResourceTypeE(v["type"])
                     res_cls = get_onem2m_resource_type(res_type.name)
                     return res_cls(v["name"], resourceID=v["value"], resourceType=res_type)
-                child_resource = map(map_child_resource, child_resource)
+                child_resource = list(map(map_child_resource, child_resource))
             except (TypeError, AttributeError, KeyError, ValueError):
                 raise CSEValueError("Invalid entry in child resources: %s",
                                     child_resource)
@@ -80,7 +78,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
                     )
                     representation["notificationEvent"] = {
                         get_short_attribute_name(k) or get_short_member_name(k): v
-                        for k, v in e.iteritems()
+                        for k, v in e.items()
                     }
             except (AttributeError, KeyError):
                 self.logger.exception("failed to encode notify")
@@ -104,7 +102,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
                     "nm":   c.basename,
                     "typ":  c.resourceType
                 }
-            representation["childResource"] = map(get_child_rep, representation["childResource"])
+            representation["childResource"] = list(map(get_child_rep, representation["childResource"]))
 
         if isinstance(resource, URIList):
             representation = [make_val(path, x) for x in representation]
@@ -137,7 +135,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
         return self.dumps({typename: representation})
 
     def _handle_partial_addressing(self, resource, pretty):
-        for k, v in resource.iteritems():
+        for k, v in resource.items():
             if k in ('latest', 'oldest') and isinstance(v, ContentInstance):
                 resource[k] = v.resourceID
         if pretty:
@@ -148,7 +146,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
 
         def convert_to_long_keys(d):
             return {get_long_resource_name(k) or get_long_attribute_name(k) or
-                    get_long_member_name(k) or k: v for k, v in d.iteritems()}
+                    get_long_member_name(k) or k: v for k, v in d.items()}
 
         try:
             if hasattr(s, "read"):
@@ -161,7 +159,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
         self.logger.debug("Read data: %s", data)
 
         try:
-            typename, data = data.items()[0]
+            typename, data = list(data.items())[0]
             return get_onem2m_type(get_typename(typename)), data
         except (AttributeError, IndexError, TypeError):
             raise CSESyntaxError("Not a valid resource representation")

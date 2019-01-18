@@ -6,4 +6,4 @@ cd $(dirname ${0})
 
 cd InfluxdbApp
 
-PYTHONPATH=${PYTHONPATH}:src exec python -m influxdbapp $@
+PYTHONPATH=${PYTHONPATH}:src exec python3 -m influxdbapp $@

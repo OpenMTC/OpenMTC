@@ -5,7 +5,7 @@ import sys
 import os
 import gevent.monkey
 
-if 'threading' in sys.modules and not os.environ.get('SUPPORT_GEVENT'):
+if 'threading' in sys.modules and not os.environ.get('GEVENT_SUPPORT'):
     raise Exception('threading module loaded before monkey patching in '
                     'gevent_main!')
 
@@ -60,7 +60,7 @@ gevent.ssl.PROTOCOL_SSLv3 = gevent.ssl.PROTOCOL_TLSv1
 # gevent main
 ################################################################################
 from openmtc.configuration import ConfigurationError
-from openmtc_server.util.async import async_all
+from openmtc_server.util.async_ import async_all
 
 _components = []
 _plugins = []
@@ -168,7 +168,8 @@ def stop_component(component):
 
 
 def stop_components():
-    map(stop_component, reversed(_components))
+    for c in reversed(_components):
+        stop_component(c)
     logger.debug("Components stopped")
 
 
@@ -179,8 +180,10 @@ def stop_plugin(plugin):
 
 def stop_plugins():
     # stop transport plugins after the others
-    map(stop_plugin, filter(lambda p: not p.name.endswith('TransportPlugin'), _plugins))
-    map(stop_plugin, filter(lambda p: p.name.endswith('TransportPlugin'), _plugins))
+    for p in [p for p in _plugins if not p.name.endswith('TransportPlugin')]:
+        stop_plugin(p)
+    for p in [p for p in _plugins if p.name.endswith('TransportPlugin')]:
+        stop_plugin(p)
 
 
 def init_component(component, api):
@@ -278,7 +281,7 @@ def main(default_config_file, is_gateway):
     from openmtc_server.platform.default.Event import (ResourceFinishEvent,
                                                        NetworkEvent)
 
-    from GEventNetworkManager import GEventNetworkManager
+    from .GEventNetworkManager import GEventNetworkManager
 
     from openmtc_server.util.db import load_db_module
 

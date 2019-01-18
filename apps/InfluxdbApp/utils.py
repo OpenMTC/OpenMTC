@@ -35,8 +35,8 @@ def get_packages(package, package_dir, excluded_list=None, included_list=None):
     r_prefix = len(root) + 1
     for path, dirs, files in os.walk(root, onerror=on_error):
         is_module = "__init__.py" in files and path != root
-        excluded = any(map(lambda x: x in path, excluded_list))
-        included = any(map(lambda x: x in path, included_list))
+        excluded = any([x in path for x in excluded_list])
+        included = any([x in path for x in included_list])
         if is_module and (not excluded or included):
             packages.append(package + "." + path[r_prefix:].replace("/", "."))
 
@@ -56,7 +56,7 @@ def get_pkg_files(base_dir, name):
 
 def enable_init_files(init_dir, init_dist_files):
     for f in init_dist_files:
-        os.chmod(os.path.join(init_dir, os.path.basename(f)), 0755)
+        os.chmod(os.path.join(init_dir, os.path.basename(f)), 0o755)
 
 
 def move_config_files(config_dir, config_files):
@@ -74,7 +74,7 @@ def create_openmtc_user(db_dir=None, log_dir=None):
     try:
         from pwd import getpwnam
     except ImportError:
-        print "Could not import the 'pwd' module. Skipping user management"
+        print("Could not import the 'pwd' module. Skipping user management")
     else:
         # assuming DB_DIR was created by setup already
         try:

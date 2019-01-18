@@ -13,7 +13,7 @@ request = OneM2MRequest("create",
                         pc=data_string,
                         ty="application/json")
 
-print request.to
+print(request.to)
 #>>> onem2m
-print request.pc
+print(request.pc)
 #>>> {"type": "temperature", "value": 15}

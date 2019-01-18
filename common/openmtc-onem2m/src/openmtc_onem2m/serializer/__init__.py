@@ -22,7 +22,7 @@ def create_onem2m_serializer(content_type):
 
 
 def get_onem2m_supported_content_types():
-    return _factories.keys()
+    return list(_factories.keys())
 
 
 def get_onem2m_decoder(content_type):
@@ -37,6 +37,8 @@ def get_onem2m_decoder(content_type):
         serializer = create_onem2m_serializer(content_type)
         _serializers[content_type] = serializer
         return serializer
+
+
 get_serializer = get_onem2m_decoder
 
 

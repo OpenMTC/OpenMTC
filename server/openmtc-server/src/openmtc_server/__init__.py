@@ -13,9 +13,7 @@ class Component(LoggerMixin):
         pass
 
 
-class Serializer(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class Serializer(LoggerMixin, metaclass=ABCMeta):
     @abstractmethod
     def encode(self, resource):
         raise NotImplementedError()

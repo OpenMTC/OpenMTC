@@ -1,4 +1,4 @@
-from urllib import quote
+from urllib.parse import quote
 from datetime import datetime
 
 from mimeparse import parse_mime_type

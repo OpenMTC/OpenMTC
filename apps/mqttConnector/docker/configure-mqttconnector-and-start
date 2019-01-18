@@ -76,4 +76,4 @@ mv ${CONFIG_TEMP} ${CONFIG_FILE}
 
 echo "done"
 
-exec python -m mqttconnector $@
+exec python3 -m mqttconnector $@
