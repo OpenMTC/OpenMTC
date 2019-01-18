@@ -1,3 +1,4 @@
+import datetime
 from openmtc_onem2m import OneM2MRequest
 from openmtc_onem2m.exc import CSENotFound
 from openmtc_onem2m.model import (
@@ -8,6 +9,7 @@ from openmtc_onem2m.model import (
     NotificationContentTypeE,
     EventNotificationCriteria,
     NotificationEventTypeE,
+    AggregatedNotification,
 )
 from openmtc_onem2m.transport import OneM2MOperation
 from openmtc_server.Plugin import Plugin
@@ -95,6 +97,10 @@ class NotificationHandler(Plugin):
             "pid": subscription.parentID,
             "enc": get_event_notification_criteria(subscription),
             "sub": subscription,
+            "not": [],                          # notifications
+            "levt": datetime.datetime.now(),    # last event time
+            "sno": 0                            # sent notifications (ratelimit)
+
         }
 
     def _handle_subscription_updated(self, subscription, _):
@@ -276,6 +282,68 @@ class NotificationHandler(Plugin):
         # preSubscriptionNotify is not supported in this release of the
         # document.
 
+        # batchNotify
+        try:
+            batch_notify = sub.batchNotify
+
+            if batch_notify is not None:
+                current_time = datetime.datetime.now()
+                notifications = self.subscriptions_info[sub.resourceID]["not"]
+
+                for uri in sub.notificationURI:
+                    notifications.append(
+                        Notification(
+                            notificationEvent=NotificationEventC(
+                                representation=resource
+                            ),
+                            subscriptionReference=self._get_subscription_reference(uri, sub.path),
+                            creator=sub.creator
+                        )
+                    )
+
+                # Note: the extra condition 'len(notifications) < int(batch_notify.number) + 1'
+                # is needed, otherwise sometimes one more notification is sent
+                if int(batch_notify.number) <= len(notifications) and len(notifications) < int(batch_notify.number) + 1 or \
+                        int(batch_notify.duration) <= int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds):
+                    aggregated_notification = AggregatedNotification(**{"notification": notifications})
+
+                    self._send_notification(aggregated_notification, sub)
+                    self.subscriptions_info[sub.resourceID]["levt"] = current_time
+                    self.subscriptions_info[sub.resourceID]["not"] = []
+
+                return
+        except AttributeError:
+            pass
+
+        # rateLimit
+        try:
+            ratelimit = sub.rateLimit
+
+            if ratelimit is not None:
+                notification_resources = self.subscriptions_info[sub.resourceID]["not"]
+
+                for uri in sub.notificationURI:
+                    notification_resources.append(resource)
+
+                for i in range(len(notification_resources)):
+                    current_time = datetime.datetime.now()
+
+                    if int((current_time - self.subscriptions_info[sub.resourceID]["levt"]).seconds) <= int(ratelimit.timeWindow):
+                        if self.subscriptions_info[sub.resourceID]["sno"] <= int(ratelimit.maxNrOfNotify):
+                            self._send_notification(notification_resources.pop(0), sub)
+                            self.subscriptions_info[sub.resourceID]["sno"] += 1
+                        else:
+                            break
+                    else:
+                        self.subscriptions_info[sub.resourceID]["levt"] = current_time
+                        self.subscriptions_info[sub.resourceID]["sno"] = 0
+                        break
+
+                return
+        except AttributeError:
+            pass
+
+
         # Step 3.0 The Originator shall check the notification and reachability
         # schedules, but the notification schedules may be checked in different
         # order.
@@ -350,6 +418,15 @@ class NotificationHandler(Plugin):
 
     def _send_notification(self, resource, sub):
         self.logger.debug("sending notification for resource: %s", resource)
+
+        if isinstance(resource, AggregatedNotification):
+            for uri in sub.notificationURI:
+                self.api.handle_onem2m_request(OneM2MRequest(
+                    op=OneM2MOperation.notify,
+                    to=uri,
+                    pc=resource
+                ))
+            return
 
         for uri in sub.notificationURI:
             self.api.handle_onem2m_request(OneM2MRequest(

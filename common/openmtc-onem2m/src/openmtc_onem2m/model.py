@@ -772,11 +772,21 @@ class EventNotificationCriteria(OneM2MEntity):
 
 
 class BatchNotify(OneM2MEntity):
-    pass  # TODO
+    """ See TS-004 6.3.5.6
+        See TS-004 Table 6.3.5.6-1"""
+
+    number = Attribute(int)
+    duration = Attribute(int)
+
 
 
 class RateLimit(OneM2MEntity):
-    pass  # TODO
+    """ See TS-004 6.3.5.31
+        See TS-004 Table 6.3.5.31-1"""
+
+    maxNrOfNotify = Attribute(int)
+    timeWindow = Attribute(int)
+
 
 
 class Subscription(RegularResourceC):

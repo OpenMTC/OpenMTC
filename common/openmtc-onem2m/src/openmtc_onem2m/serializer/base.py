@@ -13,7 +13,7 @@ from openmtc_onem2m.model import (get_onem2m_type, ContentInstance,
                                   get_long_attribute_name,
                                   OneM2MEntity, OneM2MResource, Container,
                                   get_long_resource_name, OneM2MContentResource,
-                                  URIList, OneM2MIntEnum, SecurityInfo)
+                                  URIList, OneM2MIntEnum, SecurityInfo, AggregatedNotification)
 
 _typename_matcher = re_compile(r'^m2m:([a-z]+)$')
 
@@ -51,6 +51,17 @@ class OneM2MSerializer(LoggerMixin, metaclass=ABCMeta):
             representation = data["notificationEvent"]["representation"]
             representation = self.decode(self.dumps(representation))
             data["notificationEvent"]["representation"] = representation
+        if resource_type is AggregatedNotification and "notification" in data:
+            notifications = data["notification"]
+            data["notification"] = []
+
+            for notification in notifications:
+                data["notification"].append(
+                    self.decode(
+                        self.dumps(notification)
+                    )
+                )
+
         resource = resource_type(**data)
         if child_resource:
             resource.childResource = child_resource
@@ -66,6 +77,22 @@ class OneM2MDictSerializer(OneM2MSerializer):
             representation = resource.values
 
         self.logger.debug("Encoding representation: %s", representation)
+
+        if isinstance(resource, AggregatedNotification):
+            try:
+                notifications = representation["notification"]
+
+                if notifications:
+                    representation["notification"] = []
+
+                    for notification in notifications:
+                        representation["notification"].append(
+                            self.encode_resource(
+                                notification, pretty, path, encoding, fields, True
+                            )
+                        )
+            except (AttributeError, KeyError):
+                pass
 
         if isinstance(resource, Notification):
             # handle notifications
@@ -120,7 +147,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
                 k, v in representation.items()}
 
         if not isinstance(resource, (OneM2MResource, Notification,
-                                     SecurityInfo, OneM2MContentResource)):
+                                     SecurityInfo, OneM2MContentResource,AggregatedNotification)):
             return representation
 
         typename = 'm2m:' + (get_short_resource_name(resource.typename) or

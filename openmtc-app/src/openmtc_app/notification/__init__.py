@@ -7,6 +7,9 @@ from openmtc_onem2m.model import (
     EventNotificationCriteria,
     NotificationEventTypeE,
     Subscription,
+    BatchNotify,
+    RateLimit,
+    AggregatedNotification,
 )
 from openmtc_onem2m.serializer import get_onem2m_decoder
 from urllib.parse import urlparse
@@ -98,12 +101,19 @@ class NotificationManager(LoggerMixin):
     def register_callback(self, func, sur, del_func=None):
         self.callbacks[sur] = {
             'cb': func if len(getargspec(func)[0]) > 1
-            else lambda _, **notification: func(notification['rep']),
+            else lambda _, **notification: (
+                func(notification['not']) if 'not' in notification.keys()
+                else func(notification['rep'])),
             'del_cb': del_func
         }
 
     def _handle_callback(self, originator, **notification):
-        sur = notification.pop('sur')
+        try:
+            n = notification["not"][0]
+        except KeyError:
+            n = notification
+
+        sur = n.pop('sur')
         sur = self._normalize_path(sur)
 
         try:
@@ -132,7 +142,7 @@ class NotificationManager(LoggerMixin):
     def get_expiration_time(self):
         return None
 
-    def subscribe(self, path, func, delete_func=None, filter_criteria=None, expiration_time=None,
+    def subscribe(self, path, func, delete_func=None, filter_criteria=None, sub_options=None, expiration_time=None,
                   notification_types=(NotificationEventTypeE.updateOfResource,)):
         self._init()
 
@@ -140,12 +150,23 @@ class NotificationManager(LoggerMixin):
         event_notification_criteria.notificationEventType = (
             event_notification_criteria.notificationEventType or list(notification_types))
 
-        subscription = self.mapper.create(path, Subscription(
+        subscription = Subscription(
             notificationURI=[self.mapper.originator],
             expirationTime=expiration_time or self.get_expiration_time(),
             eventNotificationCriteria=event_notification_criteria,
             subscriberURI=self.mapper.originator,
-        ))
+        )
+
+        if sub_options:
+            try:
+                subscription.batchNotify = BatchNotify(**sub_options["batchNotify"])
+            except KeyError:
+                try:
+                    subscription.rateLimit = RateLimit(**sub_options["rateLimit"])
+                except KeyError:
+                    pass
+
+        subscription = self.mapper.create(path, subscription)
 
         reference = self._normalize_path(subscription.path)
         self.register_callback(func, reference, delete_func)
@@ -263,10 +284,32 @@ class HttpNotificationHandler(BaseNotificationHandler):
                     cl = int(request.environ.get('CONTENT_LENGTH'), 0)
                     request.data = request.environ['wsgi.input'].read(cl)
 
-            notification = get_onem2m_decoder(request.content_type).decode(request.data)
-            if not notification.verificationRequest:
-                notification = self._unpack_notification(notification)
-                self._callback(request.headers['x-m2m-origin'], **notification)
+
+            ######## NEW CODE BEGINNING
+            notification = {}
+            notification_type = get_onem2m_decoder(request.content_type).decode(request.data)
+
+            if isinstance(notification_type, AggregatedNotification):
+                notification["not"] = []
+
+                for n in notification_type.values["notification"]:
+                    notification["not"].append(
+                        self._unpack_notification(n)
+                    )
+            else:
+                notification = self._unpack_notification(notification_type)
+            ######## NEW CODE ENDING
+
+            # TODO Check if the above is working or take the below one
+            ######## OLD CODE BEGINNING
+            # notification = get_onem2m_decoder(request.content_type).decode(request.data)
+            # if not notification.verificationRequest:
+            #     notification = self._unpack_notification(notification)
+            ######## OLD CODE ENDING
+
+
+            self._callback(request.headers['x-m2m-origin'], **notification)
+
 
             return Response(
                 headers={
