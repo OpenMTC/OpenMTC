@@ -31,16 +31,16 @@ parser.add_argument("devices", nargs="*")
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
 # variables
-nm = get_value("name", (unicode, str), default_name, args, config)
+nm = get_value("name", str, default_name, args, config)
 cb = config.get("cse_base", "onem2m")
-ep = get_value("ep", (unicode, str), default_ep, args, config)
+ep = get_value("ep", str, default_ep, args, config)
 poas = config.get("poas", ["http://auto:28728"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
 
 s = config.get("sim", False)
 p = int(config.get("sim_period"))
-cul_device = get_value('cul_device', (unicode, str), default_device, args, config)
+cul_device = get_value('cul_device', str, default_device, args, config)
 device_mappings = get_value('device_mappings', dict, {}, args, config)
 devices = get_value('devices', list, [], args, config)
 

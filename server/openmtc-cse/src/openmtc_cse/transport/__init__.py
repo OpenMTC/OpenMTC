@@ -1,4 +1,4 @@
-from urlparse import urlparse
+from urllib.parse import urlparse
 from netifaces import AF_INET, AF_INET6
 
 from aplus import Promise
@@ -64,7 +64,7 @@ class OneM2MTransportDomain(Component):
         self.events.resource_deleted.register_handler(self._handle_cse_deleted, RemoteCSE)
 
         interfaces = self._api.network_manager.get_interfaces().get()
-        self._addresses = {i.name: filter(self._filter_out_link_local, i.addresses)
+        self._addresses = {i.name: list(filter(self._filter_out_link_local, i.addresses))
                            for i in interfaces}
 
     @staticmethod
@@ -104,7 +104,7 @@ class OneM2MTransportDomain(Component):
 
     # interface handling
     def _handle_interface_created(self, interface):
-        self._addresses[interface.name] = filter(self._filter_out_link_local, interface.addresses)
+        self._addresses[interface.name] = list(filter(self._filter_out_link_local, interface.addresses))
         self._create_endpoints()
 
     def _handle_interface_removed(self, interface):

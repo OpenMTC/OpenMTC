@@ -39,7 +39,7 @@ class HTTPSMixin(LoggerMixin):
 	def get_request(self):
 		try:
 			return self.socket.accept()
-		except error, e:
+		except error as e:
 			self.logger.exception("Error during accept(): %s", e)
 			raise
 

@@ -1,4 +1,4 @@
-# Dont install via the operating system's package manager
+# Don't install via the operating system's package manager
 # Install all dependencies via the "pip" tool
 # e.g. $ sudo pip install urllib3
 # or   $ sudo pip install --requirement dependencies.txt
@@ -16,8 +16,6 @@ python_socketio>=1.7.5
 flask
 geventhttpclient
 enum34
-pyxb==1.2.3
-dtls
 blist
 simplejson
 ujson
@@ -25,5 +23,4 @@ pymongo
 paho-mqtt
 coapthon
 rdflib
-fyzz
 yapps

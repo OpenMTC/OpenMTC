@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-exec python -m influxdbapp $@
+exec python3 -m influxdbapp $@

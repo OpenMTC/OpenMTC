@@ -28,7 +28,7 @@ class AbstractXMLSerializer(LoggerMixin):
 				return XML(input)
 			else:	
 				return ElementTree().parse(input)
-		except Exception, e:
+		except Exception as e:
 			self._handle_parse_error(e)
 			raise ParseError(e)
 		

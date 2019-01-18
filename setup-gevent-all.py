@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup
 from distutils.core import setup
@@ -26,18 +26,18 @@ SETUP_LICENSE = "Fraunhofer FOKUS proprietary"
 SETUP_REQUIRES = [
     "urllib3", "gevent (>=1.0)", "iso8601 (>=0.1.5)", "werkzeug (>=0.9)",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
-    "flask", "pyxb (==1.2.3)", "enum34", "dtls", "geventhttpclient",
+    "flask", "enum34", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps", "paho_mqtt"
+     "yapps", "paho_mqtt"
 ]
 SETUP_INSTALL_REQUIRES = [
     "urllib3", "gevent >= 1.0", "iso8601 >= 0.1.5", "werkzeug >= 0.9",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
-    "flask", "pyxb == 1.2.3", "enum34", "dtls", "geventhttpclient",
+    "flask", "enum34", "geventhttpclient",
     # server only
     "funcy", "netifaces", "decorator", "mimeparse", "coapthon", "rdflib",
-    "fyzz", "yapps", "paho_mqtt"
+     "yapps", "paho_mqtt"
 ]
 
 # packages
@@ -77,8 +77,7 @@ CONFIG_DIR = "/etc/openmtc/gevent"
 CONFIG_DIST_FILES = ("openmtc-gevent/etc/conf/config-backend.json.dist",
                      "openmtc-gevent/etc/conf/config-gateway.json.dist")
 SSL_CERT_DIR = "/etc/openmtc/certs"
-SSL_CERT_FILES = tuple(map(lambda x: os.path.join('openmtc-gevent/certs/', x),
-                           os.listdir('openmtc-gevent/certs')))
+SSL_CERT_FILES = tuple([os.path.join('openmtc-gevent/certs/', x) for x in os.listdir('openmtc-gevent/certs')])
 DATA_FILES = [
     (DB_DIR, ""),
     (LOG_DIR, ""),

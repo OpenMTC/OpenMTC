@@ -9,7 +9,7 @@ from openmtc_onem2m.model import (
     Subscription,
 )
 from openmtc_onem2m.serializer import get_onem2m_decoder
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from openmtc_onem2m.util import split_onem2m_address
 
@@ -67,7 +67,7 @@ class NotificationManager(LoggerMixin):
     def _get_auto_host(ep):
         try:
             import socket
-            from urlparse import urlparse
+            from urllib.parse import urlparse
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             netloc = urlparse(ep).netloc.split(':')
             s.connect((netloc[0], int(netloc[1])))
@@ -156,7 +156,7 @@ class NotificationManager(LoggerMixin):
         del self.callbacks[sur]
 
     def shutdown(self):
-        for subscription in self.callbacks.keys():
+        for subscription in list(self.callbacks.keys()):
             try:
                 self.unsubscribe(subscription)
             except OneM2MError:

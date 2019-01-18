@@ -40,36 +40,27 @@ parser.add_argument("--mqtts-keyfile", help="Path to own mqtts key")
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
 # variables
-nm = get_value("name", (unicode, str), default_name, args, config)
+nm = get_value("name", str, default_name, args, config)
 cb = config.get("cse_base", "onem2m")
-ep = get_value("ep", (unicode, str), default_ep, args, config)
+ep = get_value("ep", str, default_ep, args, config)
 poas = config.get("poas", ["http://auto:21753"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
-
 broker_ep = config.get("broker_ep", "localhost:8883")
-
-topic_pre = get_value("topic_pre", (unicode, str), default_topic_pre, args,
-                      config)
-topic_index_location = get_value("topic_index_location", (int),
+topic_pre = get_value("topic_pre", str, default_topic_pre, args, config)
+topic_index_location = get_value("topic_index_location", int,
                                  default_topic_index_location, args, config)
-topic_index_device = get_value("topic_index_device", (int),
+topic_index_device = get_value("topic_index_device", int,
                                default_topic_index_device, args, config)
-fiware_service = get_value("fiware_service", (unicode, str),
-                           default_fiware_service, args, config)
-broker_user = get_value("broker_user", (unicode, str), default_broker_user,
-                        args, config)
-broker_user_pw = get_value("broker_user_pw", (unicode, str),
-                           default_broker_user_pw, args, config)
-user_pw = get_value("broker_user_pw", (unicode, str), default_broker_user_pw,
-                    args, config)
+fiware_service = get_value("fiware_service", str, default_fiware_service, args, config)
+broker_user = get_value("broker_user", str, default_broker_user, args, config)
+broker_user_pw = get_value("broker_user_pw", str, default_broker_user_pw, args, config)
+user_pw = get_value("broker_user_pw", str, default_broker_user_pw, args, config)
 mqtts_enabled = get_value("mqtts_enabled", (bool), False, args, config)
-mqtts_ca_certs = get_value("mqtts_ca_certs", (unicode, str),
-                           default_mqtts_ca_certs, args, config)
-mqtts_certfile = get_value("mqtts_certfile", (unicode, str),
-                           default_mqtts_certfile, args, config)
-mqtts_keyfile = get_value("mqtts_keyfile", (unicode, str),
-                          default_mqtts_keyfile, args, config)
+mqtts_ca_certs = get_value("mqtts_ca_certs", str, default_mqtts_ca_certs, args, config)
+mqtts_certfile = get_value("mqtts_certfile", str, default_mqtts_certfile, args, config)
+mqtts_keyfile = get_value("mqtts_keyfile", str, default_mqtts_keyfile, args, config)
+
 # start
 app = mqttConnector(
     broker_ep=broker_ep,

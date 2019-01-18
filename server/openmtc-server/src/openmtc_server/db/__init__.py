@@ -5,9 +5,7 @@ from openmtc_server.db.exc import DBError
 from collections import MutableMapping
 
 
-class DBAdapter(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class DBAdapter(LoggerMixin, metaclass=ABCMeta):
     def __init__(self, config, *args, **kw):
         super(DBAdapter, self).__init__(*args, **kw)
 
@@ -36,9 +34,7 @@ class DBAdapter(LoggerMixin):
         pass
 
 
-class Shelve(LoggerMixin, MutableMapping):
-    __metaclass__ = ABCMeta
-
+class Shelve(LoggerMixin, MutableMapping, metaclass=ABCMeta):
     @abstractmethod
     def commit(self):
         raise NotImplementedError()
@@ -48,9 +44,7 @@ class Shelve(LoggerMixin, MutableMapping):
         raise NotImplementedError()
 
 
-class Session(object):
-    __metaclass__ = ABCMeta
-
+class Session(object, metaclass=ABCMeta):
     @abstractmethod
     def store(self, resource):
         raise NotImplementedError()
@@ -96,9 +90,7 @@ class Session(object):
         raise NotImplementedError()
 
 
-class BasicSession(Session, LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class BasicSession(Session, LoggerMixin, metaclass=ABCMeta):
     def __init__(self, resource_type, *args, **kw):
         super(BasicSession, self).__init__(*args, **kw)
 
@@ -129,7 +121,8 @@ class BasicSession(Session, LoggerMixin):
 
     def delete_children(self, resource_type, parent):
         children = self.get_collection(resource_type, parent)
-        map(self.delete, children)
+        for c in children:
+            self.delete(c)
 
     def _get_content_instances(self, parent):
         return self.get_collection(self.cinType, parent)

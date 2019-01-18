@@ -1,4 +1,4 @@
-from parsers import S300THParser, EM1000EMParser, FS20Parser
+from .parsers import S300THParser, EM1000EMParser, FS20Parser
 
 
 def test_parsers():

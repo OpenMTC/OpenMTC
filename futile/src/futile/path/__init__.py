@@ -30,10 +30,10 @@ Date:	7 Mar 2004
 #	 it doesn't play nice with other types that implement
 #	 __radd__().  Test this.
 
-from __future__ import generators
+
 
 def quote(p):
-	from urllib2 import quote
+	from urllib.parse import quote
 	return quote(p, "")
 
 
@@ -46,15 +46,15 @@ __all__ = ['path']
 _base = str
 try:
 	if os.path.supports_unicode_filenames:
-		_base = unicode
+		_base = str
 except AttributeError:
 	pass
 
 # Pre-2.3 workaround for basestring.
 try:
-	basestring
+	str
 except NameError:
-	basestring = (str, unicode)
+	str = (str, str)
 
 # Universal newline support
 _textmode = 'r'
@@ -403,7 +403,7 @@ class path(_base):
 		For example, path('/users').glob('*/bin/*') returns a list
 		of all the files users have in their bin directories.
 		"""
-		return map(path, glob.glob(_base(self / pattern)))
+		return list(map(path, glob.glob(_base(self / pattern))))
 
 
 	# --- Reading or writing an entire file at once.
@@ -467,11 +467,11 @@ class path(_base):
 				t = f.read()
 			finally:
 				f.close()
-			return (t.replace(u'\r\n', u'\n')
-					 .replace(u'\r\x85', u'\n')
-					 .replace(u'\r', u'\n')
-					 .replace(u'\x85', u'\n')
-					 .replace(u'\u2028', u'\n'))
+			return (t.replace('\r\n', '\n')
+					 .replace('\r\x85', '\n')
+					 .replace('\r', '\n')
+					 .replace('\x85', '\n')
+					 .replace('\u2028', '\n'))
 
 	def write_text(self, text, encoding=None, errors='strict', linesep=os.linesep, append=False):
 		""" Write the given text to this file.
@@ -518,7 +518,7 @@ class path(_base):
 
 		This applies to Unicode text the same as to 8-bit text, except
 		there are three additional standard Unicode end-of-line sequences:
-		u'\x85', u'\r\x85', and u'\u2028'.
+		u'\x85', u'\r\x85', and u'\\u2028'.
 
 		(This is slightly different from when you open a file for
 		writing with fopen(filename, "w") in C or file(filename, 'w')
@@ -537,16 +537,16 @@ class path(_base):
 		conversion.
 
 		"""
-		if isinstance(text, unicode):
+		if isinstance(text, str):
 			if linesep is not None:
 				# Convert all standard end-of-line sequences to
 				# ordinary newline characters.
-				text = (text.replace(u'\r\n', u'\n')
-							.replace(u'\r\x85', u'\n')
-							.replace(u'\r', u'\n')
-							.replace(u'\x85', u'\n')
-							.replace(u'\u2028', u'\n'))
-				text = text.replace(u'\n', linesep)
+				text = (text.replace('\r\n', '\n')
+							.replace('\r\x85', '\n')
+							.replace('\r', '\n')
+							.replace('\x85', '\n')
+							.replace('\u2028', '\n'))
+				text = text.replace('\n', linesep)
 			if encoding is None:
 				encoding = sys.getdefaultencoding()
 			bytes = text.encode(encoding, errors)
@@ -608,7 +608,7 @@ class path(_base):
 		linesep - The desired line-ending.  This line-ending is
 			applied to every line.  If a line already has any
 			standard line ending ('\r', '\n', '\r\n', u'\x85',
-			u'\r\x85', u'\u2028'), that will be stripped off and
+			u'\r\x85', u'\\u2028'), that will be stripped off and
 			this will be used instead.  The default is os.linesep,
 			which is platform-dependent ('\r\n' on Windows, '\n' on
 			Unix, etc.)  Specify None to write the lines as-is,
@@ -629,15 +629,15 @@ class path(_base):
 		f = self.open(mode)
 		try:
 			for line in lines:
-				isUnicode = isinstance(line, unicode)
+				isUnicode = isinstance(line, str)
 				if linesep is not None:
 					# Strip off any existing line-end and add the
 					# specified linesep string.
 					if isUnicode:
-						if line[-2:] in (u'\r\n', u'\x0d\x85'):
+						if line[-2:] in ('\r\n', '\x0d\x85'):
 							line = line[:-2]
-						elif line[-1:] in (u'\r', u'\n',
-										   u'\x85', u'\u2028'):
+						elif line[-1:] in ('\r', '\n',
+										   '\x85', '\u2028'):
 							line = line[:-1]
 					else:
 						if line[-2:] == '\r\n':
@@ -754,10 +754,10 @@ class path(_base):
 		os.renames(self, new)
 	# --- Create/delete operations on directories
 
-	def mkdir(self, mode=0750):
+	def mkdir(self, mode=0o750):
 		os.mkdir(self, mode)
 
-	def makedirs(self, mode=0750):
+	def makedirs(self, mode=0o750):
 		os.makedirs(self, mode)
 
 	def rmdir(self):
@@ -769,7 +769,7 @@ class path(_base):
 
 	# --- Modifying operations on files
 
-	def touch(self, mode = 0640):
+	def touch(self, mode = 0o640):
 		""" Set the access/modified times of this file to the current time.
 		Create the file if it does not exist.
 		"""
@@ -823,15 +823,15 @@ class path(_base):
 		if not self.isfile():
 			raise Exception("Not a file: '%s'" % (self, ))
 
-	def forcedir(self, mode = 0750):
+	def forcedir(self, mode = 0o750):
 		if not self.isdir():
 			if self.exists():
 				raise Exception("Not a directory: '%s'" % (self, ))
 			self.makedirs(mode)
 			
-	def forcefile(self, mode = 0640):
+	def forcefile(self, mode = 0o640):
 		if not self.exists():
-			return self.touch(mode = 0640)
+			return self.touch(mode = 0o640)
 		if not self.isfile():
 			raise Exception("Not a file: %s" % (self ,))
 

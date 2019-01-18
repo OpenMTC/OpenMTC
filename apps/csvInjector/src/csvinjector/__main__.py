@@ -42,28 +42,20 @@ parser.add_argument(
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
 # variables
-nm = get_value("name", (unicode, str), default_name, args, config)
+nm = get_value("name", str, default_name, args, config)
 cb = config.get("cse_base", "onem2m")
-ep = get_value("ep", (unicode, str), default_ep, args, config)
+ep = get_value("ep", str, default_ep, args, config)
 poas = config.get("poas", ["http://auto:28300"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
-csv_path = get_value("csv_path", (unicode, str), default_csv_path, args,
-                     config)
-csv_delim = get_value("csv_delim", (unicode, str), default_csv_delim, args,
-                      config)
-csv_quotechar = get_value("csv_quotechar", (unicode, str),
-                          default_csv_quotechar, args, config)
-device_classifier = get_value("device_classifier", (unicode, str),
-                          default_device_classifier, args, config)
-date_classifier = get_value("date_classifier", (unicode, str, list),
-                          default_date_classifier, args, config)
-time_format = get_value("time_format", (unicode, str, list),
-                          default_time_format, args, config)
-duration = get_value("duration", (int, float),
-                          default_duration, args, config)
-repeat = get_value("repeat", (unicode, str),
-                          default_repeat, args, config)
+csv_path = get_value("csv_path", str, default_csv_path, args, config)
+csv_delim = get_value("csv_delim", str, default_csv_delim, args, config)
+csv_quotechar = get_value("csv_quotechar", str, default_csv_quotechar, args, config)
+device_classifier = get_value("device_classifier", str, default_device_classifier, args, config)
+date_classifier = get_value("date_classifier", (str, list), default_date_classifier, args, config)
+time_format = get_value("time_format", (str, list), default_time_format, args, config)
+duration = get_value("duration", (int, float), default_duration, args, config)
+repeat = get_value("repeat", str, default_repeat, args, config)
 
 # start
 app = csvInjector(

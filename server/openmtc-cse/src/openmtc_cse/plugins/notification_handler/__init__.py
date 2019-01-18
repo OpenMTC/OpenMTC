@@ -77,13 +77,13 @@ class NotificationHandler(Plugin):
 
     def _get_sub_list(self, pid, net):
         return [
-            v['sub'] for v in self.subscriptions_info.itervalues()
+            v['sub'] for v in self.subscriptions_info.values()
             if v['pid'] == pid and net in v['enc'].notificationEventType
         ]
 
     def _delete_subs_from_parent(self, pid):
         self.subscriptions_info = {
-            k: v for k, v in self.subscriptions_info.iteritems() if v["pid"] != pid
+            k: v for k, v in self.subscriptions_info.items() if v["pid"] != pid
         }
 
     def _handle_subscription_created(self, subscription, _):
@@ -143,24 +143,16 @@ class NotificationHandler(Plugin):
     def _handle_subscribable_resource_updated(self, resource, _):
         self.logger.debug("_handle_subscribable_resource_updated for %s", resource)
 
-        map(
-            lambda sub: self._handle_subscription(resource, sub),
-            self._get_sub_list(
-                resource.resourceID,
-                NotificationEventTypeE.updateOfResource,
-            )
-        )
+        for sub in self._get_sub_list(
+                resource.resourceID, NotificationEventTypeE.updateOfResource,):
+            self._handle_subscription(resource, sub)
 
     def _handle_subscribable_resource_created(self, resource, _):
         self.logger.debug("_handle_subscribable_resource_created for %s", resource)
 
-        map(
-            lambda sub: self._handle_subscription(resource, sub),
-            self._get_sub_list(
-                resource.parentID,
-                NotificationEventTypeE.createOfDirectChildResource,
-            )
-        )
+        for sub in self._get_sub_list(
+                resource.parentID, NotificationEventTypeE.createOfDirectChildResource,):
+            self._handle_subscription(resource, sub)
 
     def _handle_subscribable_resource_deleted(self, resource, _):
         self.logger.debug("_handle_subscribable_resource_deleted for %s", resource)

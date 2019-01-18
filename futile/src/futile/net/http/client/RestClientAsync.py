@@ -285,7 +285,7 @@ class RestClient(LoggerMixin):
 			req.end()
 
 		except Exception as e:
-			print "Exception triggered: %s"%e
+			print("Exception triggered: %s"%e)
 			promise.reject(e)
 
 		return promise

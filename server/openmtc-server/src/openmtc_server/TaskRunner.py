@@ -2,9 +2,7 @@ from abc import ABCMeta, abstractmethod
 from futile.logging import LoggerMixin
 
 
-class TaskRunner(LoggerMixin):
-    __metaclass__ = ABCMeta
-
+class TaskRunner(LoggerMixin, metaclass=ABCMeta):
     @abstractmethod
     def run_task(self, task, *args, **kw):
         raise NotImplementedError()

@@ -59,7 +59,7 @@ class CUL868Coordinator(LoggerMixin):
         run_forever(period, self._generate_simulated_data)
 
     def _generate_simulated_data(self):
-        p = choice(self.sim_parsers.keys())
+        p = choice(list(self.sim_parsers.keys()))
         fake_parser = self.sim_parsers[p]
         dev_id, data = fake_parser(p)
         handler = self.handlers[p]

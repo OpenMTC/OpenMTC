@@ -103,7 +103,7 @@ if __name__ == '__main__':
 ## end of http://code.activestate.com/recipes/576694/ }}}
 
 ## kca: 
-    print OrderedSet('simsalabim')[1]
+    print(OrderedSet('simsalabim')[1])
     
     # Test case for exception at shutdown (yes, really...)
     x = OrderedSet('simsalabim')

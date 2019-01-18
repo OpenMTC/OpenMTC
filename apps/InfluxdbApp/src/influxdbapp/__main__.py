@@ -30,21 +30,21 @@ parser.add_argument("--db-pw", help="InfluxDB User password")
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
 # variables
-nm = get_value("name", (unicode, str), default_name, args, config)
+nm = get_value("name", str, default_name, args, config)
 cb = config.get("cse_base", "onem2m")
-ep = get_value("ep", (unicode, str), default_ep, args, config)
+ep = get_value("ep", str, default_ep, args, config)
 poas = config.get("poas", ["http://auto:23706"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
 lbl = get_value("labels", list, default_labels, args, config)
 
-influx_host = get_value("influx_host", (unicode, str), "localhost", args, config)
-influx_port = get_value("influx_port", (unicode, str), "8086", args, config)
-influx_user = get_value("influx_user", (unicode, str), "root", args, config)
-influx_password = get_value("influx_password", (unicode, str), "root", args, config)
-db_name = get_value("db_name", (unicode, str), "example", args, config)
-db_user = get_value("db_user", (unicode, str), "test", args, config)
-db_pw = get_value("db_pw", (unicode, str), "test", args, config)
+influx_host = get_value("influx_host", str, "localhost", args, config)
+influx_port = get_value("influx_port", str, "8086", args, config)
+influx_user = get_value("influx_user", str, "root", args, config)
+influx_password = get_value("influx_password", str, "root", args, config)
+db_name = get_value("db_name", str, "example", args, config)
+db_user = get_value("db_user", str, "test", args, config)
+db_pw = get_value("db_pw", str, "test", args, config)
 
 # start
 app = InfluxdbApp(
