@@ -49,7 +49,7 @@ class OneM2MSerializer(LoggerMixin):
             except (TypeError, AttributeError, KeyError, ValueError):
                 raise CSEValueError("Invalid entry in child resources: %s",
                                     child_resource)
-        if resource_type is Notification and "notificationEvent" in data:
+        if resource_type is Notification and data.get("notificationEvent"):
             representation = data["notificationEvent"]["representation"]
             representation = self.decode(self.dumps(representation))
             data["notificationEvent"]["representation"] = representation
@@ -62,7 +62,10 @@ class OneM2MSerializer(LoggerMixin):
 class OneM2MDictSerializer(OneM2MSerializer):
     def encode_resource(self, resource, pretty=False, path=None, encoding="utf-8", fields=None,
                         encapsulated=False):
-        representation = resource.values
+        if fields and isinstance(resource, OneM2MResource):
+            representation = {k: v for k, v in resource.values.items() if fields and k in fields}
+        else:
+            representation = resource.values
 
         self.logger.debug("Encoding representation: %s", representation)
 
@@ -93,7 +96,7 @@ class OneM2MDictSerializer(OneM2MSerializer):
                 return resource_id
             return val_path + resource_id
 
-        if isinstance(resource, OneM2MResource):
+        if isinstance(resource, OneM2MResource) and "childResource" in representation:
 
             def get_child_rep(c):
                 return {
@@ -112,52 +115,11 @@ class OneM2MDictSerializer(OneM2MSerializer):
             if isinstance(resource.oldest, ContentInstance):
                 representation['oldest'] = resource.oldest.resourceID
 
-        # cleans representation
-        def clean_representation(o):
-            try:
-                # removes empty attributes
-                empty_keys = []
-                for k, v in o.items():
-                    if v is None:
-                        empty_keys.append(k)
-                    elif isinstance(v, OneM2MEntity):
-                        o[k] = self.encode_resource(v, pretty, path, encoding, fields)
-                    elif isinstance(v, list):
-
-                        def encode_list_item(item):
-                            if isinstance(item, OneM2MEntity):
-                                return self.encode_resource(item, pretty, path, encoding, fields)
-                            return item
-                        if len(v):
-                            o[k] = map(encode_list_item, v)
-                        else:
-                            empty_keys.append(k)
-                    else:
-                        try:
-                            if len(v) == 0:
-                                empty_keys.append(k)
-                        except TypeError:
-                            pass
-
-                for k in empty_keys:
-                    del o[k]
-
-                for k, v in o.items():
-                    if not isinstance(v, (unicode, str, bool, datetime,
-                                          OneM2MIntEnum)):
-                        clean_representation(v)
-            except AttributeError:
-                if isinstance(o, list):
-                    for p in o:
-                        clean_representation(p)
-
         if not isinstance(resource, OneM2MContentResource):
             representation = {
                 get_short_resource_name(k) or get_short_attribute_name(k) or
                 get_short_member_name(k): v for
                 k, v in representation.items()}
-
-            clean_representation(representation)
 
         if not isinstance(resource, (OneM2MResource, Notification,
                                      SecurityInfo, OneM2MContentResource)):

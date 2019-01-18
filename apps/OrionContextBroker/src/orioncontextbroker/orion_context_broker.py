@@ -37,10 +37,13 @@ class OrionContextBroker(ResourceManagementXAE):
             accumulate_address = "http://" + self._get_auto_host(orion_host) + ":8080"
 
         # Orion API
+        self._dry_run = not orion_host
         self.orion_api = OrionAPI(
             orion_host=orion_host,
             api_version=orion_api,
             accumulate_endpoint="{}/accumulate".format(accumulate_address))
+        if not self._dry_run:
+            self._dry_run = not self.orion_api.is_host_alive()
 
         # Subscription Sink for OCB
         self.app = Flask(__name__)
@@ -116,6 +119,9 @@ class OrionContextBroker(ResourceManagementXAE):
         return re.sub('[\W]', '_', f_s), '%s-%s' % (e_pre, dev_id)
 
     def _sensor_data_cb(self, sensor_info, sensor_data):
+        if self._dry_run:
+            return
+
         try:
             fiware_service, entity_name = self._entity_names[sensor_info['ID']]
         except KeyError:
@@ -138,6 +144,10 @@ class OrionContextBroker(ResourceManagementXAE):
                 'ID']]
         self.logger.info("Create new Entity {} on Fiware Service {}".format(
             entity_name, fiware_service))
+
+        if self._dry_run:
+            return
+
         self.orion_api.create_entity(
             entity_name, fiware_service=fiware_service)
         data_dummy = {

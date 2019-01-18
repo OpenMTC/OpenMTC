@@ -13,6 +13,12 @@ from openmtc_server.exc import ConfigurationError
 from openmtc_server.util import log_error
 
 
+container_virtual_mapping = {
+    'la': 'latest',
+    'ol': 'oldest'
+}
+
+
 class OneM2MMethodDomain(Component):
     def __init__(self, config, *args, **kw):
         super(OneM2MMethodDomain, self).__init__(*args, **kw)
@@ -209,11 +215,11 @@ class OneM2MMethodDomain(Component):
         # oldest, latest -> Container
         # TODO(rst): fanOutPoint -> group
         # TODO(rst): pollingChannelURI -> pollingChannel
-        if path.endswith(('latest', 'oldest')):
+        if path.endswith(tuple(container_virtual_mapping.keys())):
             parent_path, virtual = path.rsplit('/', 1)
             parent = get_resource(parent_path)
             if isinstance(parent, model.Container):
-                resource = getattr(parent, virtual)
+                resource = getattr(parent, container_virtual_mapping[virtual])
                 if resource is None:
                     raise CSENotFound()
                 return resource

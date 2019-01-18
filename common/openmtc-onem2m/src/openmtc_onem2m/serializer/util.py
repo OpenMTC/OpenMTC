@@ -27,9 +27,6 @@ def encode_onem2m_content(content, content_type, pretty=False, path=None,
     if content is None:
         return None, None
 
-    fields = fields  # TODO(rst): maybe necessary
-    # fields = ["resourceID"]
-
     serializer = get_onem2m_encoder(content_type)
 
     data = serializer.encode_resource(content, pretty=pretty, path=path,

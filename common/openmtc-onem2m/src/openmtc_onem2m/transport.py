@@ -201,10 +201,11 @@ class OneM2MRequest(object):
 
     """Class representing a OneM2M request"""
 
-    def __init__(self, op, to, fr=None, rqi=None, ty=None, pc=None, rol=None,
+    def __init__(self, op, to, fr=None, rqi=None, ty=None, pc=None, rids=None,
                  ot=None, rqet=None, rset=None, oet=None, rt=None, rp=None,
                  rcn=None, ec=None, da=None, gid=None, filter_criteria=None,
-                 fc=None, drt=None):
+                 fc=None, drt=None, tids=None, ltids=None, tqi=None, rvi=None,
+                 vsi=None):
         # Operation
         self.operation = op
         # Target uri
@@ -216,7 +217,7 @@ class OneM2MRequest(object):
         self.resource_type = ty
         # Resource content to be transferred.
         self.content = pc
-        self.role = rol
+        self.role_ids = rids
         self.originating_timestamp = ot
         self.request_expiration_timestamp = rqet
         self.result_expiration_timestamp = rset
@@ -230,6 +231,11 @@ class OneM2MRequest(object):
         self.filter_criteria = filter_criteria or fc
         # Optional Discovery result type
         self.discovery_result_type = drt
+        self.token_ids = tids
+        self.local_token_ids = ltids
+        self.token_request_identifier = tqi
+        self.release_version_indicator = rvi
+        self.vendor_information = vsi
 
     @property
     def op(self):
@@ -272,12 +278,12 @@ class OneM2MRequest(object):
         self.content = pc
 
     @property
-    def rol(self):
-        return self.role
+    def rids(self):
+        return self.role_ids
 
-    @rol.setter
-    def rol(self, rol):
-        self.role = rol
+    @rids.setter
+    def rids(self, rids):
+        self.role_ids = rids
 
     @property
     def ot(self):
@@ -375,6 +381,46 @@ class OneM2MRequest(object):
     def drt(self, drt):
         self.discovery_result_type = drt
 
+    @property
+    def tids(self):
+        return self.token_ids
+
+    @tids.setter
+    def tids(self, tids):
+        self.token_ids = tids
+
+    @property
+    def ltids(self):
+        return self.local_token_ids
+
+    @ltids.setter
+    def ltids(self, rvi):
+        self.local_token_ids = ltids
+
+    @property
+    def tqi(self):
+        return self.token_request_identifier
+
+    @tqi.setter
+    def tqi(self, tqi):
+        self.token_request_identifier = tqi
+
+    @property
+    def rvi(self):
+        return self.release_version_indicator
+
+    @rvi.setter
+    def rvi(self, rvi):
+        self.release_version_indicator = rvi
+
+    @property
+    def vsi(self):
+        return self.vendor_information
+
+    @vsi.setter
+    def vsi(self, vsi):
+        self.vendor_information = vsi
+
     def __str__(self):
         return '%s: %s' % (self.__class__.__name__, ' | '.join([
             '%s: %s' % (str(k), str(v)) for k, v in self.__dict__.iteritems()
@@ -385,7 +431,8 @@ class OneM2MResponse(object):
     """Class representing a OneM2M response"""
 
     def __init__(self, status_code, request=None, rqi=None, pc=None, to=None,
-                 fr=None, rsc=None):
+                 fr=None, rsc=None, ot=None, rset=None, ec=None, cts=None,
+                 cto=None, rvi=None, vsi=None, fields=None):
         # Operation result
         if isinstance(status_code, STATUS):
             self.response_status_code = status_code
@@ -397,14 +444,27 @@ class OneM2MResponse(object):
             self.to = request.to
             # Originator ID
             self.originator = request.fr
+            self.originating_timestamp = request.ot
+            self.result_expiration_timestamp = request.rset
+            self.event_category = request.ec
+            self.release_version_indicator = request.rvi
+            self.vendor_information = request.vsi
         else:
             self.request_identifier = rqi
             # Target uri
             self.to = to
             # Originator ID
             self.originator = fr
+            self.originating_timestamp = ot
+            self.release_version_indicator = rvi
+            self.vendor_information = vsi
+        self.result_expiration_timestamp = rset
+        self.event_category = ec
         # Resource content to be transferred.
         self.content = pc
+        self.content_status = cts
+        self.content_offset = cto
+        self.fields = fields
 
     @property
     def status_code(self):
@@ -437,6 +497,62 @@ class OneM2MResponse(object):
     @fr.setter
     def fr(self, fr):
         self.originator = fr
+
+    @property
+    def ot(self):
+        return self.originating_timestamp
+
+    @ot.setter
+    def ot(self, ot):
+        self.originating_timestamp = ot
+
+    @property
+    def rset(self):
+        return self.result_expiration_timestamp
+
+    @rset.setter
+    def rset(self, rset):
+        self.result_expiration_timestamp = rset
+
+    @property
+    def ec(self):
+        return self.event_category
+
+    @ec.setter
+    def ec(self, ec):
+        self.event_category = ec
+
+    @property
+    def cts(self):
+        return self.content_status
+
+    @cts.setter
+    def cts(self, cts):
+        self.content_status = cts
+
+    @property
+    def cto(self):
+        return self.content_offset
+
+    @cto.setter
+    def cto(self, cto):
+        self.content_offset = cto
+
+    @property
+    def rvi(self):
+        return self.release_version_indicator
+
+    @rvi.setter
+    def rvi(self, rvi):
+        self.release_version_indicator = rvi
+
+    @property
+    def vsi(self):
+        return self.vendor_information
+
+    @vsi.setter
+    def vsi(self, vsi):
+        self.vendor_information = vsi
 
     def __str__(self):
         return '%s: %s' % (self.__class__.__name__, ' | '.join([

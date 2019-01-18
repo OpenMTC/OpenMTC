@@ -22,14 +22,16 @@ from openmtc_onem2m.exc import (CSEOperationNotAllowed, STATUS_OK, CSETypeError,
                                 CSEMissingValue, CSEValueError, STATUS_CREATED,
                                 CSEError, CSESyntaxError, CSEBadRequest,
                                 CSEPermissionDenied, STATUS_NOT_FOUND, CSEConflict,
-                                CSEContentsUnacceptable, CSETargetNotReachable)
+                                CSEContentsUnacceptable, CSETargetNotReachable,
+                                STATUS_UPDATED, STATUS_DELETED)
 from openmtc_onem2m.model import (ExpiringResource, Notification,
                                   AccessControlOperationE, ResourceTypeE,
                                   NotificationContentTypeE, FilterUsageE,
                                   get_short_resource_name, URIList,
                                   DiscResTypeE, Container, AccessControlPolicy,
                                   AccessControlPolicyIDHolder, AccessControlRuleC,
-                                  DynAuthDasRequestC, SecurityInfo, SecurityInfoTypeE, AE)
+                                  DynAuthDasRequestC, SecurityInfo, SecurityInfoTypeE,
+                                  AE, ResultContentE, ContentInstance)
 from openmtc_onem2m.transport import (OneM2MResponse, OneM2MRequest,
                                       OneM2MOperation, OneM2MErrorResponse)
 from openmtc_onem2m.util import split_onem2m_address
@@ -51,8 +53,21 @@ class OneM2MDefaultController(LoggerMixin):
     def __init__(self, db_session, resource_type, handle_onem2m_request):
         super(OneM2MDefaultController, self).__init__()
         self.resource_type = resource_type
-        self.db_session = db_session
         self.handle_onem2m_request = handle_onem2m_request
+
+        # DB wrapper
+
+        def _update(resource, fields=None):
+            if isinstance(resource, (Container, ContentInstance)):
+                resource.stateTag += 1
+            return db_session.update(resource, fields)
+        self._create = db_session.store
+        self._get = db_session.get
+        self._update = _update
+        self._delete = db_session.delete
+        self._get_collection = db_session.get_collection
+        self._get_latest_content_instance = db_session.get_latest_content_instance
+        self._get_oldest_content_instance = db_session.get_oldest_content_instance
 
     def __call__(self, request, target_resource):
         self.logger.debug("%s servicing request", type(self).__name__)
@@ -90,6 +105,10 @@ class OneM2MDefaultController(LoggerMixin):
         dynamic_authorization = self.onem2m_config.get("dynamic_authorization", {})
         self._dynamic_authorization_supported = dynamic_authorization.get('enabled', False)
         self._dynamic_authorization_poa = dynamic_authorization.get('poa', [])
+
+        # release version indicator
+        if not self.request.rvi:
+            self.request.rvi = '2a'
 
         return self._handle_request()
 
@@ -200,7 +219,7 @@ class OneM2MDefaultController(LoggerMixin):
         self._check_privileges(parent)
 
     def _get_parent_of_resource(self, resource):
-        return self.db_session.get(resource.parentID)
+        return self._get(resource.parentID)
 
     def _check_privileges(self, resource):
         # get all ACPs
@@ -374,7 +393,7 @@ class OneM2MDefaultController(LoggerMixin):
         try:
             for dac_id in resource.dynamicAuthorizationConsultationIDs:
                 try:
-                    dac = self.db_session.get(dac_id)
+                    dac = self._get(dac_id)
                     if dac.dynamicAuthorizationEnabled:
                         return dac
                 except DBNotFound:
@@ -384,7 +403,7 @@ class OneM2MDefaultController(LoggerMixin):
         except AttributeError:
             return None
         else:
-            return self._get_dynamic_authorization_consultation(self.db_session.get(pid))
+            return self._get_dynamic_authorization_consultation(self._get(pid))
 
     def _create_dynamic_policy(self, resource, acp_info):
         acp = AccessControlPolicy(
@@ -407,7 +426,7 @@ class OneM2MDefaultController(LoggerMixin):
         resp = self.api.handle_onem2m_request(req).get()
         dyn_acp_id = resp.content.resourceID
         resource.accessControlPolicyIDs.append(dyn_acp_id)
-        self.db_session.update(resource, ['accessControlPolicyIDs'])
+        self._update(resource, ['accessControlPolicyIDs'])
 
     def _perform_evaluation(self, policies, privilege_type):
 
@@ -725,7 +744,7 @@ class OneM2MDefaultController(LoggerMixin):
 
         self.resource = resource
 
-        return self.db_session.store(resource)
+        return self._create(resource)
 
     def _set_resource_id(self, values):
         short_name = get_short_resource_name(self.resource_type.typename)
@@ -789,6 +808,12 @@ class OneM2MDefaultController(LoggerMixin):
         self.fields = self.request.content and self.request.content.values
 
     def _handle_retrieve(self):
+        try:
+            self.request.rcn = ResultContentE(int(self.request.rcn))
+        except ValueError:
+            raise CSEBadRequest()
+        except TypeError:
+            self.request.rcn = ResultContentE.attributes
         try:
             fu = self.request.filter_criteria.filterUsage
         except AttributeError:
@@ -857,7 +882,7 @@ class OneM2MDefaultController(LoggerMixin):
                 self.logger.debug("is resource '%s' virtual? -> %s", s.name,
                                   s.virtual)
                 if not s.virtual:
-                    sub_node = self.db_session.get(s.path)
+                    sub_node = self._get(s.path)
                     self._do_discovery(sub_node)
 
     def _prepare_resource(self):
@@ -872,17 +897,22 @@ class OneM2MDefaultController(LoggerMixin):
         if self.fields and isinstance(self.fields, list):
             res.set_values({k: v if k in self.fields else None for
                             k, v in res.get_values().items()})
-        return self._retrieve_children()
+
+        if self.request.rcn == ResultContentE.attributes_and_child_resource_references:
+            self._retrieve_children()
 
     def _send_retrieve_response(self):
-        return OneM2MResponse(STATUS_OK, pc=self.result, request=self.request)
+        fields = self.resource.values.keys()
+        if self.request.rcn != ResultContentE.attributes_and_child_resource_references:
+            fields = [k for k in fields if k != 'childResource']
+        return OneM2MResponse(STATUS_OK, pc=self.result, request=self.request, fields=fields)
 
     def _retrieve_children(self):
         return self._retrieve_children_for_resource(self.resource)
 
     def _retrieve_children_for_resource(self, resource):
         self.logger.debug("getting children of: %s", resource)
-        children = self.db_session.get_collection(None, resource)
+        children = self._get_collection(None, resource)
         resource.childResource = children
 
     # UPDATE
@@ -988,8 +1018,8 @@ class OneM2MDefaultController(LoggerMixin):
 
         # self.resource = resource
 
-        return self.db_session.update(self.resource)
-        # return self.db_session.update(resource, values.keys())
+        return self._update(self.resource)
+        # return self._update(resource, values.keys())
 
     def _set_mandatory_update_attributes(self, values):
         values["lastModifiedTime"] = self.now
@@ -1000,7 +1030,7 @@ class OneM2MDefaultController(LoggerMixin):
                                      self.request)
 
     def _send_update_response(self):
-        return OneM2MResponse(STATUS_OK, pc=self.resource,
+        return OneM2MResponse(STATUS_UPDATED, pc=self.resource,
                               request=self.request)
 
     # DELETE
@@ -1014,14 +1044,14 @@ class OneM2MDefaultController(LoggerMixin):
         return self._send_delete_response()
 
     def _get_parent(self):
-        self.parent = self.db_session.get(self.resource.parent_path)
+        self.parent = self._get(self.resource.parent_path)
 
     def _delete_resource(self):
         self._delete_children()
         self._do_delete_resource()
 
     def _do_delete_resource(self):
-        return self.db_session.delete(self.resource)
+        return self._delete(self.resource)
 
     def _delete_children(self):
         self._retrieve_children()
@@ -1045,7 +1075,7 @@ class OneM2MDefaultController(LoggerMixin):
         self.events.resource_deleted.fire(self.resource, self.request)
 
     def _send_delete_response(self):
-        return OneM2MResponse(STATUS_OK, request=self.request)
+        return OneM2MResponse(STATUS_DELETED, request=self.request)
 
 
 # see TS-0004 7.4.4
@@ -1115,7 +1145,7 @@ class AEController(OneM2MDefaultController):
             ae_id = get_generic_ae_id()
 
         try:
-            self.db_session.get(ae_id)
+            self._get(ae_id)
         except DBNotFound:
             pass
         else:
@@ -1283,23 +1313,28 @@ class ContentInstanceController(OneM2MDefaultController):
     def _create_resource(self):
         super(ContentInstanceController, self)._create_resource()
 
-        # handle_old_instances
-        max_nr_of_instances = self.parent.maxNrOfInstances
-        current_nr_of_instances = self.parent.currentNrOfInstances
-        if 0 < max_nr_of_instances <= current_nr_of_instances:
+        def remove_oldest_child():
             self.parent.currentNrOfInstances -= 1
             self.parent.currentByteSize -= self.parent.oldest.contentSize
 
-            self.db_session.delete(self.parent.oldest)
+            self._delete(self.parent.oldest)
 
             if self.parent.currentNrOfInstances >= 1:
-                oldest = self.db_session.get_oldest_content_instance(
+                oldest = self._get_oldest_content_instance(
                     self.parent)
                 self.logger.debug("Setting new oldest: %s", oldest)
                 self.parent.oldest = oldest
             else:
                 self.logger.debug("Setting oldest to None")
                 self.parent.oldest = None
+
+        # handle_old_instances
+        if 0 < self.parent.maxNrOfInstances <= self.parent.currentNrOfInstances:
+            remove_oldest_child()
+
+        while (0 < self.parent.maxByteSize <
+               self.parent.currentByteSize + self.resource.contentSize):
+            remove_oldest_child()
 
         # handle_new_instance
         self.parent.currentNrOfInstances += 1
@@ -1309,7 +1344,13 @@ class ContentInstanceController(OneM2MDefaultController):
                               self.resource)
             self.parent.oldest = self.resource
         self.parent.latest = self.resource
-        self.db_session.update(self.parent)
+        self._update(self.parent)
+
+    def _check_create_representation(self):
+        super(ContentInstanceController, self)._check_create_representation()
+
+        if self.request.content.resourceName in ('la', 'ol'):
+            raise CSEConflict()
 
     def _set_mandatory_create_attributes(self, vals):
         self.request.name = None
@@ -1323,21 +1364,23 @@ class ContentInstanceController(OneM2MDefaultController):
     def _delete_resource(self):
         super(ContentInstanceController, self)._delete_resource()
 
-        cnt = self.db_session.get(self.resource.parentID)
+        cnt = self._get(self.resource.parentID)
         # TODO(rst): handle byte size
         try:
-            ci_l = self.db_session.get_latest_content_instance(cnt)
-            ci_o = self.db_session.get_oldest_content_instance(cnt)
+            ci_l = self._get_latest_content_instance(cnt)
+            ci_o = self._get_oldest_content_instance(cnt)
         except (DBError, KeyError):
             cnt.latest = None
             cnt.oldest = None
             cnt.currentNrOfInstances = 0
+            cnt.currentByteSize = 0
         else:
             cnt.latest = ci_l
             cnt.oldest = ci_o
             cnt.currentNrOfInstances -= 1
+            cnt.currentByteSize -= self.resource.contentSize
 
-        return self.db_session.update(cnt)
+        return self._update(cnt)
 
 
 class AccessControlPolicyController(OneM2MDefaultController):

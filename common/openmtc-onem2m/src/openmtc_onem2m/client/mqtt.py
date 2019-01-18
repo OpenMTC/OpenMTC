@@ -83,11 +83,12 @@ class OneM2MMQTTClient(OneM2MClient):
 
     __request_fields = frozenset([
         'op',
+        'to',
         'fr',
         'rqi',
         'ty',
         'pc',
-        'rol',
+        'rids',
         'ot',
         'rqet',
         'rset',
@@ -98,17 +99,28 @@ class OneM2MMQTTClient(OneM2MClient):
         'ec',
         'da',
         'gid',
-        'drt',
-        'to',
         'fc',
+        'drt',
+        'tids',
+        'ltids',
+        'tqi',
+        'rvi',
+        'vsi',
     ])
 
     __response_fields = frozenset([
         'rsc',
         'rqi',
         'pc',
-        'fr',
         'to',
+        'fr',
+        'ot',
+        'rset',
+        'ec',
+        'cts',
+        'cto',
+        'rvi',
+        'vsi',
     ])
 
     @staticmethod
@@ -370,7 +382,8 @@ class OneM2MMQTTClient(OneM2MClient):
                 sp_id, cse_id, _ = split_onem2m_address(response.to)
                 response.content = self._decode(
                     encode_onem2m_content(response.content, 'application/json',
-                                          path=sp_id + cse_id)[1]
+                                          path=sp_id + cse_id,
+                                          fields=response.fields)[1]
                 )
 
             self._publish_message(

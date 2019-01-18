@@ -1,0 +1,423 @@
+---
+- config:
+  - testset: "Openmtc pyresttests"
+
+###############################################################################
+# ResourceType: CSEBASE
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.1"
+  - name: "CSEBase Retrieve on Mca"
+  - url: "/onem2m"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', 'x-m2m-rvi': '2a'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected:  'foobar'}
+    - compare: {header: x-m2m-rvi, comparator: 'eq', expected: '2a'}
+    - compare: {jsonpath_mini: 'm2m:cb.ty', comparator: 'eq', expected: 5}
+
+###############################################################################
+# ResourceType: RemoteCSE
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.2"
+  - name: "RemoteCSE Create"
+  - url: "/onem2m/"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:csr": {"csi":"/mn-cse-1", "cb":"onem2m", "rr":true, "cst":2, "rn":"mn-cse-1"}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:csr.ty', comparator: 'eq', expected: 16}
+
+- test:
+  - group: "Openmtc Test 8.1.2"
+  - name: "remoteCSE Retrieve"
+  - url: "/onem2m/mn-cse-1"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:csr.ty', comparator: 'eq', expected: 16}
+
+- test:
+  - group: "Openmtc Test 8.1.2"
+  - name: "RemoteCSE Update"
+  - url: "/onem2m/mn-cse-1"
+  - method: "PUT" #Update
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:csr": {"rr":false}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2004'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:csr.ty', comparator: 'eq', expected: 16}
+
+- test:
+  - group: "Openmtc Test 8.1.2"
+  - name: "remoteCSE Delete"
+  - url: "/onem2m/mn-cse-1"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+###############################################################################
+# ResourceType: AE
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.3"
+  - name: "AE Create"
+  - url: "/onem2m/"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:ae": {"api":"/myAE","rr":true,"rn":"myAE"}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:ae.ty', comparator: 'eq', expected: 2}
+
+- test:
+  - group: "Openmtc Test 8.1.3"
+  - name: "AE Retrieve"
+  - url: "/onem2m/myAE"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:ae.ty', comparator: 'eq', expected: 2}
+
+- test:
+  - group: "Openmtc Test 8.1.3"
+  - name: "AE Update"
+  - url: "/onem2m/myAE"
+  - method: "PUT" #Update
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:csr": {"rr":false}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2004'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:ae.ty', comparator: 'eq', expected: 2}
+
+- test:
+  - group: "Openmtc Test 8.1.3"
+  - name: "AE Delete"
+  - url: "/onem2m/myAE"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+###############################################################################
+# ResourceType: Container
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "AE Create"
+  - url: "/onem2m/"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:ae": {"api":"/myAE","rr":true,"rn":"myAE"}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:ae.ty', comparator: 'eq', expected: 2}
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "Container Create"
+  - url: "/onem2m/myAE"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cnt": {"rn":"myContainer"}}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cnt.ty', comparator: 'eq', expected: 3}
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "Container Retrieve"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cnt.ty', comparator: 'eq', expected: 3}
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "Container Update"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "PUT" #Update
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cnt": {"mni": 4}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2004'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cnt.ty', comparator: 'eq', expected: 3}
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "Container Delete"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "AE Delete"
+  - url: "/onem2m/myAE"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+###############################################################################
+# ResourceType: ContentInstance
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "AE Create"
+  - url: "/onem2m/"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:ae": {"api":"/myAE","rr":true,"rn":"myAE"}}' #pc
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:ae.ty', comparator: 'eq', expected: 2}
+
+- test:
+  - group: "Openmtc Test 8.1.4"
+  - name: "Container Create"
+  - url: "/onem2m/myAE"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cnt": {"rn":"myContainer"}}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cnt.ty', comparator: 'eq', expected: 3}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Create"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cin": {"con":"Type" , "rn":"Testcontent", "cnf": "text/plain:0" }}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "Container Retrieve"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {jsonpath_mini: 'm2m:cnt.cni', comparator: 'eq', expected: 1}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Retrieve"
+  - url: "/onem2m/myAE/myContainer/Testcontent"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Delete"
+  - url: "/onem2m/myAE/myContainer/Testcontent"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Create"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cin": {"con":"Type" , "rn":"Testcontent", "cnf": "text/plain:0" }}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "latest ContentInstance Delete"
+  - url: "/onem2m/myAE/myContainer/la"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Create"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cin": {"con":"Type" , "rn":"Testcontent", "cnf": "text/plain:0" }}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "oldest ContentInstance Delete"
+  - url: "/onem2m/myAE/myContainer/ol"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "ContentInstance Create"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "POST" #Create
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - body: '{"m2m:cin": {"con":"Type" , "rn":"Testcontent", "cnf": "text/plain:0" }}' #pc, , "li" = "Container1"
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2001'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "latest ContentInstance Retrieve"
+  - url: "/onem2m/myAE/myContainer/la"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "oldest ContentInstance Retrieve"
+  - url: "/onem2m/myAE/myContainer/ol"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: {jsonpath_mini: 'm2m:cin.ty', comparator: 'eq', expected: 4}
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "Container Delete"
+  - url: "/onem2m/myAE/myContainer"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+- test:
+  - group: "Openmtc Test 8.1.5"
+  - name: "AE Delete"
+  - url: "/onem2m/myAE"
+  - method: "DELETE" #Delete
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar'}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2002'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+    - compare: [raw_body: "", expected: ""]
+
+###############################################################################
+# Discovery
+###############################################################################
+- test:
+  - group: "Openmtc Test 8.1.6"
+  - name: "Discovery all resources"
+  - url: "/onem2m?fu=1"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+
+- test:
+  - group: "Openmtc Test 8.1.6"
+  - name: "Discovery with filter criteria"
+  - url: "/onem2m?fu=1&lbl=key1"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+
+- test:
+  - group: "Openmtc Test 8.1.6"
+  - name: "Discovery with limit filter criteria"
+  - url: "/onem2m?fu=1&lim=2"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+
+- test:
+  - group: "Openmtc Test 8.1.6"
+  - name: "Discovery with mulriple filter criteria"
+  - url: "/onem2m?fu=1&lbl=key1&lbl=key2&lim=1"
+  - method: "GET" #Retrieve
+  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+  - validators:
+    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+
+#- test:
+#  - group: "Openmtc Test 8.1.6"
+#  - name: "Discovery with level filter criteria"
+#  - url: "/onem2m?fu=1&lvl=2"
+#  - method: "GET" #Retrieve
+#  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+#  - validators:
+#    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+#    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}
+
+#- test:
+#  - group: "Openmtc Test 8.1.6"
+#  - name: "Discovery with offset filter criteria"
+#  - url: "/onem2m?fu=1&ofst=1"
+#  - method: "GET" #Retrieve
+#  - headers: {'x-m2m-origin':'CAE0', 'x-m2m-ri': 'foobar', Content-Type: application/vnd.onem2m-res+json, Content-Location: CAE0, f}
+#  - validators:
+#    - compare: {header: x-m2m-rsc, comparator: 'eq', expected: '2000'}
+#    - compare: {header: x-m2m-ri, comparator: 'eq', expected: 'foobar'}

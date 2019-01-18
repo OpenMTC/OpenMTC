@@ -30,12 +30,7 @@ del logger
 
 def _default(x):
     if isinstance(x, datetime):
-        try:
-            isoformat = x.isoformat
-        except AttributeError:
-            raise TypeError("%s (%s)" % (x, type(x)))
-
-        return isoformat()
+        return x.strftime("%Y%m%dT%H%M%S")
     elif isinstance(x, ContentInstance):
         return x.resourceID
     else:

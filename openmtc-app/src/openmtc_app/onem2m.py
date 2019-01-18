@@ -547,7 +547,7 @@ class XAE(LoggerMixin):
         """
         return self._get_content_from_cin(
             self.mapper.get(
-                getattr(container, 'path', container) + '/latest'
+                getattr(container, 'path', container) + '/la'
             )
         )
 
@@ -851,7 +851,7 @@ class ResourceManagementXAE(XAE):
                     self._discovered_sensors[sensor_path]['blacklisted'] = True
 
     def _handle_new_sensor(self, sensor_path):
-        latest = self.get_resource(sensor_path + '/latest')
+        latest = self.get_resource(sensor_path + '/la')
         if latest:
             spawn(self._handle_sensor_data, sensor_path, self._get_content_from_cin(latest))
 

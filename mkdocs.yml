@@ -1,0 +1,52 @@
+site_name: Open MTC
+site_url: https://github.com/OpenMTC/OpenMTC
+repo_url: https://github.com/OpenMTC/OpenMTC.git
+site_description: FIWARE Open MTC IoT Agent document site
+docs_dir: doc/
+site_dir: html
+markdown_extensions: [toc,tables, fenced_code]
+use_directory_urls: false
+theme: readthedocs
+extra_css: ["https://fiware.org/style/fiware_readthedocs.css", "https://fiware.org/style/fiware_readthedocs_iot.css"]
+pages:
+    - Home: index.md
+    - 'User & Programmers Manual':
+      -   Introduction: introduction.md
+      -   Quick Start: openmtc-get-started.md
+      -   The MQTT Client: onem2m-client-mqtt.md
+      -   Authentication Guide: authentication.md
+      -   Overview REST API: overview-rest-api.md
+      -   Write your first OpenMTC applications: training/training-index.md 
+      -   Console Outputs:
+          -   Sensor Backend: training/console-outputs/training-sensor-backend.md
+          -   Sensor Gateway: training/console-outputs/training-sensor-gateway.md
+          -   Sensor IPE: training/console-outputs/training-sensor-ipe.md
+          -   Sensor GUI: training/console-outputs/training-sensor-gui.md
+          -   Sensor Actuator Backend: training/console-outputs/training-sensor-actuator-backend.md
+          -   Sensor Actuator Gateway: training/console-outputs/training-sensor-actuator-gateway.md
+          -   Sensor Actuator IPE: training/console-outputs/training-sensor-actuator-ipe.md
+          -   Sensor Actuator GUI: training/console-outputs/training-sensor-actuator-gui.md
+      -   Training:
+          -   IPE Sensors: training/training-ipe-sensors.md 
+          -   IPE Sensors Actuators: training/training-ipe-sensors-actuators.md 
+          -   GUI Sensors: training/training-gui-sensors.md 
+          -   GUI Sensors Actuators: training/training-gui-sensors-actuators.md
+      -   SDK - Using the Application Framework: sdk-framework.md
+      -   SDK - The low-level CSE Client: sdk-client.md
+      -   SDK - The Data Model: sdk-datamodel.md
+      -   Examples: 
+          -   IoT Data Visualization: example-apps/IoT-data-visualization.py
+          -   Data Aggregation: example-apps/data-aggregation.py
+          -   Simple Decision: example-apps/simple-decision.py
+          -   Simple Decision 2: example-apps/simple-decision-2.py
+      -   Scripts:
+          -   Create App Structure Script: create-app-structure.md
+          -   Create binary docker images Script: create-binary-docker.md
+      -   Code Repository Structure: repository-structure.md
+      -   Developer FAQ: developer-faq.md
+    - 'Installation & Administration Manual': 
+       -   Deployment: deployment-guide.md
+       -   Installation of the OpenMTC SDK: install-sdk.md
+    - Appendix : various.md
+    - Resource Names & Types : reference-doc/resource-names-and-types.md
+    - Gateway & Backend Configuration : reference-doc/gateway-and-backend-configuration.md

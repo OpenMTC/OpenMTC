@@ -48,7 +48,7 @@ _method_map_to_http = {
 
 _clients = LRUCache(threadsafe=False)
 
-_query_params = frozenset(['rt', 'rp', 'rcn', 'da', 'drt'])
+_query_params = frozenset(['rt', 'rp', 'rcn', 'da', 'drt', 'rids', 'tids', 'ltids', 'tqi'])
 
 _header_to_field_map = {
     'X-M2M-ORIGIN': 'originator',
@@ -59,6 +59,8 @@ _header_to_field_map = {
     'X-M2M-RET':    'rqet',
     'X-M2M-OET':    'oet',
     'X-M2M-EC':     'ec',
+    'X-M2M-RVI':    'rvi',
+    'X-M2M-VSI':    'vsi',
 }
 
 
@@ -162,10 +164,13 @@ class OneM2MHTTPClient(OneM2MClient):
             content_type += '; ty=' + str(ResourceTypeE[onem2m_request.resource_type.typename])
 
         headers = {
-            header: getattr(onem2m_request, field) for header, field in _header_to_field_map.iteritems()
+            header: getattr(onem2m_request, field)
+            for header, field in _header_to_field_map.iteritems()
             if getattr(onem2m_request, field) is not None
         }
         headers['content-type'] = content_type
+
+        headers['accept'] = self.content_type
 
         self.logger.debug("Added request params: %s", params)
 

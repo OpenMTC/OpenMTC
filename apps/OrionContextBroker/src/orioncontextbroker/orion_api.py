@@ -43,6 +43,13 @@ class OrionAPI(LoggerMixin):
             self.logger.error('Type of "{}" unknown'.format(element))
             return u"Unknown"
 
+    def is_host_alive(self):
+        req = self._request(
+            "{}/v2/entities".format(self.host),
+            method="get"
+        )
+        return req['status'] >= 0
+
     def create_entity(self,
                       entity_name,
                       entity_type="openmtc",

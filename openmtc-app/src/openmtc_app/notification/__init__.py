@@ -205,8 +205,9 @@ class MqttNotificationHandler(BaseNotificationHandler):
         from openmtc_onem2m.exc import get_response_status
 
         def wrapper(request):
-            notification = self._unpack_notification(request.content)
-            self._callback(request.originator, **notification)
+            if not request.content.verificationRequest:
+                notification = self._unpack_notification(request.content)
+                self._callback(request.originator, **notification)
             return OneM2MResponse(status_code=get_response_status(2000), request=request)
 
         self._client = get_client(self._endpoint.geturl(), handle_request_func=wrapper)
@@ -255,9 +256,17 @@ class HttpNotificationHandler(BaseNotificationHandler):
             assert 'x-m2m-ri' in request.headers, 'Missing request id'
             assert 'content-type' in request.headers, 'Unspecified content type'
 
+            if not request.data:
+                if request.environ.get('HTTP_TRANSFER_ENCODING') == 'chunked':
+                    request.data = request.environ['wsgi.input'].read()
+                else:
+                    cl = int(request.environ.get('CONTENT_LENGTH'), 0)
+                    request.data = request.environ['wsgi.input'].read(cl)
+
             notification = get_onem2m_decoder(request.content_type).decode(request.data)
-            notification = self._unpack_notification(notification)
-            self._callback(request.headers['x-m2m-origin'], **notification)
+            if not notification.verificationRequest:
+                notification = self._unpack_notification(notification)
+                self._callback(request.headers['x-m2m-origin'], **notification)
 
             return Response(
                 headers={

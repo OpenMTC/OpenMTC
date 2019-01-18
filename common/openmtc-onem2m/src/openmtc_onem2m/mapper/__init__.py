@@ -49,7 +49,8 @@ class OneM2MMapper(BasicMapper):
             path,
             self.originator,
             ty=type(instance),
-            pc=instance
+            pc=instance,
+            rvi='2a'
         )).get()
 
         try:
@@ -83,7 +84,8 @@ class OneM2MMapper(BasicMapper):
             OneM2MOperation.update,
             instance.path,
             self.originator,
-            pc=instance
+            pc=instance,
+            rvi='2a'
         )).get()
 
         try:
@@ -105,6 +107,8 @@ class OneM2MMapper(BasicMapper):
             path,
             self.originator,
             filter_criteria=fc,
+            rvi='2a',
+            rcn=5,
             **request_options
         )).get()
 
@@ -112,7 +116,8 @@ class OneM2MMapper(BasicMapper):
         self._send_request(OneM2MRequest(
             OneM2MOperation.delete,
             getattr(instance, "path", instance),
-            self.originator
+            self.originator,
+            rvi='2a'
         ))
 
     # TODO(rst): check if this can be removed in parent class
