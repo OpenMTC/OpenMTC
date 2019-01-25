@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 import logging
 
 import requests
+from datetime import datetime
 
 from futile.logging import LoggerMixin
 
@@ -89,7 +90,7 @@ class OrionAPI(LoggerMixin):
                 "type": self._get_type(data_senml["v"]),
                 "metadata": {
                     "timestamp": {
-                        "value": data_senml["t"],
+                        "value": datetime.fromtimestamp(data_senml["t"]).replace(microsecond=0).isoformat(),
                         "type": "String"
                     },
                     "bn": {
