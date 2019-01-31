@@ -28,6 +28,7 @@ script:
   - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
   - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
   - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
   - docker push openmtc/orion-context-broker-app-amd64
   - docker push openmtc/orion-context-broker-app-arm
   - docker logs gateway
