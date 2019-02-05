@@ -13,6 +13,7 @@
 [![](https://img.shields.io/docker/pulls/openmtc/gateway-amd64.svg)](https://hub.docker.com/u/openmtc)
 [![Build Status](https://travis-ci.org/OpenMTC/OpenMTC.svg?branch=master)](https://travis-ci.org/OpenMTC/OpenMTC)
 [![Known Vulnerabilities](https://snyk.io/test/github/OpenMTC/OpenMTC/badge.svg?targetFile=openmtc-gevent%2Frequirements.txt)](https://snyk.io/test/github/OpenMTC/OpenMTC?targetFile=openmtc-gevent%2Frequirements.txt)
+[![Coverage Status](https://coveralls.io/repos/github/OpenMTC/OpenMTC/badge.svg?branch=master)](https://coveralls.io/github/OpenMTC/OpenMTC?branch=master)
 
 The OpenMTC SDK aims to provide developers with a convenient yet flexible tool
 to write oneM2M compliant applications. This includes network applications
