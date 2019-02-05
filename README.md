@@ -30,6 +30,7 @@ check the FIWARE Catalogue entry for the
 -   [Usage](#usage)
 -   [API](#api)
 -   [Quality Assurance](#quality-assurance)
+-   [Contributing](#contributing)
 -   [License](#license)
 
 
@@ -91,7 +92,11 @@ follows:
 
 ---
 
-## Licence
+## Contributing
+
+Contribution guidelines are detailed in the [CONTRIBUTIONS](https://github.com/OpenMTC/OpenMTC/blob/master/CONTRIBUTIONS.md) file.
+
+## License
 
 The OpenMTC SDK is licensed under the Eclipse Public License (EPL)
 version 1.
