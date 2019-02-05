@@ -3,6 +3,7 @@ try:
 except ImportError:
     from urlparse import urljoin
 import logging
+from datetime import datetime
 
 import requests
 
@@ -92,7 +93,8 @@ class OrionAPI(LoggerMixin):
                 "type": self._get_type(data_senml["v"]),
                 "metadata": {
                     "timestamp": {
-                        "value": data_senml["t"],
+                        "value": datetime.fromtimestamp(float(data_senml["t"])).replace(microsecond=0).isoformat()
+                        if data_senml["t"] != "none" else data_senml["t"],
                         "type": "String"
                     },
                     "bn": {
