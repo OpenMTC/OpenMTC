@@ -1,36 +1,55 @@
 services:
-- docker
+  - docker
+dist: xenial
 before_script:
-- sudo apt update
-- sudo apt install qemu-user-static
-- "./create-binary-docker backend"
-- "./create-binary-docker backend -a arm"
-- "./create-binary-docker gateway"
-- "./create-binary-docker gateway -a arm"
-- "./create-binary-docker orioncontextbroker"
-- "./create-binary-docker orioncontextbroker -a arm"
-- "./create-binary-docker influxdbapp"
-- "./create-binary-docker influxdbapp -a arm"
-- "./create-binary-docker cul868ipe"
-- "./create-binary-docker cul868ipe -a arm"
+  - sudo apt update
+  - sudo apt install qemu-user-static python3 python3-pip python3-setuptools
+  - sudo pip3 install --upgrade pip
+  - sudo python3 -m pip install --upgrade setuptools
+  - sudo python3 -m pip install --upgrade pyresttest
+  - "./create-binary-docker backend"
+  - "./create-binary-docker backend -a arm"
+  - "./create-binary-docker gateway"
+  - "./create-binary-docker gateway -a arm"
+  - "./create-binary-docker orioncontextbroker"
+  - "./create-binary-docker orioncontextbroker -a arm"
+  - "./create-binary-docker influxdbapp"
+  - "./create-binary-docker influxdbapp -a arm"
+  - "./create-binary-docker cul868ipe"
+  - "./create-binary-docker cul868ipe -a arm"
+  - docker run -d --name backend -p 0.0.0.0:18000:18000 -e "ONEM2M_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" openmtc/backend-amd64 -v
+  - docker logs backend
+  - docker run -d --name gateway -p 0.0.0.0:8000:8000 -e "ONEM2M_HTTP_TRANSPORT_PORT=8000" -e "ONEM2M_CSE_ID=gateway" -e "ONEM2M_REMOTE_CSE_POA=<POA>" -e "ONEM2M_REMOTE_CSE_ID=backend" -e "ONEM2M_NOTIFICATION_DISABLED=false" -e "ONEM2M_REGISTRATION_DISABLED=false" openmtc/gateway-amd64 -v
+  - docker logs gateway
 script:
-- docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
-- docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
-- docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
-- docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
-- docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
-- docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
-- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-- docker push openmtc/backend-amd64
-- docker push openmtc/backend-arm
-- docker push openmtc/gateway-amd64
-- docker push openmtc/gateway-arm
-- docker push openmtc/orion-context-broker-app-amd64
-- docker push openmtc/orion-context-broker-app-arm
-- docker push openmtc/cul868-ipe-amd64
-- docker push openmtc/cul868-ipe-arm
-- docker push openmtc/influxdb-app-amd64
-- docker push openmtc/influxdb-app-arm
+  - docker tag openmtc/orioncontextbroker-amd64 openmtc/orion-context-broker-app-amd64
+  - docker tag openmtc/orioncontextbroker-arm openmtc/orion-context-broker-app-arm
+  - docker tag openmtc/cul868ipe-amd64 openmtc/cul868-ipe-amd64
+  - docker tag openmtc/cul868ipe-arm openmtc/cul868-ipe-arm
+  - docker tag openmtc/influxdbapp-amd64 openmtc/influxdb-app-amd64
+  - docker tag openmtc/influxdbapp-arm openmtc/influxdb-app-arm
+  - docker logs gateway
+  - docker logs backend
+after_script:
+  - pyresttest http://localhost:8000   tests/interoperability/basic.yaml
 env:
   matrix:
     secure: oQe/MxxFrPPArxb6OFzOUwG2ZlA5GYekMR6qn0Y3101v82MdrIVgDILHR41iwykTtk1XpJPV9uabsRsvY4hBmbjYzihYZFOAzFf+/KU7wROtKum0fFfLjCPb8uGV41k1JTquB94FibXboVAP7rNL0Vrpl+FGUvMGatQBtwZnGvha6Ha07qTao+X9+0dJ4YvFlvcba/jfzBZBwHw7KHpRoiyKU0dPmXpHcqnZBFcNqRXhzdVrgx0auP/tghoshW5LQWkpTV11uSx/kYuby4oo8r8nB6L0rW1jYSXs9DHiTQCfCy24xlb9YJjCD9aFcjH0lIkVIqQwJYA67MzKYMK4XV684J/Jr3+jfVOoUt0bpZaTnk+r/uiFCtEsN7q0KUlvHLUAi1YNJhKs6CRrAH3GK25QByh+suzPzZoHP42F2LYP9URlzbDH+/v7CwNuw+9pHSmxEhs18LVmggwkMos3o3ArvzMLRNJ3QG1fdoxL/Ubqxhmvhy4rZi6vGQsiF64oX8PN0sRgXekTU/ma+6CTM6qhgkocMUYzT2r/6qd/9R3jmtxSZnikjkR6Iu9NLzAUY+cqnvvjohAvqYyj+tGlQfOPxAU9H4wXnbQWLBM8yn6yt2Ki+3+Jx4Owdv0oXVJpN0GWjMzIJ1nEus5odkWW+c4wcZb6m3Ak0PrzYPp2BgE=
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push openmtc/backend-amd64;
+    docker push openmtc/backend-arm;
+    docker push openmtc/gateway-amd64;
+    docker push openmtc/gateway-arm;
+    docker push openmtc/orion-context-broker-app-amd64;
+    docker push openmtc/orion-context-broker-app-arm;
+    docker push openmtc/cul868-ipe-amd64;
+    docker push openmtc/cul868-ipe-arm;
+    docker push openmtc/influxdb-app-amd64;
+    docker push openmtc/influxdb-app-arm;
+    fi
+after_failure:
+  - docker logs backend
+  - docker logs gateway
+  - coveralls
