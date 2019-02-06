@@ -103,5 +103,5 @@ Contribution guidelines are detailed in the [CONTRIBUTIONS](https://github.com/O
 The OpenMTC SDK is licensed under the Eclipse Public License (EPL)
 version 1.
 
-© 2018 OpenMTC
+© 2018-2019 OpenMTC
 
