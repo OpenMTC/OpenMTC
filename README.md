@@ -24,6 +24,9 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for the
 [IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
 
+| :books: [Documentation](https://fiware-openmtc.readthedocs.io) | :page_facing_up: [Site](http://www.openmtc.org) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :dart: [Roadmap](roadmap.md) |
+|---|---|---|---|---|
+
 # Content
 
 -   [Install](#install)
