@@ -96,7 +96,7 @@ follows:
 
 ## Contributing
 
-Contribution guidelines are detailed in the [CONTRIBUTIONS](https://github.com/OpenMTC/OpenMTC/blob/master/CONTRIBUTIONS.md) file.
+Contribution guidelines are detailed in the [CONTRIBUTIONS](CONTRIBUTIONS.md) file.
 
 ## License
 
