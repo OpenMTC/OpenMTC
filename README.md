@@ -32,6 +32,7 @@ check the FIWARE Catalogue entry for the
 -   [Usage](#usage)
 -   [API](#api)
 -   [Quality Assurance](#quality-assurance)
+-   [Training](#training)
 -   [Contributing](#contributing)
 -   [License](#license)
 
@@ -93,6 +94,10 @@ follows:
     ![ ](https://img.shields.io/badge/dynamic/json.svg?label=Stability&url=https://fiware.github.io/catalogue/json/open_mtc.json&query=$.stability&colorB=blue)
 
 ---
+
+## Training  
+
+Some lessons on IPE Sensors, SDK and GUI Sensors can be found in our [Documentation](https://fiware-openmtc.readthedocs.io/en/latest/training/training-ipe-sensors/)
 
 ## Contributing
 
