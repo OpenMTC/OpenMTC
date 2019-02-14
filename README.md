@@ -36,7 +36,7 @@ check the FIWARE Catalogue entry for the
 -   [License](#license)
 
 
-## Install
+## Install 
 
 Information about how to install the JSON IoTAgent can be found at the
 corresponding section of the
