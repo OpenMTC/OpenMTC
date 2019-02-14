@@ -91,4 +91,4 @@ if __name__ == "__main__":
     from openmtc_app.flask_runner import SimpleFlaskRunner as Runner
 
     ep = "http://localhost:8000"
-    Runner(DataAggregation(), port=6050, host='auto').run(ep)
+    Runner(DataAggregation(poas=['http://localhost:21346'])).run(ep)

@@ -43,6 +43,6 @@ if __name__ == "__main__":
     from openmtc_app.flask_runner import SimpleFlaskRunner as Runner
 
     ep = "http://localhost:8000"
-    Runner(DataVisualization(), port=6050, host='auto').run(ep)
+    Runner(DataVisualization(poas=['http://localhost:21345'])).run(ep)
 
 
