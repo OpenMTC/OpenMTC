@@ -1,7 +1,7 @@
 import time
 from collections import namedtuple
 
-from cul_868_coordinator import CUL868Coordinator
+from .cul_868_coordinator import CUL868Coordinator
 from openmtc_app.onem2m import XAE
 from openmtc_onem2m.model import Container
 
@@ -44,7 +44,7 @@ class CUL868IPE(XAE):
 
         self.cul = CUL868Coordinator(device=device, sim=sim)
 
-        for d in map(lambda s: CULDevice(*s.split(":")[:2]), cul_devices):
+        for d in [CULDevice(*s.split(":")[:2]) for s in cul_devices]:
             if d.type == "fs20":
                 house_code, device_code = d.device_id.split("-")
                 self.fs20.append((house_code, device_code))
@@ -85,11 +85,11 @@ class CUL868IPE(XAE):
 
             if func:
                 sub_labels.append('openmtc:actuator_data')
-                sub_labels += map(lambda x: "openmtc:actuator_data:%s" % x, l) if l else []
+                sub_labels += ["openmtc:actuator_data:%s" % x for x in l] if l else []
                 sub_cnt = Container(resourceName=c_id, maxNrOfInstances=0, labels=sub_labels)
             else:
                 sub_labels.append('openmtc:sensor_data')
-                sub_labels += map(lambda x: "openmtc:sensor_data:%s" % x, l) if l else []
+                sub_labels += ["openmtc:sensor_data:%s" % x for x in l] if l else []
                 sub_cnt = Container(resourceName=c_id, labels=sub_labels)
 
             self.containers[s_id] = s_cnt = self.create_container(dev_cnt, sub_cnt)
@@ -123,7 +123,7 @@ class CUL868IPE(XAE):
     def _get_handle_switch(self, house_code, device_code):
 
         def handle_switch(container, content):
-            if isinstance(content, (str, unicode)):  # fallback to old behavior
+            if isinstance(content, str):  # fallback to old behavior
                 if content == 'TOGGLE':
                     self.cul.toggle(house_code, device_code)
                 elif content == 'ON':

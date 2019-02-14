@@ -8,11 +8,11 @@ from openmtc_onem2m.transport import OneM2MRequest, MetaInformation, \
     OneM2MOperation
 from openmtc_server.Plugin import Plugin
 from copy import deepcopy
-from openmtc_server.util.async import async_all
+from openmtc_server.util.async_ import async_all
 from re import sub
-from urlparse import urlparse
+from urllib.parse import urlparse
 # url join with coap compatibility
-from urlparse import urljoin, uses_relative, uses_netloc
+from urllib.parse import urljoin, uses_relative, uses_netloc
 
 uses_relative.append('coap')
 uses_netloc.append('coap')
@@ -77,7 +77,7 @@ class AnnouncementHandler(Plugin):
 
         return retrieve_remote_cse_list() \
             .then(
-            lambda remote_cse_list: async_all(map(get_cse, remote_cse_list))) \
+            lambda remote_cse_list: async_all(list(map(get_cse, remote_cse_list)))) \
             .then(handle_remote_cse_list) \
             .then(self._started)
         # return self._started()
@@ -277,8 +277,8 @@ class AnnouncementHandler(Plugin):
         # from the cseList and no further actions for those CSEs are performed.
         def check_cse_list():
             self.logger.debug("check_cse_list: %s vs %s" % (
-            db_cse_list, self._cse_links.values()))
-            return filter(lambda x: x in db_cse_list, self._cse_links.values())
+            db_cse_list, list(self._cse_links.values())))
+            return [x for x in list(self._cse_links.values()) if x in db_cse_list]
 
         # b) Send createXXXAnnouncementResourceRequestIndication (where XXX is
         # replaced by the type of the resource to be announced) for each CSE in
@@ -464,12 +464,12 @@ class AnnouncementHandler(Plugin):
 
             # filters out all False in the list
             def filter_func(l):
-                return filter(None, l)
+                return [_f for _f in l if _f]
 
             return async_all([
-                (async_all(map(create_func, create_list)).then(filter_func)
+                (async_all(list(map(create_func, create_list))).then(filter_func)
                  .then(lambda l: l + filtered_cses)),
-                async_all(map(delete_func, delete_list)).then(filter_func)
+                async_all(list(map(delete_func, delete_list))).then(filter_func)
             ])
 
         return send_anncs(check_cse_list())
@@ -597,7 +597,7 @@ class AnnouncementHandler(Plugin):
             # TODO: conversion to set()  is questionable
             update_list = [x for x in cse_list if x not in set(add_list)]
 
-            return async_all(map(send_update_annc_pre, update_list))
+            return async_all(list(map(send_update_annc_pre, update_list)))
 
         self.logger.debug('No attributes changed, returning None')
         return None

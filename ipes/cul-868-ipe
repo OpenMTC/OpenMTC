@@ -6,4 +6,4 @@ cd $(dirname ${0})
 
 cd CUL868IPE
 
-PYTHONPATH=${PYTHONPATH}:src exec python -m cul868ipe $@
+PYTHONPATH=${PYTHONPATH}:src exec python3 -m cul868ipe $@

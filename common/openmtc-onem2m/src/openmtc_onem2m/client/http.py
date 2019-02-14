@@ -1,11 +1,13 @@
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 import ssl
 from socket import (
     gaierror,
     error as socket_error,
 )
 from time import time
-from urlparse import urlparse
+from urllib.parse import urlparse
 from aplus import Promise
 from futile.caching import LRUCache
 from geventhttpclient.client import HTTPClient
@@ -145,7 +147,7 @@ class OneM2MHTTPClient(OneM2MClient):
             filter_criteria = onem2m_request.fc
             params.update({
                 (get_short_attribute_name(name) or get_short_member_name(name)): val
-                for name, val in filter_criteria.get_values(True).iteritems()
+                for name, val in filter_criteria.get_values(True).items()
             })
 
         if onem2m_request.ae_notifying:
@@ -154,7 +156,7 @@ class OneM2MHTTPClient(OneM2MClient):
             path = normalize_path(onem2m_request.to)
 
         if params:
-            path += '?' + urllib.urlencode(params, True)
+            path += '?' + urllib.parse.urlencode(params, True)
 
         content_type, data = encode_onem2m_content(onem2m_request.content, self.content_type, path=path)
 
@@ -165,7 +167,7 @@ class OneM2MHTTPClient(OneM2MClient):
 
         headers = {
             header: getattr(onem2m_request, field)
-            for header, field in _header_to_field_map.iteritems()
+            for header, field in _header_to_field_map.items()
             if getattr(onem2m_request, field) is not None
         }
         headers['content-type'] = content_type
@@ -201,7 +203,7 @@ class OneM2MHTTPClient(OneM2MClient):
             get_response_status(rsc),
             request=onem2m_request,
             rsc=rsc,
-            pc=decode_onem2m_content(response.read(), response.get("content-type"))
+            pc=decode_onem2m_content(response.read().decode("utf-8"), response.get("content-type"))
         )
 
     def send_onem2m_request(self, onem2m_request):

@@ -31,5 +31,6 @@ app_file=${app_array[$[${choice}-1]]}
 ################################################################################
 # run app_file
 cd ${base_path}
-. ../../common/prep-env.sh
-python ${app_file}
+cd ..
+. ../common/prep-env.sh
+python3 ${app_file}

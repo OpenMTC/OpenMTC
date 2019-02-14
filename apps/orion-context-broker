@@ -6,4 +6,4 @@ cd $(dirname ${0})
 
 cd OrionContextBroker
 
-PYTHONPATH=${PYTHONPATH}:src exec python -m orioncontextbroker $@
+PYTHONPATH=${PYTHONPATH}:src exec python3 -m orioncontextbroker $@

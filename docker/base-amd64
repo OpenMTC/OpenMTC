@@ -3,7 +3,7 @@
 ############################################################
 
 # Set the base image to use debian
-FROM debian:jessie
+FROM debian:stretch
 
 # Set the file maintainer
 MAINTAINER rst/tgu
@@ -20,8 +20,9 @@ RUN printf "Starting update...\n" && \
     build-essential \
     netbase \
     iproute2 \
-    python-pip \
-    python-dev \
+    python3-setuptools \
+    python3-pip \
+    python3-dev \
     jq > /dev/null && \
     apt-get clean && \
     printf "Installation and cleanup finished.\n"

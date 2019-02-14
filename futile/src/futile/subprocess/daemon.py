@@ -86,7 +86,7 @@ class CheckPIDFileController(DaemonController):
 		try:
 			os.kill(pid, 0)
 			return True
-		except OSError, e:
+		except OSError as e:
 			if e.errno == errno.ESRCH:
 				return False
 			raise

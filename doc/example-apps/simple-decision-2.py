@@ -19,4 +19,4 @@ if __name__ == "__main__":
     from openmtc_app.flask_runner import SimpleFlaskRunner as Runner
 
     ep = "http://localhost:8000"
-    Runner(SimpleDecision2(), port=6050, host='auto').run(ep)
+    Runner(SimpleDecision2(poas=['http://localhost:21387'])).run(ep)

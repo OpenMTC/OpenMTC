@@ -115,7 +115,7 @@ class mqttConnector(XAE):
         # check payload
         try:
             readings = json_decode(
-                base64decode(json_decode(payload)['m2m:cin']['con']))
+                base64decode(json_decode(payload)['m2m:cin']['con']).decode('utf-8'))
         except (ValueError, KeyError, TypeError):
             self.logger.error('Damaged payload; discarding')
             return

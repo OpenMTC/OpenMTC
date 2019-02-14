@@ -24,6 +24,8 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for the
 [IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
 
+| :books: [Documentation](https://fiware-openmtc.readthedocs.io) | :page_facing_up: [Site](http://www.openmtc.org) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :dart: [Roadmap](roadmap.md) |
+
 # Content
 
 -   [Install](#install)
@@ -34,7 +36,7 @@ check the FIWARE Catalogue entry for the
 -   [License](#license)
 
 
-## Install
+## Install 
 
 Information about how to install the JSON IoTAgent can be found at the
 corresponding section of the
@@ -94,12 +96,12 @@ follows:
 
 ## Contributing
 
-Contribution guidelines are detailed in the [CONTRIBUTIONS](https://github.com/OpenMTC/OpenMTC/blob/master/CONTRIBUTIONS.md) file.
+Contribution guidelines are detailed in the [CONTRIBUTIONS](CONTRIBUTIONS.md) file.
 
 ## License
 
 The OpenMTC SDK is licensed under the Eclipse Public License (EPL)
 version 1.
 
-© 2018 OpenMTC
+© 2018-2019 OpenMTC
 

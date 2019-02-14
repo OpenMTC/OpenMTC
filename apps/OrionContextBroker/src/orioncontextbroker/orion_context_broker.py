@@ -1,14 +1,11 @@
 import re
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flask import Flask, Response, request
 from gevent.pywsgi import WSGIServer
 
 from openmtc_app.onem2m import ResourceManagementXAE
-from orion_api import OrionAPI
+from .orion_api import OrionAPI
 
 
 class OrionContextBroker(ResourceManagementXAE):
@@ -20,7 +17,7 @@ class OrionContextBroker(ResourceManagementXAE):
                  *args,
                  **kw):
         super(OrionContextBroker, self).__init__(*args, **kw)
-        if isinstance(labels, basestring):
+        if isinstance(labels, str):
             self.labels = {labels}
         elif hasattr(labels, '__iter__'):
             self.labels = set(labels)
@@ -103,9 +100,8 @@ class OrionContextBroker(ResourceManagementXAE):
         device_type = "sensor" if sensor_info.get("sensor_labels",
                                                   None) else "actuator"
         try:
-            id_label = filter(
-                lambda x: (x.startswith('openmtc:id:')),
-                sensor_info['{}_labels'.format(device_type)]).pop()
+            id_label = [x for x in sensor_info['{}_labels'.format(device_type)]
+                        if x.startswith('openmtc:id:')].pop()
             cse_id, dev_id = re.sub('^openmtc:id:', '',
                                     id_label).split('/')[:2]
         except (IndexError, ValueError):

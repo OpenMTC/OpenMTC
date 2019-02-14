@@ -17,11 +17,11 @@ class MQTTTransportPlugin(Plugin):
         self._initialized()
 
     def _start(self):
-        self.api.register_onem2m_client(portmap.keys(), get_client)
+        self.api.register_onem2m_client(list(portmap.keys()), get_client)
         interface = self.config.get('interface', '127.0.0.1')
         port = self.config.get('port', 1883)
         try:
-            scheme = portmap.keys()[portmap.values().index(port)]
+            scheme = list(portmap.keys())[list(portmap.values()).index(port)]
         except (KeyError, ValueError):
             scheme = 'mqtt'
 

@@ -34,4 +34,4 @@ cd ${base_path}
 cd ..
 . ../common/prep-env.sh
 cd ${base_path}
-python ${app_file}
+python3 ${app_file}

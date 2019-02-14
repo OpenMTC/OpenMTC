@@ -38,20 +38,17 @@ parser.add_argument(
 args, config = prepare_app(parser, __loader__, __name__, "config.json")
 
 # variables
-nm = get_value("name", (unicode, str), default_name, args, config)
+nm = get_value("name", str, default_name, args, config)
 cb = config.get("cse_base", "onem2m")
-ep = get_value("ep", (unicode, str), default_ep, args, config)
+ep = get_value("ep", str, default_ep, args, config)
 poas = config.get("poas", ["http://auto:25396"])
 originator_pre = config.get("originator_pre", "//openmtc.org/mn-cse-1")
 ssl_certs = config.get("ssl_certs", {})
 interval = get_value("interval", int, default_ep, args, config)
 lbl = get_value("labels", list, default_labels, args, config)
-orion_host = get_value("orion_host", (unicode, str), default_orion_host, args,
-                       config)
-orion_api = get_value("orion_api", (unicode, str), default_orion_api, args,
-                      config)
-accumulate_address = get_value("accumulate_address", (unicode, str),
-                               default_accumulate_address, args, config)
+orion_host = get_value("orion_host", str, default_orion_host, args, config)
+orion_api = get_value("orion_api", str, default_orion_api, args, config)
+accumulate_address = get_value("accumulate_address", str, default_accumulate_address, args, config)
 
 # start
 app = OrionContextBroker(

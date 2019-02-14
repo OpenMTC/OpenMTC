@@ -1,3 +1,4 @@
+import platform
 import sys
 from logging import DEBUG
 from threading import Thread
@@ -6,8 +7,8 @@ from traceback import print_stack
 from futile.logging import LoggerMixin
 from openmtc.exc import OpenMTCError
 
-if sys.subversion[0] != "CPython":
-    from inspect import ismethod, getargspec
+if platform.python_implementation != "CPython":
+    from inspect import ismethod, getfullargspec
 
 # TODO: kca: can't pass in values for then/error currently
 
@@ -160,11 +161,11 @@ class Promise(LoggerMixin):
         """
         self._errbacks.append(f)
 
-    if sys.subversion[0] != "CPython":
+    if platform.python_implementation != "CPython":
         def _invoke(self, func, value):
             try:
                 if value is None:
-                    args, _, _, _ = getargspec(func)
+                    args = getfullargspec(func).args
                     arglen = len(args)
                     if not arglen or (arglen == 1 and ismethod(func)):
                         return func()
@@ -181,11 +182,11 @@ class Promise(LoggerMixin):
             try:
                 if value is None:
                     try:
-                        target = func.im_func
+                        target = func.__func__
                     except AttributeError:
-                        argcount = func.func_code.co_argcount
+                        argcount = func.__code__.co_argcount
                     else:
-                        argcount = target.func_code.co_argcount - 1
+                        argcount = target.__code__.co_argcount - 1
 
                     if argcount == 0:
                         return func()
@@ -365,7 +366,7 @@ def listPromise(*args):
             if not arg.isFulfilled():
                 return
 
-        value = map(lambda p: p.value, args)
+        value = [p.value for p in args]
         ret._fulfill(value)
 
     for arg in args:

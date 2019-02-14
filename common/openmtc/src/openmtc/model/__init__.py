@@ -5,7 +5,7 @@ from enum import Enum
 from iso8601 import parse_date, ParseError
 from operator import attrgetter
 
-from futile import basestring, issubclass, NOT_SET
+from futile import issubclass, NOT_SET
 from futile.logging import LoggerMixin
 from openmtc.model.exc import ModelError, ModelTypeError
 
@@ -26,7 +26,7 @@ class Collection(Sequence, Mapping):
 
     def __getitem__(self, index):
         if isinstance(index, (int, slice)):
-            return self._map.values()[index]
+            return list(self._map.values())[index]
         return self._map[index]
 
     def __contains__(self, v):
@@ -47,7 +47,7 @@ class Collection(Sequence, Mapping):
         return self._map.get(k, default)
 
     def __iter__(self):
-        return self._map.itervalues()
+        return iter(self._map.values())
 
     def __len__(self):
         return len(self._map)
@@ -76,7 +76,7 @@ class Collection(Sequence, Mapping):
 
 
 class Member(LoggerMixin):
-    def __init__(self, type=unicode, version="1.0", *args, **kw):
+    def __init__(self, type=str, version="1.0", *args, **kw):
         super(Member, self).__init__(*args, **kw)
         self.type = type
         self.version = version
@@ -109,7 +109,7 @@ class Attribute(Member):
     RO = "RO"
     WO = "WO"
 
-    def __init__(self, type=unicode, default=None,
+    def __init__(self, type=str, default=None,
                  accesstype=None, mandatory=None,
                  update_mandatory=None,
                  id_attribute=None, path_attribute=None,
@@ -157,24 +157,22 @@ class Attribute(Member):
             return self.default
 
 
-try:
-    unicode
+class BytesAttribute(Attribute):
+    def __init__(self, default=None, accesstype=None,
+                 mandatory=None, *args, **kw):
+        super(BytesAttribute, self).__init__(type=bytes,
+                                             default=default,
+                                             accesstype=accesstype,
+                                             mandatory=mandatory, *args,
+                                             **kw)
 
-    class UnicodeAttribute(Attribute):
-        def __init__(self, default=None, accesstype=None,
-                     mandatory=False, *args, **kw):
-            super(UnicodeAttribute, self).__init__(type=unicode,
-                                                   default=default,
-                                                   accesstype=accesstype,
-                                                   mandatory=mandatory, *args,
-                                                   **kw)
+    def convert(self, value, instance):
+        if isinstance(value, str):
+            return bytes(value, "utf-8")
+        return super(BytesAttribute, self).convert(value, instance)
 
-        def convert(self, value, instance):
-            if isinstance(value, str):
-                return value.decode("utf-8")
-            return super(UnicodeAttribute, self).convert(value, instance)
-except NameError:
-    UnicodeAttribute = Attribute
+
+UnicodeAttribute = Attribute
 
 
 class DatetimeAttribute(Attribute):
@@ -187,7 +185,7 @@ class DatetimeAttribute(Attribute):
                                                 **kw)
 
     def convert(self, value, instance):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 return parse_date(value)
             except ParseError as e:
@@ -196,7 +194,7 @@ class DatetimeAttribute(Attribute):
 
 
 class ListAttribute(Attribute):
-    def __init__(self, content_type=unicode, type=list,
+    def __init__(self, content_type=str, type=list,
                  default=NOT_SET, *args, **kw):
         super(ListAttribute, self).__init__(type=type,
                                             default=default, *args, **kw)
@@ -239,7 +237,7 @@ class ListAttribute(Attribute):
 
 
 class StringListAttribute(Attribute):
-    def __init__(self, content_type=unicode, type=list,
+    def __init__(self, content_type=str, type=list,
                  default=NOT_SET, *args, **kw):
         super(StringListAttribute, self).__init__(type=type, default=default,
                                                   *args, **kw)
@@ -427,24 +425,22 @@ class ResourceType(ABCMeta):
     # TODO: caching
     @property
     def attribute_names(self):
-        return map(attrgetter("name"), self.attributes)
+        return list(map(attrgetter("name"), self.attributes))
 
     @property
     def collection_names(self):
-        return map(attrgetter("name"), self.collections)
+        return list(map(attrgetter("name"), self.collections))
 
     @property
     def subresource_names(self):
-        return map(attrgetter("name"), self.subresources)
+        return list(map(attrgetter("name"), self.subresources))
 
     @property
     def member_names(self):
-        return map(attrgetter("name"), self.__members__)
+        return list(map(attrgetter("name"), self.__members__))
 
 
-class Entity(LoggerMixin):
-    __metaclass__ = ResourceType
-
+class Entity(LoggerMixin, metaclass=ResourceType):
     def __init__(self, *args, **kw):
         self.set_values(kw)
 
@@ -467,7 +463,7 @@ class Entity(LoggerMixin):
                     # TODO: proper solution?
                     if (v is not None and isinstance(member, ListAttribute) and
                             not isinstance(v, (list, tuple, set))):
-                        v = v.values()[0]
+                        v = list(v.values())[0]
                     setattr(self, member.name, v)
                 except KeyError:
                     pass
@@ -487,7 +483,7 @@ class Entity(LoggerMixin):
         """
         if values:
             raise ModelTypeError("%s resource has no attribute %s" %
-                                 (self.typename, values.keys()[0]))
+                                 (self.typename, list(values.keys())[0]))
 
     @classmethod
     def get_typename(cls):
@@ -569,7 +565,7 @@ class Resource(Entity):
     __model_version__ = None
 
     def __init__(self, path=None, parent=None, *args, **kw):
-        if path is not None and not isinstance(path, basestring):
+        if path is not None and not isinstance(path, str):
             raise TypeError(path)
         self.__path = path
         self.parent = parent
@@ -629,7 +625,7 @@ class Resource(Entity):
                 # FIXME: move into de-serializer and handle dicts
                 if (v is not None and isinstance(member, ListAttribute) and
                         not isinstance(v, (list, tuple, set))):
-                    v = v.values()[0]
+                    v = list(v.values())[0]
                 setattr(self, member.name, v)
             except KeyError:
                 try:
@@ -637,7 +633,7 @@ class Resource(Entity):
                     # TODO: proper solution?
                     if (v is not None and isinstance(member, ListAttribute) and
                             not isinstance(v, (list, tuple, set))):
-                        v = v.values()[0]
+                        v = list(v.values())[0]
                     setattr(self, member.name, v)
                 except KeyError:
                     pass
