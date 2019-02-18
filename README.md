@@ -6,14 +6,14 @@
 
 [![FIWARE IoT Agents](https://nexus.lab.fiware.org/static/badges/chapters/iot-agents.svg)](https://www.fiware.org/developers/catalogue/)
 [![License: Eclipse](https://img.shields.io/github/license/OpenMTC/OpenMTC.svg)](https://www.eclipse.org/legal/epl-v10.html)
+[![](https://img.shields.io/docker/pulls/openmtc/gateway-amd64.svg)](https://hub.docker.com/u/openmtc)
 [![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/iot-agents.svg)](https://stackoverflow.com/questions/tagged/fiware+iot)
 <br/>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-openmtc.svg)](http://fiware-openmtc.readthedocs.org/en/latest/?badge=latest)
-![Status](https://nexus.lab.fiware.org/static/badges/statuses/iot-openmtc.svg)
-[![](https://img.shields.io/docker/pulls/openmtc/gateway-amd64.svg)](https://hub.docker.com/u/openmtc)
 [![Build Status](https://travis-ci.org/OpenMTC/OpenMTC.svg?branch=master)](https://travis-ci.org/OpenMTC/OpenMTC)
-[![Known Vulnerabilities](https://snyk.io/test/github/OpenMTC/OpenMTC/badge.svg?targetFile=openmtc-gevent%2Frequirements.txt)](https://snyk.io/test/github/OpenMTC/OpenMTC?targetFile=openmtc-gevent%2Frequirements.txt)
 [![Coverage Status](https://coveralls.io/repos/github/OpenMTC/OpenMTC/badge.svg?branch=master)](https://coveralls.io/github/OpenMTC/OpenMTC?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/OpenMTC/OpenMTC/badge.svg?targetFile=openmtc-gevent%2Frequirements.txt)](https://snyk.io/test/github/OpenMTC/OpenMTC?targetFile=openmtc-gevent%2Frequirements.txt)
+![Status](https://nexus.lab.fiware.org/static/badges/statuses/iot-openmtc.svg)
 
 The OpenMTC SDK aims to provide developers with a convenient yet flexible tool
 to write oneM2M compliant applications. This includes network applications
@@ -25,6 +25,7 @@ check the FIWARE Catalogue entry for the
 [IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
 
 | :books: [Documentation](https://fiware-openmtc.readthedocs.io) | :page_facing_up: [Site](http://www.openmtc.org) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :dart: [Roadmap](roadmap.md) |
+|---|---|---|---|
 
 # Content
 
