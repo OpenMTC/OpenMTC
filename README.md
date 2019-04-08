@@ -31,6 +31,7 @@ check the FIWARE Catalogue entry for the
 -   [Install](#install)
 -   [Usage](#usage)
 -   [API](#api)
+-   [Training](#training)
 -   [Quality Assurance](#quality-assurance)
 -   [Contributing](#contributing)
 -   [License](#license)
@@ -46,6 +47,11 @@ corresponding section of the
 
 Information about how to use the IoT Agent can be found in the
 [User & Programmers Manual](https://fiware-openmtc.readthedocs.io/en/latest/introduction).
+
+## Training
+
+Information about our Training can be found in the
+[Training Section](https://fiware-openmtc.readthedocs.io/en/latest/training/training-ipe-sensors/index.html).
 
 ## API
 
@@ -96,7 +102,7 @@ follows:
 
 ## Contributing
 
-Contribution guidelines are detailed in the [CONTRIBUTIONS](CONTRIBUTIONS.md) file.
+Contribution guidelines are detailed in the [CREDITS](CREDITS.md) file.
 
 ## License
 
