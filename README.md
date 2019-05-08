@@ -24,7 +24,7 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for the
 [IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
 
-| :octocat: [Git Repository](https://github.com/OpenMTC/OpenMTC) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :books: [Documentation](https://fiware-openmtc.readthedocs.io/) | :page_facing_up: [Site](https://www.openmtc.org/) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/iot-agents/idas) |
+| :octocat: [Git Repository](https://github.com/OpenMTC/OpenMTC) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :books: [Documentation](https://fiware-openmtc.readthedocs.io/) | :page_facing_up: [Site](https://www.openmtc.org/) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/iot-agents/open-mtc) |
 | -------------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 
 # Content
