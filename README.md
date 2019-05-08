@@ -24,20 +24,21 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for the
 [IoT Agents](https://github.com/Fiware/catalogue/tree/master/iot-agents).
 
-| :books: [Documentation](https://fiware-openmtc.readthedocs.io) | :page_facing_up: [Site](http://www.openmtc.org) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :dart: [Roadmap](roadmap.md) |
-|---|---|---|---|
+| :octocat: [Git Repository](https://github.com/OpenMTC/OpenMTC) | :whale: [Docker Hub](https://hub.docker.com/u/openmtc) | :books: [Documentation](https://fiware-openmtc.readthedocs.io/) | :page_facing_up: [Site](https://www.openmtc.org/) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/iot-agents/idas) |
+| -------------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 
 # Content
 
 -   [Install](#install)
 -   [Usage](#usage)
 -   [API](#api)
+-   [Training](#training)
 -   [Quality Assurance](#quality-assurance)
 -   [Contributing](#contributing)
 -   [License](#license)
 
 
-## Install 
+## Install
 
 Information about how to install the JSON IoTAgent can be found at the
 corresponding section of the
@@ -47,6 +48,11 @@ corresponding section of the
 
 Information about how to use the IoT Agent can be found in the
 [User & Programmers Manual](https://fiware-openmtc.readthedocs.io/en/latest/introduction).
+
+## Training
+
+Information about our Training can be found in the
+[Training Section](https://fiware-openmtc.readthedocs.io/en/latest/training/training-ipe-sensors/index.html).
 
 ## API
 
@@ -97,7 +103,7 @@ follows:
 
 ## Contributing
 
-Contribution guidelines are detailed in the [CONTRIBUTIONS](CONTRIBUTIONS.md) file.
+Contribution guidelines are detailed in the [CREDITS](CREDITS.md) file.
 
 ## License
 
