@@ -18,12 +18,12 @@ SETUP_LICENSE = "Fraunhofer FOKUS proprietary"
 
 # requirements
 SETUP_REQUIRES = [
-    "urllib3", "gevent (>=1.0)", "iso8601 (>=0.1.5)", "werkzeug (>=0.9)",
+    "urllib3", "gevent (>=1.0)", "iso8601 (>=0.1.5)", "werkzeug (==0.16)",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
     "flask", "enum34", "geventhttpclient"
 ]
 SETUP_INSTALL_REQUIRES = [
-    "urllib3", "gevent >= 1.0", "iso8601 >= 0.1.5", "werkzeug >= 0.9",
+    "urllib3", "gevent >= 1.0", "iso8601 >= 0.1.5", "werkzeug == 0.16",
     "blist", "simplejson", "ujson", "python_socketio", "gevent_websocket",
     "flask", "enum34", "geventhttpclient"
 ]
