@@ -371,8 +371,8 @@ def main(default_config_file, is_gateway):
     openmtc_server.api.events = Api.events
 
     shutdown_event = GEventEvent()
-    gevent.signal(signal.SIGTERM, shutdown_event.set)
-    gevent.signal(signal.SIGINT, shutdown_event.set)
+    signal.signal(signal.SIGTERM, shutdown_event.set)
+    signal.signal(signal.SIGINT, shutdown_event.set)
 
     try:
         init_component(otd, Api)
