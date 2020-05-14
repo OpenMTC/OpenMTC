@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-base_path=$(dirname "$(readlink -f "${0}")")
+base_path=$(dirname "$(greadlink -f "${0}")")
 
 ################################################################################
 # set app_file
