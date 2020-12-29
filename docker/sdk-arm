@@ -11,11 +11,11 @@ ENV MOD_NAME=sdk
 MAINTAINER rst/tgu
 
 # update pip to latest version
-RUN pip3 install --upgrade pip setuptools
+RUN pip3 install --no-cache-dir --upgrade pip setuptools
 
 # install openmtc dependencies
 COPY tmp/$MOD_NAME-dependencies.txt /tmp/requirements.txt
-RUN pip3 install --upgrade --requirement /tmp/requirements.txt
+RUN pip3 install --no-cache-dir --upgrade --requirement /tmp/requirements.txt
 
 # install openmtc-sdk
 COPY tmp/openmtc-$MOD_NAME.tar.gz /tmp/openmtc-$MOD_NAME.tar.gz
