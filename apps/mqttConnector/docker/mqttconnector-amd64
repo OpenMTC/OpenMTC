@@ -12,7 +12,7 @@ MAINTAINER rst
 
 # install openmtc dependencies
 COPY tmp/$MOD_NAME-dependencies.txt /tmp/requirements.txt
-RUN pip install --upgrade --requirement /tmp/requirements.txt
+RUN pip install --no-cache-dir --upgrade --requirement /tmp/requirements.txt
 
 # install openmtc-mqttconnector
 COPY tmp/openmtc-$MOD_NAME.tar.gz /tmp/openmtc-$MOD_NAME.tar.gz
