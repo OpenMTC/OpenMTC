@@ -1,0 +1,19 @@
+{
+    "enabler": "OpenMTC",
+    "chapter": "iotagents",
+    "academy": "",
+    "readthedocs": "fiware-openmtc",
+    "helpdesk": "",
+    "coveralls": "",
+    "github": ["OpenMTC/OpenMTC"],
+    "dockerregistry": ["hub.docker.com"],
+    "docker": ["openmtc/orion-context-broker-app-arm"],
+    "email": "",
+    "status": "incubating",
+    "compose": "",
+    "exclude": [""],
+    "stackexchange": ["fiware+iot"],
+    "unit-test": "",
+    "smoke-test": "",
+    "dockerfile": "https://github.com/OpenMTC/OpenMTC/blob/master/docker/backend-arm"
+}
