@@ -1,1 +1,27 @@
-dependencies.txt
+# Don't install via the operating system's package manager
+# Install all dependencies via the "pip" tool
+# e.g. $ sudo pip install urllib3
+# or   $ sudo pip install --requirement dependencies.txt
+
+urllib3
+gevent>=1.1
+iso8601>=0.1.5
+werkzeug>=0.9
+funcy
+netifaces
+decorator
+mimeparse
+gevent_websocket
+python_socketio>=1.7.5
+flask
+geventhttpclient
+enum34
+blist
+simplejson
+ujson
+pymongo
+paho-mqtt
+coapthon
+rdflib
+yapps
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
